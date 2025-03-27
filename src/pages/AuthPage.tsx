@@ -14,7 +14,7 @@ export default function AuthPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <img
-        src="/public/GainPlay.png"
+        src="/GainPlay.png"
         alt="GainPlay Logo"
         width={200}
         height={200}
