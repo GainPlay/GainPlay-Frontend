@@ -14,7 +14,7 @@ export default function AuthPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <img
-        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/GainPlay%20(1)-yTMtfbwYJZTFXppHMRfXy6DGhEyzCj.png"
+        src="/public/GainPlay.png"
         alt="GainPlay Logo"
         width={200}
         height={200}
