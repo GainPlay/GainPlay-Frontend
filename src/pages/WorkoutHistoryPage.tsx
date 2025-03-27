@@ -31,7 +31,7 @@ import {
 } from "../components/ui/collapsible";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { workoutService } from "../services/workoutService";
-import type { UserData } from "../types";
+import type { UserData } from "@/types";
 
 type WorkoutHistoryItem = {
   date: string;
