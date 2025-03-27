@@ -34,6 +34,7 @@ export default function FriendsPage({
 
   useEffect(() => {
     handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, selectedGoals, userData]);
 
   const handleSearch = () => {

@@ -74,7 +74,8 @@ interface CartPageProps {
   updateUserData: (newData: Partial<UserData>) => void;
 }
 
-export default function CartPage({ userData, updateUserData }: CartPageProps) {
+// eslint-disable-next-line no-empty-pattern
+export default function CartPage({}: CartPageProps) {
   const navigate = useNavigate();
   const [coins, setCoins] = useState(0);
   const [ownedAvatars, setOwnedAvatars] = useState<string[]>([]);

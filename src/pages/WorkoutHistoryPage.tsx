@@ -47,10 +47,8 @@ interface WorkoutHistoryPageProps {
   updateUserData: (newData: Partial<UserData>) => void;
 }
 
-export default function WorkoutHistoryPage({
-  userData,
-  updateUserData
-}: WorkoutHistoryPageProps) {
+// eslint-disable-next-line no-empty-pattern
+export default function WorkoutHistoryPage({}: WorkoutHistoryPageProps) {
   const navigate = useNavigate();
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistoryItem[]>(
     []

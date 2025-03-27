@@ -39,7 +39,7 @@ export default function ProfilePage({
   const [editedGoals, setEditedGoals] = useState<{ [key: string]: number }>(
     userData.goals
   );
-  const [ownedAvatars, setOwnedAvatars] = useState<string[]>([]);
+  const [ownedAvatars] = useState<string[]>([]);
 
   const handleSave = () => {
     const updatedUserData = {

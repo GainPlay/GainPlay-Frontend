@@ -32,7 +32,8 @@ interface HomePageProps {
   updateUserData: (newData: Partial<UserData>) => void;
 }
 
-export default function HomePage({ userData, updateUserData }: HomePageProps) {
+// eslint-disable-next-line no-empty-pattern
+export default function HomePage({}: HomePageProps) {
   const navigate = useNavigate();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [showMaxSetsAlert, setShowMaxSetsAlert] = useState(false);
@@ -44,7 +45,7 @@ export default function HomePage({ userData, updateUserData }: HomePageProps) {
   const [activeExerciseIndex, setActiveExerciseIndex] = useState<number | null>(
     null
   );
-  const [windowDimensions, setWindowDimensions] = useState({
+  const [, setWindowDimensions] = useState({
     width: 0,
     height: 0
   });
