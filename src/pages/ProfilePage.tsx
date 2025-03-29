@@ -1,27 +1,27 @@
-import { useState } from "react";
+import { avatarService } from "@/services/avatarService";
+import {
+  ArrowLeft,
+  Check,
+  Coins,
+  Edit,
+  Target,
+  Trophy,
+  User,
+  UserCheck,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "../components/ui/card";
-import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Progress } from "../components/ui/progress";
-import {
-  ArrowLeft,
-  Trophy,
-  Target,
-  User,
-  Edit,
-  Check,
-  Coins,
-  UserCheck
-} from "lucide-react";
 import { Slider } from "../components/ui/slider";
-import type { UserData } from "../types";
-import { avatars } from "../data/mockData";
+import type { Avatar, UserData } from "../types";
 
 interface ProfilePageProps {
   userData: UserData;
@@ -30,7 +30,7 @@ interface ProfilePageProps {
 
 export default function ProfilePage({
   userData,
-  updateUserData
+  updateUserData,
 }: ProfilePageProps) {
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
@@ -40,12 +40,13 @@ export default function ProfilePage({
     userData.goals
   );
   const [ownedAvatars] = useState<string[]>([]);
+  const [avatars, setAvatars] = useState<Avatar[]>([]);
 
   const handleSave = () => {
     const updatedUserData = {
       name: editedName,
       email: editedEmail,
-      goals: editedGoals
+      goals: editedGoals,
     };
     updateUserData(updatedUserData);
     setEditMode(false);
@@ -55,6 +56,20 @@ export default function ProfilePage({
     updateUserData({ avatar: newAvatar });
     localStorage.setItem("currentAvatar", newAvatar);
   };
+
+  useEffect(() => {
+    const fetchAvatars = async () => {
+      try {
+        const avatarsData = await avatarService.getAvatars();
+
+        setAvatars(avatarsData);
+      } catch (error) {
+        console.log("Failed to fetch avatarsData");
+      }
+    };
+
+    fetchAvatars();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-purple-100 p-4 pb-20">

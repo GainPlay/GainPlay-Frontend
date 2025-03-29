@@ -1,34 +1,39 @@
+import { useEffect, useState } from "react";
 import {
+  Navigate,
+  Route,
   BrowserRouter as Router,
   Routes,
-  Route,
-  Navigate
 } from "react-router-dom";
-import { useState, useEffect } from "react";
+import Navigation from "./components/Navigation";
 import { Toaster } from "./components/ui/toaster";
 import AuthPage from "./pages/AuthPage";
+import CartPage from "./pages/CartPage";
+import FriendsPage from "./pages/FriendsPage";
 import HomePage from "./pages/HomePage";
 import OnboardingPage from "./pages/OnboardingPage";
-import CartPage from "./pages/CartPage";
 import ProfilePage from "./pages/ProfilePage";
-import FriendsPage from "./pages/FriendsPage";
-import WorkoutHistoryPage from "./pages/WorkoutHistoryPage";
 import UserProfilePage from "./pages/UserProfilePage";
-import Navigation from "./components/Navigation";
+import WorkoutHistoryPage from "./pages/WorkoutHistoryPage";
+import { userService } from "./services/userService";
 import type { UserData } from "./types";
-import { defaultUserData } from "./data/mockData";
 
 function App() {
   const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
-    const storedUserData = localStorage.getItem("userData");
-    if (storedUserData) {
-      setUserData(JSON.parse(storedUserData));
-    } else {
-      setUserData(defaultUserData);
-      localStorage.setItem("userData", JSON.stringify(defaultUserData));
-    }
+    const fetchData = async () => {
+      const storedUserData = localStorage.getItem("userData");
+      if (storedUserData) {
+        setUserData(JSON.parse(storedUserData));
+      } else {
+        const user = await userService.getUserData();
+        setUserData(user);
+        localStorage.setItem("userData", JSON.stringify(user));
+      }
+    };
+
+    fetchData();
   }, []);
 
   const updateUserData = (newData: Partial<UserData>) => {
