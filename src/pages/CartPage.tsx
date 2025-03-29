@@ -18,6 +18,57 @@ type Avatar = {
   price: number;
 };
 
+const avatars: Avatar[] = [
+  {
+    id: "1",
+    name: "Sporty Spice",
+    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Sporty",
+    price: 100,
+  },
+  {
+    id: "2",
+    name: "Zen Master",
+    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Zen",
+    price: 150,
+  },
+  {
+    id: "3",
+    name: "Power Lifter",
+    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Power",
+    price: 200,
+  },
+  {
+    id: "4",
+    name: "Yoga Guru",
+    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Yoga",
+    price: 250,
+  },
+  {
+    id: "5",
+    name: "Runner",
+    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Runner",
+    price: 300,
+  },
+  {
+    id: "6",
+    name: "Swimmer",
+    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Swimmer",
+    price: 350,
+  },
+  {
+    id: "7",
+    name: "Cyclist",
+    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Cyclist",
+    price: 400,
+  },
+  {
+    id: "8",
+    name: "Boxer",
+    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Boxer",
+    price: 450,
+  },
+];
+
 interface CartPageProps {
   userData: UserData;
   updateUserData: (newData: Partial<UserData>) => void;
