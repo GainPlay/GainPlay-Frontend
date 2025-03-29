@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Checkbox } from "../components/ui/checkbox";
+import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { friends as initialFriends, allGoals } from "../data/mockData";
-import type { Friend, UserData } from "../types";
 import { toast } from "../hooks/use-toast";
+import type { Friend, UserData } from "../types";
 
 interface FriendsPageProps {
   userData: UserData;
@@ -21,44 +21,58 @@ export default function FriendsPage({
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
-  const [filteredFriends, setFilteredFriends] =
-    useState<Friend[]>(initialFriends);
+  const [filteredFriends, setFilteredFriends] = useState<Friend[]>([]);
+  const [goals, setGoals] = useState<string[]>([]);
+
+  const getAllGoals = (): Promise<string[]> => {
+    return axios
+      .get("/api/goals")
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error("Error fetching goals data:", error);
+        throw error;
+      });
+  };
+
+  const getFriendsData = (): Promise<Friend[] | null> => {
+    return axios
+      .get<Friend[]>("/api/friends")
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error("Error fetching friends data:", error);
+        return null;
+      });
+  };
 
   useEffect(() => {
-    const updatedFriends = initialFriends.map((friend) => ({
-      ...friend,
-      isFriend: userData.friends.some((f: Friend) => f.id === friend.id),
-    }));
-    setFilteredFriends(updatedFriends);
+    const fetchData = async () => {
+      const initialFriends = await getFriendsData();
+      if (initialFriends) {
+        const updatedFriends = initialFriends.map((friend: Friend) => ({
+          ...friend,
+          isFriend: userData.friends.some((f: Friend) => f.id === friend.id),
+        }));
+        setFilteredFriends(updatedFriends);
+      } else {
+        setFilteredFriends([]);
+      }
+    };
+
+    fetchData();
   }, [userData]);
 
   useEffect(() => {
-    handleSearch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, selectedGoals, userData]);
+    const fetchGoals = async () => {
+      try {
+        const goalsData = await getAllGoals();
+        setGoals(goalsData);
+      } catch (error) {
+        console.log("Failed to fetch goals");
+      }
+    };
 
-  const handleSearch = () => {
-    const filtered = initialFriends
-      .map((friend) => ({
-        ...friend,
-        isFriend: userData
-          ? userData.friends.some((f) => f.id === friend.id)
-          : friend.isFriend,
-      }))
-      .filter((friend) => {
-        const nameMatch = friend.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        const emailMatch = friend.email
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        const goalsMatch =
-          selectedGoals.length === 0 ||
-          selectedGoals.some((goal) => friend.goals.includes(goal));
-        return (nameMatch || emailMatch) && goalsMatch;
-      });
-    setFilteredFriends(filtered);
-  };
+    fetchGoals();
+  }, []);
 
   const handleGoalToggle = (goal: string) => {
     setSelectedGoals((prev) =>
@@ -102,7 +116,7 @@ export default function FriendsPage({
           className="w-full"
         />
         <div className="flex flex-wrap gap-2">
-          {allGoals.map((goal) => (
+          {goals.map((goal) => (
             <div key={goal} className="flex items-center">
               <Checkbox
                 id={goal}
