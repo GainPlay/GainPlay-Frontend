@@ -25,17 +25,14 @@ export default function OnboardingPage() {
     if (currentGoal < goals.length - 1) {
       setCurrentGoal(currentGoal + 1);
     } else {
-      const userGoals = answers.map<Partial<UserGoal>>((currentAnswer, index) => {
-        return { goalId: goals[index].id, value: currentAnswer.value };
-      });
-      await userService.saveUserGoals(userGoals);
+      await userService.saveUserGoals(answers);
       navigate("/home");
     }
   };
 
   const handleAnswer = (value: number[]) => {
     const newAnswers = [...answers];
-    newAnswers[currentGoal] = { goalId: goals[currentGoal].id, value: value[0] };
+    newAnswers[currentGoal] = { goalId: goals[currentGoal].id, name:goals[currentGoal].name, value: value[0] };
     setAnswers(newAnswers);
   };
 

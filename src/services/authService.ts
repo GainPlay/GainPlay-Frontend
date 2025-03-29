@@ -73,12 +73,20 @@ export const signup = async (
   email: string,
   withCreation = true
 ): Promise<AxiosResponse<SignupResponse>> => {
-  return await apiClient.post("TODO", {
-    username,
-    email,
-    password,
-    withCreation
-  });
+//   return await apiClient.post("TODO", {
+//     username,
+//     email,
+//     password,
+//     withCreation
+//   });
+
+return {
+  data: {
+    username: 'etay',
+    email: 'mudachi',
+    password: '123'
+  }
+} as AxiosResponse<SignupResponse>;
 };
 
 export const googleSignIn = async (

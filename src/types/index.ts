@@ -51,6 +51,7 @@ export type UserGoal = {
   id: number;
   userId: number;
   goalId: number;
+  name: string;
   value: number;
   createdAt: Date;
   updatedAt: Date;
