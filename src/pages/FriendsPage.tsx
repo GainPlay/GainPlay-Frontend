@@ -5,9 +5,10 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Checkbox } from "../components/ui/checkbox";
 import { Label } from "../components/ui/label";
-import { friends as initialFriends, allGoals } from "../data/mockData";
+import { allGoals } from "../data/mockData";
 import type { Friend, UserData } from "../types";
 import { toast } from "../hooks/use-toast";
+import { userService } from "@/services/userService";
 
 interface FriendsPageProps {
   userData: UserData;
@@ -21,15 +22,23 @@ export default function FriendsPage({
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
-  const [filteredFriends, setFilteredFriends] =
-    useState<Friend[]>(initialFriends);
+  const [filteredFriends, setFilteredFriends] = useState<Friend[]>([]);
 
   useEffect(() => {
-    const updatedFriends = initialFriends.map((friend) => ({
-      ...friend,
-      isFriend: userData.friends.some((f: Friend) => f.id === friend.id),
-    }));
-    setFilteredFriends(updatedFriends);
+    const fetchData = async () => {
+      const initialFriends = await userService.getFriends();
+      if (initialFriends) {
+        const updatedFriends = initialFriends.map((friend) => ({
+          ...friend,
+          isFriend: userData.friends.some((f: Friend) => f.id === friend.id),
+        }));
+        setFilteredFriends(updatedFriends);
+      } else {
+        setFilteredFriends([]);
+      }
+    };
+
+    fetchData();
   }, [userData]);
 
   useEffect(() => {
@@ -38,7 +47,7 @@ export default function FriendsPage({
   }, [searchTerm, selectedGoals, userData]);
 
   const handleSearch = () => {
-    const filtered = initialFriends
+    const filtered = filteredFriends
       .map((friend) => ({
         ...friend,
         isFriend: userData
