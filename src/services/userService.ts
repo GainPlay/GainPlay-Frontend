@@ -47,7 +47,7 @@ export const userService = {
   },
   saveUserGoals: async (userGoals: Partial<UserGoal>[]): Promise<void> => {
     try {
-      apiClient.post("/workout/generate", userGoals);
+      apiClient.post("api/workout/generate", userGoals);
     } catch (error) {
       throw error;
     }
