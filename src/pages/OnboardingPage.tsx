@@ -25,14 +25,40 @@ export default function OnboardingPage() {
     if (currentGoal < goals.length - 1) {
       setCurrentGoal(currentGoal + 1);
     } else {
-     const workout = await userService.saveUserGoals(answers);
-      navigate("/home");
+      try {
+        const interval = setInterval(async () => {
+          const workout = await userService.saveUserGoals(answers);
+
+          // Example: Stop when workout is non-empty
+          console.log(workout);
+          console.log(workout.length);
+
+          if (workout.length > 0) {
+            clearInterval(interval); // stop the loop
+
+            const formatedWorkout = workout.map((item) => ({
+              ...item,
+              sets: Array(item.targetSets).fill({ completed: false, reps: 0 }),
+              currentSet: 0,
+              currentReps: 0,
+            }));
+
+            navigate("/home", {
+              state: {
+                workoutJson: JSON.stringify(formatedWorkout),
+              },
+            });
+          }
+        }, 500);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
   const handleAnswer = (value: number[]) => {
     const newAnswers = [...answers];
-    newAnswers[currentGoal] = { goalId: goals[currentGoal].id, name:goals[currentGoal].name, value: value[0] };
+    newAnswers[currentGoal] = { goalId: goals[currentGoal].id, name: goals[currentGoal].name, value: value[0] };
     setAnswers(newAnswers);
   };
 

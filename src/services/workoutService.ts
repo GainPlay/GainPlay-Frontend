@@ -36,7 +36,7 @@ export const workoutService = {
         const completedWorkout = {
           date: new Date().toISOString(),
           exercises: workout.map((exercise) => ({
-            name: exercise.name,
+            name: exercise.exerciseName,
             sets: exercise.sets,
             totalReps: exercise.sets.reduce((total, set) => total + set.reps, 0),
           })),

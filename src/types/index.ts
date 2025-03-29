@@ -1,7 +1,9 @@
 export type Exercise = {
-  name: string;
+  exerciseId: number;
+  exerciseName: string;
   targetSets: number;
   targetReps: number;
+  restTimeSeconds: number;
   sets: Array<{ completed: boolean; reps: number }>;
   currentSet: number;
   currentReps: number;
