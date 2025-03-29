@@ -1,21 +1,43 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "../components/ui/card";
 import { Slider } from "../components/ui/slider";
-import { onboardingQuestions } from "../data/mockData";
-
-const questions = onboardingQuestions;
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [questions, setQuestions] = useState<string[]>([]);
   const [answers, setAnswers] = useState(Array(questions.length).fill(5));
+
+  const getOnboardingQuestions = (): Promise<string[] | null> => {
+    return axios
+      .get<string[]>("/api/badges")
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error("Error fetching Onboarding Questions data:", error);
+        return null;
+      });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const initialQuestions = await getOnboardingQuestions();
+      if (initialQuestions) {
+        setQuestions(initialQuestions);
+      } else {
+        setQuestions([]);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
@@ -29,7 +51,7 @@ export default function OnboardingPage() {
           "Improve Flexibility": answers[1],
           "Increase Stamina": answers[2],
           "Exercise Frequency": answers[3],
-          "Current Fitness Level": answers[4]
+          "Current Fitness Level": answers[4],
         })
       );
       navigate("/home");
