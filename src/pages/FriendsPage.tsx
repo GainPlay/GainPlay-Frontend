@@ -7,7 +7,7 @@ import { Checkbox } from "../components/ui/checkbox";
 import { Label } from "../components/ui/label";
 import { friends as initialFriends, allGoals } from "../data/mockData";
 import type { Friend, UserData } from "../types";
-import { toast } from "../components/ui/use-toast";
+import { toast } from "../hooks/use-toast";
 
 interface FriendsPageProps {
   userData: UserData;
