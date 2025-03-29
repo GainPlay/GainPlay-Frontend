@@ -1,5 +1,5 @@
 import type { WorkoutHistoryItem, Exercise, Goal } from "../types";
-import { initialExercises, onboardingQuestions } from "../data/mockData";
+import { initialExercises } from "../data/mockData";
 import apiClient from "./apiClient";
 
 export const workoutService = {
