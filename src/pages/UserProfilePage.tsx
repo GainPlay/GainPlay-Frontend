@@ -11,7 +11,7 @@ import { Progress } from "../components/ui/progress";
 import { ArrowLeft, Trophy, Target, UserCheck } from "lucide-react";
 import type { Friend, Badge, UserData } from "../types";
 import { friends, badges } from "../data/mockData";
-import { toast } from "../components/ui/use-toast";
+import { toast } from "../hooks/use-toast";
 
 interface UserProfilePageProps {
   userData: UserData;
