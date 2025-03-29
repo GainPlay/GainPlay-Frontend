@@ -1,4 +1,4 @@
-import type { Exercise, Avatar, Badge, Friend, UserData } from "../types"
+import type { Exercise, Avatar, Badge, Friend, UserData, Goal } from "../types";
 
 export const avatars: Avatar[] = [
   { id: "1", name: "Sporty Spice", image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Sporty", price: 100 },
@@ -9,7 +9,7 @@ export const avatars: Avatar[] = [
   { id: "6", name: "Swimmer", image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Swimmer", price: 350 },
   { id: "7", name: "Cyclist", image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Cyclist", price: 400 },
   { id: "8", name: "Boxer", image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Boxer", price: 450 },
-]
+];
 
 export const badges: Badge[] = [
   { id: "1", name: "Early Bird", icon: "🌅" },
@@ -17,7 +17,7 @@ export const badges: Badge[] = [
   { id: "3", name: "Consistency King", icon: "👑" },
   { id: "4", name: "Muscle Master", icon: "💪" },
   { id: "5", name: "Cardio Crusher", icon: "🏃" },
-]
+];
 
 export const friends: Friend[] = [
   {
@@ -100,9 +100,9 @@ export const friends: Friend[] = [
     level: 6,
     isFriend: false,
   },
-]
+];
 
-export const allGoals = ["Gain Muscle", "Lose Weight", "Improve Flexibility", "Increase Stamina"]
+export const allGoals = ["Gain Muscle", "Lose Weight", "Improve Flexibility", "Increase Stamina"];
 
 export const initialExercises: Exercise[] = [
   {
@@ -129,15 +129,23 @@ export const initialExercises: Exercise[] = [
     currentSet: 0,
     currentReps: 0,
   },
-]
+];
 
-export const onboardingQuestions = [
-  "How much would you like to gain muscle?",
-  "How important is improving flexibility to you?",
-  "How much would you like to increase your stamina?",
-  "How often do you exercise per week?",
-  "How would you rate your current fitness level?",
-]
+export const onboardingQuestions: Goal[] = [
+  { id: 1, name: "muscle gain", description: "How much would you like to gain muscle?", createdAt: new Date() },
+  {
+    id: 2,
+    name: "flexibility improvment",
+    description: "How important is improving flexibility to you?",
+    createdAt: new Date(),
+  },
+  {
+    id: 3,
+    name: "stamina increasement",
+    description: "How much would you like to increase your stamina?",
+    createdAt: new Date(),
+  },
+];
 
 export const defaultUserData: UserData = {
   name: "John Doe",
@@ -151,5 +159,4 @@ export const defaultUserData: UserData = {
   },
   badges: badges.slice(0, 3),
   friends: [friends[0], friends[1]],
-}
-
+};

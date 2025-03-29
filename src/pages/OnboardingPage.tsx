@@ -1,27 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from "../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Slider } from "../components/ui/slider";
-import { onboardingQuestions } from "../data/mockData";
-
-const questions = onboardingQuestions;
+import { Goal, UserGoal } from "@/types";
+import { workoutService } from "@/services/workoutService";
+import { userService } from "@/services/userService";
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState(Array(questions.length).fill(5));
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [currentGoal, setCurrentGoal] = useState(0);
+  const [answers, setAnswers] = useState(Array(goals.length).fill(5));
+
+  useEffect(() => {
+    const fetchGoals = async (): Promise<void> => {
+      const fetchedGoals = await workoutService.getGoals();
+      setGoals(fetchedGoals);
+    };
+    fetchGoals();
+  }, []);
 
   const handleNext = () => {
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
+    if (currentGoal < goals.length - 1) {
+      setCurrentGoal(currentGoal + 1);
     } else {
       // Save answers and redirect to home page
+      const userGoals = answers.map((currentAnswer, index) => {
+        return { goalId: goals[index].id, value: currentAnswer };
+      });
+
       localStorage.setItem(
         "userGoals",
         JSON.stringify({
@@ -29,7 +37,7 @@ export default function OnboardingPage() {
           "Improve Flexibility": answers[1],
           "Increase Stamina": answers[2],
           "Exercise Frequency": answers[3],
-          "Current Fitness Level": answers[4]
+          "Current Fitness Level": answers[4],
         })
       );
       navigate("/home");
@@ -40,19 +48,15 @@ export default function OnboardingPage() {
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-purple-100">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center text-purple-800">
-            Let's Get to Know You!
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold text-center text-purple-800">Let's Get to Know You!</CardTitle>
         </CardHeader>
         <CardContent>
-          <h2 className="text-xl mb-4 text-purple-700">
-            {questions[currentQuestion]}
-          </h2>
+          <h2 className="text-xl mb-4 text-purple-700">{goals[currentGoal]?.description}</h2>
           <Slider
-            value={[answers[currentQuestion]]}
+            value={[answers[currentGoal] || 0]}
             onValueChange={(value) => {
               const newAnswers = [...answers];
-              newAnswers[currentQuestion] = value[0];
+              newAnswers[currentGoal] = value[0];
               setAnswers(newAnswers);
             }}
             max={10}
@@ -64,11 +68,8 @@ export default function OnboardingPage() {
             <span>5</span>
             <span>10</span>
           </div>
-          <Button
-            onClick={handleNext}
-            className="w-full bg-purple-600 hover:bg-purple-700"
-          >
-            {currentQuestion < questions.length - 1 ? "Next" : "Finish"}
+          <Button onClick={handleNext} className="w-full bg-purple-600 hover:bg-purple-700">
+            {currentGoal < goals.length - 1 ? "Next" : "Finish"}
           </Button>
         </CardContent>
       </Card>
