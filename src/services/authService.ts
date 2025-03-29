@@ -7,7 +7,7 @@ import {
   SignupResponse
 } from "../types/index";
 import apiClient from "./apiClient";
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/utils/constants";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/utils/constants/index";
 
 // export const headers = () => {
 //   const tokens = getTokens();
