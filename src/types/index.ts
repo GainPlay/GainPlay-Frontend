@@ -51,3 +51,26 @@ export type UserData = {
   badges: Badge[];
   friends: Friend[];
 };
+
+export type User = {
+  username: string;
+  email: string;
+  password: string;
+}
+
+type GeneralResponse = {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+};
+
+export type RefreshResponse = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export type SigninResponse = GeneralResponse;
+
+export type GoogleSignInResponse = GeneralResponse;
+
+export type SignupResponse = User;
