@@ -10,9 +10,9 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Progress } from "../components/ui/progress";
-import { friends } from "../data/mockData";
 import { toast } from "../hooks/use-toast";
 import type { Badge, Friend, UserData } from "../types";
+import { userService } from "@/services/userService";
 
 interface UserProfilePageProps {
   userData: UserData;
@@ -28,6 +28,7 @@ export default function UserProfilePage({
   const [user, setUser] = useState<Friend | null>(null);
   const [isFriend, setIsFriend] = useState(false);
   const [badges, setBadges] = useState<Badge[]>([]);
+  const [friends, setFriends] = useState<Friend[]>([]);
 
   useEffect(() => {
     const fetchBadges = async () => {
@@ -41,6 +42,20 @@ export default function UserProfilePage({
     };
 
     fetchBadges();
+  }, []);
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const friendsData = await userService.getFriends();
+
+        setFriends(friendsData);
+      } catch (error) {
+        console.log("Failed to fetch friends");
+      }
+    };
+
+    fetchFriends();
   }, []);
 
   useEffect(() => {
