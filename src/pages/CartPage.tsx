@@ -8,7 +8,7 @@ import {
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { ArrowLeft, Coins } from "lucide-react";
-import { toast } from "../components/ui/use-toast";
+import { toast } from "../hooks/use-toast";
 import type { UserData } from "../types";
 
 type Avatar = {
