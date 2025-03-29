@@ -9,6 +9,7 @@ import {
 } from "../components/ui/tabs";
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { signup } from "@/services/authService";
 
 export default function AuthPage() {
   const navigate = useNavigate();
