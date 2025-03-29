@@ -1,21 +1,34 @@
-import { useState } from "react";
+import { questionsService } from "@/services/questionsService";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "../components/ui/card";
 import { Slider } from "../components/ui/slider";
-import { onboardingQuestions } from "../data/mockData";
-
-const questions = onboardingQuestions;
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [questions, setQuestions] = useState<string[]>([]);
   const [answers, setAnswers] = useState(Array(questions.length).fill(5));
+
+  useEffect(() => {
+    const fetchquestionsData = async () => {
+      try {
+        const questionsData = await questionsService.getQuestions();
+
+        setQuestions(questionsData);
+      } catch (error) {
+        console.log("Failed to fetch questionsData");
+      }
+    };
+
+    fetchquestionsData();
+  }, []);
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
@@ -29,7 +42,7 @@ export default function OnboardingPage() {
           "Improve Flexibility": answers[1],
           "Increase Stamina": answers[2],
           "Exercise Frequency": answers[3],
-          "Current Fitness Level": answers[4]
+          "Current Fitness Level": answers[4],
         })
       );
       navigate("/home");
