@@ -102,6 +102,8 @@ export const friends: Friend[] = [
   },
 ];
 
+export const allGoals = ["Gain Muscle", "Lose Weight", "Improve Flexibility", "Increase Stamina"];
+
 export const initialExercises: Exercise[] = [
   {
     name: "Push-ups",
