@@ -1,27 +1,27 @@
-import { useState } from "react";
+import axios from "axios";
+import {
+  ArrowLeft,
+  Check,
+  Coins,
+  Edit,
+  Target,
+  Trophy,
+  User,
+  UserCheck,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "../components/ui/card";
-import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Progress } from "../components/ui/progress";
-import {
-  ArrowLeft,
-  Trophy,
-  Target,
-  User,
-  Edit,
-  Check,
-  Coins,
-  UserCheck
-} from "lucide-react";
 import { Slider } from "../components/ui/slider";
-import type { UserData } from "../types";
-import { avatars } from "../data/mockData";
+import type { Avatar, UserData } from "../types";
 
 interface ProfilePageProps {
   userData: UserData;
@@ -30,7 +30,7 @@ interface ProfilePageProps {
 
 export default function ProfilePage({
   userData,
-  updateUserData
+  updateUserData,
 }: ProfilePageProps) {
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
@@ -39,13 +39,37 @@ export default function ProfilePage({
   const [editedGoals, setEditedGoals] = useState<{ [key: string]: number }>(
     userData.goals
   );
+  const [allUsers, setAllUsers] = useState<Avatar[]>();
   const [ownedAvatars] = useState<string[]>([]);
+
+  const getAllUsers = (): Promise<Avatar[] | null> => {
+    return axios
+      .get<Avatar[]>("/api/allUsers")
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error("Error fetching allUsers data:", error);
+        return null;
+      });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const initialUsers = await getAllUsers();
+      if (initialUsers) {
+        setAllUsers(initialUsers);
+      } else {
+        setAllUsers([]);
+      }
+    };
+
+    fetchData();
+  }, [userData]);
 
   const handleSave = () => {
     const updatedUserData = {
       name: editedName,
       email: editedEmail,
-      goals: editedGoals
+      goals: editedGoals,
     };
     updateUserData(updatedUserData);
     setEditMode(false);
@@ -214,7 +238,7 @@ export default function ProfilePage({
         <CardContent>
           <div className="flex flex-wrap gap-4">
             {ownedAvatars.map((avatarId) => {
-              const avatar = avatars.find((a) => a.id === avatarId);
+              const avatar = allUsers?.find((a) => a.id === avatarId);
               if (!avatar) return null;
               return (
                 <Button
