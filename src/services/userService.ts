@@ -1,5 +1,6 @@
 import type { UserData, Friend, UserGoal } from "../types";
 import { defaultUserData, friends } from "../data/mockData";
+import apiClient from "./apiClient";
 
 export const userService = {
   getUserData: async (): Promise<UserData> => {
@@ -44,7 +45,11 @@ export const userService = {
       }, 100);
     });
   },
-  saveUserGoals: async (userGoals: UserGoal): Promise<void> => {
-    console.log(userGoals);
+  saveUserGoals: async (userGoals: Partial<UserGoal>[]): Promise<void> => {
+    try {
+      apiClient.post("/user/userGoals", userGoals);
+    } catch (error) {
+      throw error;
+    }
   },
 };

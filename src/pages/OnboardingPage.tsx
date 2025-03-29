@@ -11,7 +11,7 @@ export default function OnboardingPage() {
   const navigate = useNavigate();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [currentGoal, setCurrentGoal] = useState(0);
-  const [answers, setAnswers] = useState(Array(goals.length).fill(5));
+  const [answers, setAnswers] = useState<Partial<UserGoal>[]>([]);
 
   useEffect(() => {
     const fetchGoals = async (): Promise<void> => {
@@ -21,27 +21,22 @@ export default function OnboardingPage() {
     fetchGoals();
   }, []);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentGoal < goals.length - 1) {
       setCurrentGoal(currentGoal + 1);
     } else {
-      // Save answers and redirect to home page
-      const userGoals = answers.map((currentAnswer, index) => {
-        return { goalId: goals[index].id, value: currentAnswer };
+      const userGoals = answers.map<Partial<UserGoal>>((currentAnswer, index) => {
+        return { goalId: goals[index].id, value: currentAnswer.value };
       });
-
-      localStorage.setItem(
-        "userGoals",
-        JSON.stringify({
-          "Gain Muscle": answers[0],
-          "Improve Flexibility": answers[1],
-          "Increase Stamina": answers[2],
-          "Exercise Frequency": answers[3],
-          "Current Fitness Level": answers[4],
-        })
-      );
+      await userService.saveUserGoals(userGoals);
       navigate("/home");
     }
+  };
+
+  const handleAnswer = (value: number[]) => {
+    const newAnswers = [...answers];
+    newAnswers[currentGoal] = { goalId: goals[currentGoal].id, value: value[0] };
+    setAnswers(newAnswers);
   };
 
   return (
@@ -53,12 +48,8 @@ export default function OnboardingPage() {
         <CardContent>
           <h2 className="text-xl mb-4 text-purple-700">{goals[currentGoal]?.description}</h2>
           <Slider
-            value={[answers[currentGoal] || 0]}
-            onValueChange={(value) => {
-              const newAnswers = [...answers];
-              newAnswers[currentGoal] = value[0];
-              setAnswers(newAnswers);
-            }}
+            value={[answers[currentGoal]?.value || 0]}
+            onValueChange={handleAnswer}
             max={10}
             step={1}
             className="mb-6"

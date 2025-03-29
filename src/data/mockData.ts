@@ -102,8 +102,6 @@ export const friends: Friend[] = [
   },
 ];
 
-export const allGoals = ["Gain Muscle", "Lose Weight", "Improve Flexibility", "Increase Stamina"];
-
 export const initialExercises: Exercise[] = [
   {
     name: "Push-ups",
@@ -128,22 +126,6 @@ export const initialExercises: Exercise[] = [
     sets: Array(3).fill({ completed: false, reps: 0 }),
     currentSet: 0,
     currentReps: 0,
-  },
-];
-
-export const onboardingQuestions: Goal[] = [
-  { id: 1, name: "muscle gain", description: "How much would you like to gain muscle?", createdAt: new Date() },
-  {
-    id: 2,
-    name: "flexibility improvment",
-    description: "How important is improving flexibility to you?",
-    createdAt: new Date(),
-  },
-  {
-    id: 3,
-    name: "stamina increasement",
-    description: "How much would you like to increase your stamina?",
-    createdAt: new Date(),
   },
 ];
 

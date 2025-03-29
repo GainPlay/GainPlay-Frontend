@@ -1,5 +1,6 @@
 import type { WorkoutHistoryItem, Exercise, Goal } from "../types";
 import { initialExercises, onboardingQuestions } from "../data/mockData";
+import apiClient from "./apiClient";
 
 export const workoutService = {
   getWorkoutHistory: async (): Promise<WorkoutHistoryItem[]> => {
@@ -59,6 +60,6 @@ export const workoutService = {
     });
   },
   getGoals: async (): Promise<Goal[]> => {
-    return onboardingQuestions;
+    return (await apiClient.get("/goals")).data;
   },
 };
