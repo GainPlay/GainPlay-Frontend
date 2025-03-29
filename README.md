@@ -1,2 +1,1 @@
-# GainPlay-Frontend
-GainPlay Frontend🚀
+# GainPlay 🤘🏻
