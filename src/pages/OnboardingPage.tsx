@@ -25,7 +25,7 @@ export default function OnboardingPage() {
     if (currentGoal < goals.length - 1) {
       setCurrentGoal(currentGoal + 1);
     } else {
-      await userService.saveUserGoals(answers);
+     const workout = await userService.saveUserGoals(answers);
       navigate("/home");
     }
   };
