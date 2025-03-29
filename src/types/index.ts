@@ -40,6 +40,22 @@ export type Friend = {
   goalValues?: number[];
 };
 
+export type Goal = {
+  id: number;
+  name: string;
+  description: string;
+  createdAt: Date;
+};
+
+export type UserGoal = {
+  id: number;
+  userId: number;
+  goalId: number;
+  value: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type UserData = {
   name: string;
   email: string;
