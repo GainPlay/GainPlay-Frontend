@@ -1,17 +1,18 @@
-import { useState, useEffect } from "react";
+import { badgeService } from "@/services/badgeService";
+import { ArrowLeft, Target, Trophy, UserCheck } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "../components/ui/card";
-import { Button } from "../components/ui/button";
 import { Progress } from "../components/ui/progress";
-import { ArrowLeft, Trophy, Target, UserCheck } from "lucide-react";
-import type { Friend, Badge, UserData } from "../types";
-import { friends, badges } from "../data/mockData";
+import { friends } from "../data/mockData";
 import { toast } from "../hooks/use-toast";
+import type { Badge, Friend, UserData } from "../types";
 
 interface UserProfilePageProps {
   userData: UserData;
@@ -20,12 +21,27 @@ interface UserProfilePageProps {
 
 export default function UserProfilePage({
   userData,
-  updateUserData
+  updateUserData,
 }: UserProfilePageProps) {
   const navigate = useNavigate();
   const params = useParams();
   const [user, setUser] = useState<Friend | null>(null);
   const [isFriend, setIsFriend] = useState(false);
+  const [badges, setBadges] = useState<Badge[]>([]);
+
+  useEffect(() => {
+    const fetchBadges = async () => {
+      try {
+        const badgesData = await badgeService.getBadge();
+
+        setBadges(badgesData);
+      } catch (error) {
+        console.log("Failed to fetch badgesData");
+      }
+    };
+
+    fetchBadges();
+  }, []);
 
   useEffect(() => {
     const userId = Number.parseInt(params.id || "0");
@@ -50,7 +66,7 @@ export default function UserProfilePage({
       toast({
         title: "Friend Added",
         description: `You are now friends with ${user.name}.`,
-        variant: "default"
+        variant: "default",
       });
     }
   };
