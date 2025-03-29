@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
+import axios from "axios";
+import { ArrowLeft, Target, Trophy, UserCheck } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "../components/ui/card";
-import { Button } from "../components/ui/button";
 import { Progress } from "../components/ui/progress";
-import { ArrowLeft, Trophy, Target, UserCheck } from "lucide-react";
-import type { Friend, Badge, UserData } from "../types";
-import { friends, badges } from "../data/mockData";
 import { toast } from "../hooks/use-toast";
+import type { Badge, Friend, UserData } from "../types";
 
 interface UserProfilePageProps {
   userData: UserData;
@@ -20,16 +20,64 @@ interface UserProfilePageProps {
 
 export default function UserProfilePage({
   userData,
-  updateUserData
+  updateUserData,
 }: UserProfilePageProps) {
   const navigate = useNavigate();
   const params = useParams();
   const [user, setUser] = useState<Friend | null>(null);
   const [isFriend, setIsFriend] = useState(false);
+  const [friends, setFriends] = useState<Friend[] | null>();
+  const [badges, setBadges] = useState<Badge[] | null>();
+
+  const getFriendsData = (): Promise<Friend[] | null> => {
+    return axios
+      .get<Friend[]>("/api/friends")
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error("Error fetching friends data:", error);
+        return null;
+      });
+  };
+
+  const getBadges = (): Promise<Badge[] | null> => {
+    return axios
+      .get<Badge[]>("/api/badges")
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error("Error fetching Badges data:", error);
+        return null;
+      });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const initialBadges = await getBadges();
+      if (initialBadges) {
+        setBadges(initialBadges);
+      } else {
+        setBadges([]);
+      }
+    };
+
+    fetchData();
+  }, [userData]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const initialFriends = await getFriendsData();
+      if (initialFriends) {
+        setFriends(initialFriends);
+      } else {
+        setFriends([]);
+      }
+    };
+
+    fetchData();
+  }, [userData]);
 
   useEffect(() => {
     const userId = Number.parseInt(params.id || "0");
-    const foundUser = friends.find((friend) => friend.id === userId);
+    const foundUser = friends?.find((friend) => friend.id === userId);
     if (foundUser) {
       const isFriendStatus = userData.friends.some(
         (f: Friend) => f.id === foundUser.id
@@ -50,7 +98,7 @@ export default function UserProfilePage({
       toast({
         title: "Friend Added",
         description: `You are now friends with ${user.name}.`,
-        variant: "default"
+        variant: "default",
       });
     }
   };
@@ -122,7 +170,7 @@ export default function UserProfilePage({
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
-            {badges.slice(0, 3).map((badge: Badge) => (
+            {badges?.slice(0, 3).map((badge: Badge) => (
               <div key={badge.id} className="flex flex-col items-center">
                 <div className="text-4xl mb-1">{badge.icon}</div>
                 <div className="text-sm text-center">{badge.name}</div>
