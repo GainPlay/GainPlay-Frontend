@@ -52,18 +52,25 @@ export type UserData = {
   friends: Friend[];
 };
 
-export type Goal = {
-  id: number;
-  name: string;
-  description: string;
-  createdAt: Date;
+export type User = {
+  username: string;
+  email: string;
+  password: string;
 };
 
-export type UserGoal = {
-  id: number;
-  userId: number;
-  goalId: number;
-  value: number;
-  createdAt: Date;
-  updatedAt: Date;
+type GeneralResponse = {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
 };
+
+export type RefreshResponse = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export type SigninResponse = GeneralResponse;
+
+export type GoogleSignInResponse = GeneralResponse;
+
+export type SignupResponse = User;
