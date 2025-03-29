@@ -1,32 +1,33 @@
-import type { WorkoutHistoryItem, Exercise } from "../types"
-import { initialExercises } from "../data/mockData"
+import type { WorkoutHistoryItem, Exercise, Goal } from "../types";
+import { initialExercises } from "../data/mockData";
+import apiClient from "./apiClient";
 
 export const workoutService = {
   getWorkoutHistory: async (): Promise<WorkoutHistoryItem[]> => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const storedHistory = localStorage.getItem("workoutHistory")
-        resolve(storedHistory ? JSON.parse(storedHistory) : [])
-      }, 100)
-    })
+        const storedHistory = localStorage.getItem("workoutHistory");
+        resolve(storedHistory ? JSON.parse(storedHistory) : []);
+      }, 100);
+    });
   },
 
   getCurrentWorkout: async (): Promise<Exercise[]> => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const storedWorkout = localStorage.getItem("currentWorkout")
-        resolve(storedWorkout ? JSON.parse(storedWorkout) : initialExercises)
-      }, 100)
-    })
+        const storedWorkout = localStorage.getItem("currentWorkout");
+        resolve(storedWorkout ? JSON.parse(storedWorkout) : initialExercises);
+      }, 100);
+    });
   },
 
   saveCurrentWorkout: async (workout: Exercise[]): Promise<void> => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        localStorage.setItem("currentWorkout", JSON.stringify(workout))
-        resolve()
-      }, 100)
-    })
+        localStorage.setItem("currentWorkout", JSON.stringify(workout));
+        resolve();
+      }, 100);
+    });
   },
 
   finishWorkout: async (workout: Exercise[]): Promise<number> => {
@@ -39,24 +40,26 @@ export const workoutService = {
             sets: exercise.sets,
             totalReps: exercise.sets.reduce((total, set) => total + set.reps, 0),
           })),
-        }
+        };
 
-        const workoutHistory = JSON.parse(localStorage.getItem("workoutHistory") || "[]")
-        workoutHistory.push(completedWorkout)
-        localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory))
+        const workoutHistory = JSON.parse(localStorage.getItem("workoutHistory") || "[]");
+        workoutHistory.push(completedWorkout);
+        localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
 
-        localStorage.removeItem("currentWorkout")
-        localStorage.removeItem("workoutStarted")
-        localStorage.removeItem("activeExerciseIndex")
+        localStorage.removeItem("currentWorkout");
+        localStorage.removeItem("workoutStarted");
+        localStorage.removeItem("activeExerciseIndex");
 
-        const earnedCoins = 50
-        const userData = JSON.parse(localStorage.getItem("userData") || "{}")
-        userData.coins = (userData.coins || 0) + earnedCoins
-        localStorage.setItem("userData", JSON.stringify(userData))
+        const earnedCoins = 50;
+        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+        userData.coins = (userData.coins || 0) + earnedCoins;
+        localStorage.setItem("userData", JSON.stringify(userData));
 
-        resolve(earnedCoins)
-      }, 100)
-    })
+        resolve(earnedCoins);
+      }, 100);
+    });
   },
-}
-
+  getGoals: async (): Promise<Goal[]> => {
+    return (await apiClient.get("/goals")).data;
+  },
+};
