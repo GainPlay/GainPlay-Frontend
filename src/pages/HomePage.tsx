@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from "../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import {
   Flame,
   Trophy,
@@ -19,7 +14,7 @@ import {
   ShoppingCart,
   Coins,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { Progress } from "../components/ui/progress";
@@ -35,6 +30,7 @@ interface HomePageProps {
 // eslint-disable-next-line no-empty-pattern
 export default function HomePage({}: HomePageProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [showMaxSetsAlert, setShowMaxSetsAlert] = useState(false);
   const [workoutStarted, setWorkoutStarted] = useState(false);
@@ -42,12 +38,10 @@ export default function HomePage({}: HomePageProps) {
   const [coins, setCoins] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [earnedCoins, setEarnedCoins] = useState(0);
-  const [activeExerciseIndex, setActiveExerciseIndex] = useState<number | null>(
-    null
-  );
+  const [activeExerciseIndex, setActiveExerciseIndex] = useState<number | null>(null);
   const [, setWindowDimensions] = useState({
     width: 0,
-    height: 0
+    height: 0,
   });
 
   useEffect(() => {
@@ -56,19 +50,19 @@ export default function HomePage({}: HomePageProps) {
       setUserAvatar(userData.avatar);
       setCoins(userData.coins);
 
-      const currentWorkout = await workoutService.getCurrentWorkout();
-      if (currentWorkout.length > 0) {
-        setExercises(currentWorkout);
-      }
+      setExercises(JSON.parse(location.state?.workoutJson));
+
+      // const currentWorkout = await workoutService.getCurrentWorkout();
+      // if (currentWorkout.length > 0) {
+      //   setExercises(currentWorkout);
+      // }
 
       const storedWorkoutStarted = localStorage.getItem("workoutStarted");
       if (storedWorkoutStarted) {
         setWorkoutStarted(JSON.parse(storedWorkoutStarted));
       }
 
-      const storedActiveExerciseIndex = localStorage.getItem(
-        "activeExerciseIndex"
-      );
+      const storedActiveExerciseIndex = localStorage.getItem("activeExerciseIndex");
       if (storedActiveExerciseIndex) {
         setActiveExerciseIndex(Number.parseInt(storedActiveExerciseIndex));
       }
@@ -82,17 +76,14 @@ export default function HomePage({}: HomePageProps) {
       workoutService.saveCurrentWorkout(exercises);
     }
     localStorage.setItem("workoutStarted", JSON.stringify(workoutStarted));
-    localStorage.setItem(
-      "activeExerciseIndex",
-      activeExerciseIndex !== null ? activeExerciseIndex.toString() : ""
-    );
+    localStorage.setItem("activeExerciseIndex", activeExerciseIndex !== null ? activeExerciseIndex.toString() : "");
   }, [exercises, workoutStarted, activeExerciseIndex]);
 
   useEffect(() => {
     const handleResize = () => {
       setWindowDimensions({
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
       });
     };
 
@@ -110,10 +101,7 @@ export default function HomePage({}: HomePageProps) {
     setExercises((prevExercises) => {
       const newExercises = [...prevExercises];
       const exercise = newExercises[exerciseIndex];
-      exercise.currentReps = Math.max(
-        0,
-        increment ? exercise.currentReps + 1 : exercise.currentReps - 1
-      );
+      exercise.currentReps = Math.max(0, increment ? exercise.currentReps + 1 : exercise.currentReps - 1);
       return newExercises;
     });
   };
@@ -132,14 +120,14 @@ export default function HomePage({}: HomePageProps) {
       const newSets = [...exercise.sets];
       newSets[exercise.currentSet] = {
         completed: true,
-        reps: exercise.currentReps
+        reps: exercise.currentReps,
       };
 
       newExercises[exerciseIndex] = {
         ...exercise,
         sets: newSets,
         currentSet: exercise.currentSet + 1,
-        currentReps: 0
+        currentReps: 0,
       };
 
       return newExercises;
@@ -183,19 +171,14 @@ export default function HomePage({}: HomePageProps) {
         <>
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg text-center">
-              <h2 className="text-3xl font-bold text-purple-800 mb-4">
-                Workout Complete!
-              </h2>
+              <h2 className="text-3xl font-bold text-purple-800 mb-4">Workout Complete!</h2>
               <p className="text-xl text-purple-600 mb-4">You earned:</p>
               <div className="flex items-center justify-center text-4xl font-bold text-yellow-500 mb-6">
                 <Coins className="w-12 h-12 mr-2" />
                 {earnedCoins}
               </div>
               <div className="flex justify-center space-x-4">
-                <Button
-                  onClick={() => navigate("/workout-history")}
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
+                <Button onClick={() => navigate("/workout-history")} className="bg-purple-600 hover:bg-purple-700">
                   View Workout History
                 </Button>
                 <Button
@@ -213,10 +196,7 @@ export default function HomePage({}: HomePageProps) {
 
       <header className="flex justify-between items-center mb-6">
         <img
-          src={
-            userAvatar ||
-            "https://api.dicebear.com/6.x/avataaars/svg?seed=default"
-          }
+          src={userAvatar || "https://api.dicebear.com/6.x/avataaars/svg?seed=default"}
           alt="User Avatar"
           width={60}
           height={60}
@@ -224,11 +204,7 @@ export default function HomePage({}: HomePageProps) {
         />
         <h1 className="text-2xl font-bold text-purple-800">GainPlay</h1>
         <div className="flex items-center">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/cart")}
-            className="mr-2"
-          >
+          <Button variant="ghost" onClick={() => navigate("/cart")} className="mr-2">
             <ShoppingCart className="w-6 h-6 text-purple-600" />
           </Button>
           <div className="flex items-center">
@@ -239,16 +215,10 @@ export default function HomePage({}: HomePageProps) {
       </header>
 
       {showMaxSetsAlert && (
-        <Alert
-          variant="destructive"
-          className="mb-4 animate-in slide-in-from-top"
-        >
+        <Alert variant="destructive" className="mb-4 animate-in slide-in-from-top">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Maximum Sets Reached</AlertTitle>
-          <AlertDescription>
-            You've reached the maximum of 5 sets for this exercise. Great work!
-            💪
-          </AlertDescription>
+          <AlertDescription>You've reached the maximum of 5 sets for this exercise. Great work! 💪</AlertDescription>
         </Alert>
       )}
 
@@ -274,12 +244,8 @@ export default function HomePage({}: HomePageProps) {
         <Card className="mb-6">
           <CardContent className="flex flex-col items-center justify-center p-6 text-center">
             <PlayCircle className="w-16 h-16 text-purple-600 mb-4" />
-            <h2 className="text-2xl font-bold text-purple-800 mb-2">
-              Ready to crush your workout?
-            </h2>
-            <p className="text-purple-600 mb-4">
-              Your personalized exercise plan is all set. Let's get those gains!
-            </p>
+            <h2 className="text-2xl font-bold text-purple-800 mb-2">Ready to crush your workout?</h2>
+            <p className="text-purple-600 mb-4">Your personalized exercise plan is all set. Let's get those gains!</p>
             <Button
               onClick={startWorkout}
               className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-200 ease-in-out transform hover:scale-105"
@@ -302,13 +268,9 @@ export default function HomePage({}: HomePageProps) {
                       className="flex justify-between items-center cursor-pointer"
                       onClick={() => toggleExercise(exerciseIndex)}
                     >
-                      <span className="font-medium">{exercise.name}</span>
+                      <span className="font-medium">{exercise.exerciseName}</span>
                       <Button variant="ghost" size="sm">
-                        {activeExerciseIndex === exerciseIndex ? (
-                          <ChevronUp />
-                        ) : (
-                          <ChevronDown />
-                        )}
+                        {activeExerciseIndex === exerciseIndex ? <ChevronUp /> : <ChevronDown />}
                       </Button>
                     </div>
 
@@ -317,23 +279,13 @@ export default function HomePage({}: HomePageProps) {
                         <div className="mb-4">
                           <div className="flex justify-between mb-2">
                             <span className="text-sm font-medium">
-                              Set {exercise.currentSet + 1} of{" "}
-                              {exercise.targetSets}
+                              Set {exercise.currentSet + 1} of {exercise.targetSets}
                             </span>
                             <span className="text-sm text-purple-600">
-                              {
-                                exercise.sets.filter((set) => set.completed)
-                                  .length
-                              }{" "}
-                              sets completed
+                              {exercise.sets.filter((set) => set.completed).length} sets completed
                             </span>
                           </div>
-                          <Progress
-                            value={
-                              (exercise.currentSet / exercise.targetSets) * 100
-                            }
-                            className="h-2"
-                          />
+                          <Progress value={(exercise.currentSet / exercise.targetSets) * 100} className="h-2" />
                         </div>
 
                         {exercise.currentSet < exercise.targetSets ? (
@@ -342,21 +294,15 @@ export default function HomePage({}: HomePageProps) {
                               <Button
                                 variant="outline"
                                 size="icon"
-                                onClick={() =>
-                                  handleRepsChange(exerciseIndex, false)
-                                }
+                                onClick={() => handleRepsChange(exerciseIndex, false)}
                               >
                                 <Minus className="h-4 w-4" />
                               </Button>
-                              <span className="text-2xl font-bold min-w-[3ch] text-center">
-                                {exercise.currentReps}
-                              </span>
+                              <span className="text-2xl font-bold min-w-[3ch] text-center">{exercise.currentReps}</span>
                               <Button
                                 variant="outline"
                                 size="icon"
-                                onClick={() =>
-                                  handleRepsChange(exerciseIndex, true)
-                                }
+                                onClick={() => handleRepsChange(exerciseIndex, true)}
                               >
                                 <Plus className="h-4 w-4" />
                               </Button>
@@ -371,9 +317,7 @@ export default function HomePage({}: HomePageProps) {
                         ) : (
                           <div className="text-center p-4 bg-purple-50 rounded-lg">
                             <Check className="w-6 h-6 text-green-500 mx-auto mb-2" />
-                            <p className="text-sm font-medium">
-                              All sets completed! 🎉
-                            </p>
+                            <p className="text-sm font-medium">All sets completed! 🎉</p>
                           </div>
                         )}
 
@@ -382,17 +326,11 @@ export default function HomePage({}: HomePageProps) {
                             <div
                               key={setIndex}
                               className={`text-center p-2 rounded ${
-                                set.completed
-                                  ? "bg-purple-100 text-purple-700"
-                                  : "bg-gray-100 text-gray-400"
+                                set.completed ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-400"
                               }`}
                             >
-                              <div className="text-xs font-medium">
-                                Set {setIndex + 1}
-                              </div>
-                              <div className="text-sm">
-                                {set.completed ? set.reps : "-"}
-                              </div>
+                              <div className="text-xs font-medium">Set {setIndex + 1}</div>
+                              <div className="text-sm">{set.completed ? set.reps : "-"}</div>
                             </div>
                           ))}
                         </div>

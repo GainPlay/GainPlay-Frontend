@@ -1,4 +1,4 @@
-import type { UserData, Friend, UserGoal } from "../types";
+import type { UserData, Friend, UserGoal, Exercise } from "../types";
 import { defaultUserData, friends } from "../data/mockData";
 import apiClient from "./apiClient";
 
@@ -45,9 +45,10 @@ export const userService = {
       }, 100);
     });
   },
-  saveUserGoals: async (userGoals: Partial<UserGoal>[]): Promise<void> => {
+  saveUserGoals: async (userGoals: Partial<UserGoal>[]): Promise<Exercise[]> => {
     try {
-      apiClient.post("/user/userGoals", userGoals);
+      const goalsString = userGoals.map((item) => `${item.name}: ${item.value}`).join(", ");
+      return (await apiClient.post("workout/generate", { userProfile: goalsString })).data;
     } catch (error) {
       throw error;
     }
