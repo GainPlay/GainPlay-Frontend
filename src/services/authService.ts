@@ -84,7 +84,7 @@ export const signup = async (
 export const googleSignIn = async (
   credentialResponse: CredentialResponse
 ): Promise<AxiosResponse<GoogleSignInResponse>> => {
-  return await apiClient.post("/auth/google", {
+  return await apiClient.post("TODO", {
     credentialResponse
   });
 };
