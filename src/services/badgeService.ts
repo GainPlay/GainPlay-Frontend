@@ -1,5 +1,5 @@
-import { badges } from "../data/mockData";
-import type { Badge } from "../types";
+import { badges } from "@/data/mockData";
+import { Badge } from "@/types";
 
 export const badgeService = {
   getBadge: async (): Promise<Badge[]> => {
@@ -9,5 +9,5 @@ export const badgeService = {
         resolve(storedBadgeData ? JSON.parse(storedBadgeData) : badges);
       }, 100);
     });
-  },
+  }
 };

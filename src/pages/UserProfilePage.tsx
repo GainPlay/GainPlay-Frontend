@@ -1,177 +1,343 @@
-import { badgeService } from "@/services/badgeService";
-import { ArrowLeft, Target, Trophy, UserCheck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { Progress } from "../components/ui/progress";
-import { toast } from "../hooks/use-toast";
-import type { Badge, Friend, UserData } from "../types";
-import { userService } from "@/services/userService";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { motion } from "framer-motion";
+import { ArrowLeft, Trophy, UserPlus, UserX, Check, X } from "lucide-react";
+import { badges, friends } from "@/data/mockData";
+import { toast } from "@/hooks/use-toast";
 
-interface UserProfilePageProps {
-  userData: UserData;
-  updateUserData: (newData: Partial<UserData>) => void;
-}
+// Extended friend type with request status
+type FriendWithStatus = {
+  id: number;
+  name: string;
+  avatar: string;
+  email: string;
+  goals: string[];
+  level: number;
+  status?: "friend" | "pending-sent" | "pending-received" | "none";
+};
 
-export default function UserProfilePage({
-  userData,
-  updateUserData,
-}: UserProfilePageProps) {
+export default function UserProfilePage() {
   const navigate = useNavigate();
   const params = useParams();
-  const [user, setUser] = useState<Friend | null>(null);
-  const [isFriend, setIsFriend] = useState(false);
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [friends, setFriends] = useState<Friend[]>([]);
+  const userId = Number(params.id);
+
+  const [user, setUser] = useState<FriendWithStatus | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [allFriends, setAllFriends] = useState<FriendWithStatus[]>([]);
 
   useEffect(() => {
-    const fetchBadges = async () => {
-      try {
-        const badgesData = await badgeService.getBadge();
+    // Load all friends data from localStorage
+    const storedFriends = localStorage.getItem("friendsData");
+    let friendsData: FriendWithStatus[] = [];
 
-        setBadges(badgesData);
-      } catch (error) {
-        console.log("Failed to fetch badgesData");
+    if (storedFriends) {
+      friendsData = JSON.parse(storedFriends);
+      setAllFriends(friendsData);
+
+      // Find the specific user
+      const foundUser = friendsData.find((friend) => friend.id === userId);
+
+      if (foundUser) {
+        setUser(foundUser);
+        setIsLoading(false);
+      } else {
+        // If user not found in localStorage, try to find in mock data
+        const mockUser = friends.find((friend) => friend.id === userId);
+
+        if (mockUser) {
+          const userWithStatus = {
+            ...mockUser,
+            status: "none" as const
+          };
+          setUser(userWithStatus);
+
+          // Add this user to our friends data
+          const updatedFriends = [...friendsData, userWithStatus];
+          setAllFriends(updatedFriends);
+          localStorage.setItem("friendsData", JSON.stringify(updatedFriends));
+
+          setIsLoading(false);
+        } else {
+          // Handle user not found
+          toast({
+            title: "User not found",
+            description: "The requested user profile could not be found.",
+            variant: "destructive"
+          });
+          navigate("/friends");
+        }
       }
-    };
+    } else {
+      // If no stored friends data, initialize with mock data
+      const mockUser = friends.find((friend) => friend.id === userId);
 
-    fetchBadges();
-  }, []);
+      if (mockUser) {
+        const friendsWithStatus = friends.map((friend) => ({
+          ...friend,
+          status: "none" as const
+        }));
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const friendsData = await userService.getFriends();
+        // Set the found user
+        const userWithStatus = friendsWithStatus.find(
+          (friend) => friend.id === userId
+        );
+        setUser(userWithStatus || null);
 
-        setFriends(friendsData);
-      } catch (error) {
-        console.log("Failed to fetch friends");
+        // Store all friends
+        setAllFriends(friendsWithStatus);
+        localStorage.setItem("friendsData", JSON.stringify(friendsWithStatus));
+
+        setIsLoading(false);
+      } else {
+        // Handle user not found
+        toast({
+          title: "User not found",
+          description: "The requested user profile could not be found.",
+          variant: "destructive"
+        });
+        navigate("/friends");
       }
-    };
-
-    fetchFriends();
-  }, []);
-
-  useEffect(() => {
-    const userId = Number.parseInt(params.id || "0");
-    const foundUser = friends.find((friend) => friend.id === userId);
-    if (foundUser) {
-      const isFriendStatus = userData.friends.some(
-        (f: Friend) => f.id === foundUser.id
-      );
-      setUser({ ...foundUser, isFriend: isFriendStatus });
-      setIsFriend(isFriendStatus);
     }
-  }, [params.id, userData]);
+  }, [userId, navigate]);
 
-  const handleAddFriend = () => {
-    if (user) {
-      const updatedUser = { ...user, isFriend: true };
-      setUser(updatedUser);
-      setIsFriend(true);
+  const handleFriendAction = (
+    action: "add" | "accept" | "reject" | "remove"
+  ) => {
+    if (!user) return;
 
-      updateUserData({ friends: [...userData.friends, updatedUser] });
+    // Create a copy of all friends
+    const updatedFriends = [...allFriends];
 
-      toast({
-        title: "Friend Added",
-        description: `You are now friends with ${user.name}.`,
-        variant: "default",
-      });
+    // Find the user to update
+    const userIndex = updatedFriends.findIndex(
+      (friend) => friend.id === user.id
+    );
+
+    if (userIndex === -1) return;
+
+    // Update the user's status based on the action
+    switch (action) {
+      case "add":
+        updatedFriends[userIndex].status = "pending-sent";
+        toast({
+          title: "Friend Request Sent",
+          description: `You sent a friend request to ${user.name}`
+        });
+        break;
+      case "accept":
+        updatedFriends[userIndex].status = "friend";
+        toast({
+          title: "Friend Request Accepted",
+          description: `You are now friends with ${user.name}`,
+          variant: "default"
+        });
+        break;
+      case "reject":
+        updatedFriends[userIndex].status = "none";
+        toast({
+          title: "Friend Request Rejected",
+          description: `You rejected ${user.name}'s friend request`,
+          variant: "destructive"
+        });
+        break;
+      case "remove":
+        updatedFriends[userIndex].status = "none";
+        toast({
+          title: "Friend Removed",
+          description: `You removed ${user.name} from your friends`,
+          variant: "destructive"
+        });
+        break;
     }
+
+    // Update state and localStorage
+    setAllFriends(updatedFriends);
+    setUser(updatedFriends[userIndex]);
+    localStorage.setItem("friendsData", JSON.stringify(updatedFriends));
   };
 
-  if (!user) return <div>Loading...</div>;
+  if (isLoading || !user) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
+        <header className="flex items-center mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/friends")}
+            className="mr-2 p-2"
+          >
+            <ArrowLeft className="w-6 h-6 text-purple-600" />
+          </Button>
+          <h1 className="text-2xl font-bold text-purple-800">User Profile</h1>
+        </header>
+
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col min-h-screen bg-purple-100 p-4 pb-20">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
       <header className="flex items-center mb-6">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mr-2">
-          <ArrowLeft className="w-6 h-6" />
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/friends")}
+          className="mr-2 p-2"
+        >
+          <ArrowLeft className="w-6 h-6 text-purple-600" />
         </Button>
-        <h1 className="text-2xl font-bold text-purple-800">
-          {user.name}'s Profile
-        </h1>
+        <h1 className="text-2xl font-bold text-purple-800">User Profile</h1>
       </header>
 
-      <Card className="mb-6">
-        <CardContent className="flex items-center space-x-4 pt-6">
-          <img
-            src={user.avatar || "/placeholder.svg"}
-            alt={`${user.name}'s Avatar`}
-            width={80}
-            height={80}
-            className="rounded-full"
-          />
-          <div>
-            <h2 className="text-xl font-bold">{user.name}</h2>
-            <p className="text-gray-600">{user.email}</p>
-            <p className="text-purple-600 font-semibold mt-2 flex items-center">
-              <Trophy className="w-4 h-4 mr-1 text-yellow-500" />
-              Level {user.level}
-            </p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card className="mb-6 overflow-hidden">
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 flex flex-col items-center">
+            <div className="relative mb-4">
+              <Avatar className="h-24 w-24 border-4 border-white">
+                <AvatarImage
+                  src={user.avatar || "/placeholder.svg"}
+                  alt={user.name}
+                />
+                <AvatarFallback className="bg-purple-200 text-purple-700 text-2xl">
+                  {user.name.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -bottom-2 -right-2 bg-white text-purple-600 text-sm font-bold rounded-full h-8 w-8 flex items-center justify-center border-2 border-purple-600">
+                {user.level}
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-1">{user.name}</h2>
+            <p className="text-purple-200">{user.email}</p>
           </div>
-        </CardContent>
-      </Card>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Target className="w-5 h-5 mr-2" />
-            {user.name}'s Goals
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {user.goals.map((goal, index) => {
-            const goalValue = user.goalValues
-              ? user.goalValues[index]
-              : Math.floor(Math.random() * 10) + 1;
-            return (
-              <div key={index} className="mb-4">
-                <div className="flex justify-between mb-1">
-                  <span>{goal}</span>
-                  <span>{goalValue}/10</span>
+          <CardContent className="p-6">
+            <div className="flex justify-center space-x-2 mb-6">
+              {user.status === "none" && (
+                <Button
+                  onClick={() => handleFriendAction("add")}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Add Friend
+                </Button>
+              )}
+
+              {user.status === "pending-sent" && (
+                <Button
+                  variant="outline"
+                  className="border-purple-200 text-purple-700"
+                  disabled
+                >
+                  <Check className="w-4 h-4 mr-2" />
+                  Request Sent
+                </Button>
+              )}
+
+              {user.status === "pending-received" && (
+                <div className="flex space-x-2">
+                  <Button
+                    onClick={() => handleFriendAction("reject")}
+                    variant="outline"
+                    className="border-red-200 text-red-600 hover:bg-red-50"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Reject
+                  </Button>
+                  <Button
+                    onClick={() => handleFriendAction("accept")}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Check className="w-4 h-4 mr-2" />
+                    Accept
+                  </Button>
                 </div>
-                <Progress value={goalValue * 10} className="h-2" />
-              </div>
-            );
-          })}
-        </CardContent>
-      </Card>
+              )}
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Trophy className="w-5 h-5 mr-2" />
-            {user.name}'s Badges
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-4">
-            {badges.slice(0, 3).map((badge: Badge) => (
-              <div key={badge.id} className="flex flex-col items-center">
-                <div className="text-4xl mb-1">{badge.icon}</div>
-                <div className="text-sm text-center">{badge.name}</div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              {user.status === "friend" && (
+                <Button
+                  onClick={() => handleFriendAction("remove")}
+                  variant="outline"
+                  className="border-red-200 text-red-600 hover:bg-red-50"
+                >
+                  <UserX className="w-4 h-4 mr-2" />
+                  Remove Friend
+                </Button>
+              )}
+            </div>
 
-      {!isFriend && (
-        <Button
-          onClick={handleAddFriend}
-          className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-200 ease-in-out transform hover:scale-105 mb-4"
-        >
-          <UserCheck className="w-4 h-4 mr-2" />
-          Add Friend
-        </Button>
-      )}
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-purple-800 mb-3 flex items-center">
+                  <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
+                  Fitness Goals
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {user.goals.map((goal: string, index: number) => (
+                    <Badge
+                      key={index}
+                      className="bg-purple-100 text-purple-700 px-3 py-1.5"
+                    >
+                      {goal}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                  Achievements
+                </h3>
+                <div className="grid grid-cols-3 gap-4">
+                  {badges.slice(0, 3).map((badge) => (
+                    <div
+                      key={badge.id}
+                      className="flex flex-col items-center text-center"
+                    >
+                      <div className="text-4xl mb-1">{badge.icon}</div>
+                      <div className="text-sm">{badge.name}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                  Stats
+                </h3>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="bg-purple-50 p-3 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-700">
+                      {Math.floor(Math.random() * 30) + 1}
+                    </div>
+                    <div className="text-xs text-purple-600">Workouts</div>
+                  </div>
+                  <div className="bg-purple-50 p-3 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-700">
+                      {Math.floor(Math.random() * 20) + 1}
+                    </div>
+                    <div className="text-xs text-purple-600">Day Streak</div>
+                  </div>
+                  <div className="bg-purple-50 p-3 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-700">
+                      {user.level}
+                    </div>
+                    <div className="text-xs text-purple-600">Level</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import {
   Navigate,
   Route,
   BrowserRouter as Router,
-  Routes,
+  Routes
 } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import { Toaster } from "./components/ui/toaster";
@@ -15,41 +15,41 @@ import OnboardingPage from "./pages/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import WorkoutHistoryPage from "./pages/WorkoutHistoryPage";
-import { userService } from "./services/userService";
-import type { UserData } from "./types";
+// import { userService } from "./services/userService";
+// import type { UserData } from "./types";
 
 function App() {
-  const [userData, setUserData] = useState<UserData | null>(null);
+  // const [userData, setUserData] = useState<UserData | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const storedUserData = localStorage.getItem("userData");
-      if (storedUserData) {
-        setUserData(JSON.parse(storedUserData));
-      } else {
-        const user = await userService.getUserData();
-        setUserData(user);
-        localStorage.setItem("userData", JSON.stringify(user));
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const storedUserData = localStorage.getItem("userData");
+  //     if (storedUserData) {
+  //       setUserData(JSON.parse(storedUserData));
+  //     } else {
+  //       const user = await userService.getUserData();
+  //       setUserData(user);
+  //       localStorage.setItem("userData", JSON.stringify(user));
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
-  const updateUserData = (newData: Partial<UserData>) => {
-    setUserData((prevData) => {
-      if (prevData) {
-        const updatedData = { ...prevData, ...newData };
-        localStorage.setItem("userData", JSON.stringify(updatedData));
-        return updatedData;
-      }
-      return prevData;
-    });
-  };
+  // const updateUserData = (newData: Partial<UserData>) => {
+  //   setUserData((prevData) => {
+  //     if (prevData) {
+  //       const updatedData = { ...prevData, ...newData };
+  //       localStorage.setItem("userData", JSON.stringify(updatedData));
+  //       return updatedData;
+  //     }
+  //     return prevData;
+  //   });
+  // };
 
-  if (!userData) {
-    return <div>Loading...</div>;
-  }
+  // if (!userData) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <Router>
@@ -57,54 +57,12 @@ function App() {
         <Routes>
           <Route path="/" element={<AuthPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
-          <Route
-            path="/home"
-            element={
-              <HomePage userData={userData} updateUserData={updateUserData} />
-            }
-          />
-          <Route
-            path="/cart"
-            element={
-              <CartPage userData={userData} updateUserData={updateUserData} />
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProfilePage
-                userData={userData}
-                updateUserData={updateUserData}
-              />
-            }
-          />
-          <Route
-            path="/friends"
-            element={
-              <FriendsPage
-                userData={userData}
-                updateUserData={updateUserData}
-              />
-            }
-          />
-          <Route
-            path="/workout-history"
-            element={
-              <WorkoutHistoryPage
-                userData={userData}
-                updateUserData={updateUserData}
-              />
-            }
-          />
-          <Route
-            path="/user/:id"
-            element={
-              <UserProfilePage
-                userData={userData}
-                updateUserData={updateUserData}
-              />
-            }
-          />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/friends" element={<FriendsPage />} />
+          <Route path="/workout-history" element={<WorkoutHistoryPage />} />
+          <Route path="/user/:id" element={<UserProfilePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Navigation />
