@@ -62,7 +62,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/friends" element={<FriendsPage />} />
           <Route path="/workout-history" element={<WorkoutHistoryPage />} />
-          <Route path="/user/:id" element={<UserProfilePage />} />
+          <Route path="/user-profile/:id" element={<UserProfilePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Navigation />
