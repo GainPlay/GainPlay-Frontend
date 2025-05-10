@@ -1,13 +1,8 @@
+import { GoogleSignInResponse, SignupResponse } from "@/types";
 import { CredentialResponse } from "@react-oauth/google";
 import { AxiosResponse } from "axios";
-import {
-  GoogleSignInResponse,
-  RefreshResponse,
-  SigninResponse,
-  SignupResponse
-} from "../types/index";
 import apiClient from "./apiClient";
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/utils/constants/index";
+// import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/utils/constants/index";
 
 // export const headers = () => {
 //   const tokens = getTokens();

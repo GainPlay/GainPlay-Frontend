@@ -1,5 +1,5 @@
-import type { WorkoutHistoryItem, Exercise, Goal } from "../types";
-import { initialExercises } from "../data/mockData";
+import { initialExercises } from "@/data/mockData";
+import { FrontendExercise, Goal, WorkoutHistoryItem } from "@/types";
 import apiClient from "./apiClient";
 
 export const workoutService = {
@@ -12,7 +12,7 @@ export const workoutService = {
     });
   },
 
-  getCurrentWorkout: async (): Promise<Exercise[]> => {
+  getCurrentWorkout: async (): Promise<FrontendExercise[]> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         const storedWorkout = localStorage.getItem("currentWorkout");
@@ -21,7 +21,7 @@ export const workoutService = {
     });
   },
 
-  saveCurrentWorkout: async (workout: Exercise[]): Promise<void> => {
+  saveCurrentWorkout: async (workout: FrontendExercise[]): Promise<void> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         localStorage.setItem("currentWorkout", JSON.stringify(workout));
@@ -30,19 +30,21 @@ export const workoutService = {
     });
   },
 
-  finishWorkout: async (workout: Exercise[]): Promise<number> => {
+  finishWorkout: async (workout: FrontendExercise[]): Promise<number> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         const completedWorkout = {
           date: new Date().toISOString(),
           exercises: workout.map((exercise) => ({
-            name: exercise.exerciseName,
+            name: exercise.name,
             sets: exercise.sets,
-            totalReps: exercise.sets.reduce((total, set) => total + set.reps, 0),
-          })),
+            totalReps: exercise.sets.reduce((total, set) => total + set.reps, 0)
+          }))
         };
 
-        const workoutHistory = JSON.parse(localStorage.getItem("workoutHistory") || "[]");
+        const workoutHistory = JSON.parse(
+          localStorage.getItem("workoutHistory") || "[]"
+        );
         workoutHistory.push(completedWorkout);
         localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
 
@@ -61,5 +63,5 @@ export const workoutService = {
   },
   getGoals: async (): Promise<Goal[]> => {
     return (await apiClient.get("/goals")).data;
-  },
+  }
 };
