@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -52,7 +50,7 @@ export default function AuthPage() {
         className="relative z-10 mb-8"
       >
         <img
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/GainPlay%20(1)-yTMtfbwYJZTFXppHMRfXy6DGhEyzCj.png"
+          src="/GainPlay.png"
           alt="GainPlay Logo"
           width={150}
           height={150}
