@@ -531,7 +531,7 @@ export default function OnboardingPage() {
     <div className="flex flex-col items-center justify-center min-h-[100dvh] px-4 py-6 bg-gradient-to-b from-purple-50 to-purple-200">
       <div className="w-full max-w-md mb-8">
         <img
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/GainPlay%20(1)-yTMtfbwYJZTFXppHMRfXy6DGhEyzCj.png"
+          src="/GainPlay.png"
           alt="GainPlay Logo"
           width={120}
           height={120}
