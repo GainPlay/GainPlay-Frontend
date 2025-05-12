@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
   Flame,
-  Trophy,
   Check,
   PlayCircle,
   AlertCircle,
@@ -18,20 +16,159 @@ import {
   BarChart,
   Calendar,
   Dumbbell,
-  FlameIcon as Fire
+  FlameIcon as Fire,
+  Trophy
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "react-confetti";
 import { cn } from "@/lib/utils";
 import FallbackExerciseImage from "../components/FallbackExerciseImage";
-import ExerciseAssistant from "@/components/ExerciseAssistant";
-import { FrontendExercise } from "@/types";
-import { initialExercises, motivationalQuotes } from "@/data/mockData";
+import ExerciseAssistant from "../components/ExerciseAssistant";
+import { useNavigate } from "react-router-dom";
+import { FrontendBadge } from "@/types";
+
+type Exercise = {
+  id: string;
+  name: string;
+  targetSets: number;
+  targetReps: number;
+  restTime: number; // in seconds
+  instruction: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  muscleGroup: string;
+  xpReward: number;
+  sets: Array<{ completed: boolean; reps: number }>;
+  currentSet: number;
+  currentReps: number;
+  tips: string[];
+};
+
+const initialExercises: Exercise[] = [
+  {
+    id: "pushups",
+    name: "Push-ups",
+    targetSets: 3,
+    targetReps: 10,
+    restTime: 60,
+    instruction:
+      "Keep your body straight, lower until your chest nearly touches the floor, then push back up.",
+    difficulty: "intermediate",
+    muscleGroup: "Chest, Shoulders, Triceps",
+    xpReward: 100,
+    sets: Array(3).fill({ completed: false, reps: 0 }),
+    currentSet: 0,
+    currentReps: 0,
+    tips: [
+      "Keep your core tight throughout the movement",
+      "Don't let your hips sag or pike up",
+      "Breathe out as you push up",
+      "For easier version, do push-ups on your knees"
+    ]
+  },
+  {
+    id: "squats",
+    name: "Squats",
+    targetSets: 3,
+    targetReps: 15,
+    restTime: 45,
+    instruction:
+      "Stand with feet shoulder-width apart, lower your body as if sitting in a chair, then return to standing.",
+    difficulty: "beginner",
+    muscleGroup: "Quadriceps, Hamstrings, Glutes",
+    xpReward: 120,
+    sets: Array(3).fill({ completed: false, reps: 0 }),
+    currentSet: 0,
+    currentReps: 0,
+    tips: [
+      "Keep your chest up and back straight",
+      "Push your knees outward as you descend",
+      "Go as low as comfortable, ideally thighs parallel to ground",
+      "Push through your heels when standing up"
+    ]
+  },
+  {
+    id: "plank",
+    name: "Plank",
+    targetSets: 3,
+    targetReps: 30, // seconds
+    restTime: 30,
+    instruction:
+      "Hold a push-up position with your weight on your forearms, keeping your body in a straight line.",
+    difficulty: "intermediate",
+    muscleGroup: "Core, Shoulders",
+    xpReward: 150,
+    sets: Array(3).fill({ completed: false, reps: 0 }),
+    currentSet: 0,
+    currentReps: 0,
+    tips: [
+      "Keep your shoulders directly above your elbows",
+      "Engage your core and glutes",
+      "Don't let your hips sag or pike up",
+      "Look slightly forward, not straight down"
+    ]
+  },
+  {
+    id: "lunges",
+    name: "Lunges",
+    targetSets: 3,
+    targetReps: 12,
+    restTime: 45,
+    instruction:
+      "Step forward with one leg, lowering your hips until both knees are bent at 90 degrees, then return to standing.",
+    difficulty: "intermediate",
+    muscleGroup: "Quadriceps, Hamstrings, Glutes",
+    xpReward: 120,
+    sets: Array(3).fill({ completed: false, reps: 0 }),
+    currentSet: 0,
+    currentReps: 0,
+    tips: [
+      "Keep your upper body straight",
+      "Step far enough forward that your knee stays above your ankle",
+      "Push back up through your front heel",
+      "Alternate legs for each rep"
+    ]
+  },
+  {
+    id: "mountainClimbers",
+    name: "Mountain Climbers",
+    targetSets: 3,
+    targetReps: 20,
+    restTime: 30,
+    instruction:
+      "Start in a plank position and alternate bringing each knee toward your chest in a running motion.",
+    difficulty: "intermediate",
+    muscleGroup: "Core, Shoulders, Hip Flexors",
+    xpReward: 130,
+    sets: Array(3).fill({ completed: false, reps: 0 }),
+    currentSet: 0,
+    currentReps: 0,
+    tips: [
+      "Keep your hips down and core engaged",
+      "Move your legs as quickly as you can while maintaining form",
+      "Breathe rhythmically throughout the exercise",
+      "Each knee drive counts as one rep"
+    ]
+  }
+];
+
+// Motivational quotes for fitness
+const motivationalQuotes = [
+  "The only bad workout is the one that didn't happen.",
+  "Your body can stand almost anything. It's your mind that you have to convince.",
+  "The pain you feel today will be the strength you feel tomorrow.",
+  "Fitness is not about being better than someone else. It's about being better than you used to be.",
+  "The hardest lift of all is lifting your butt off the couch.",
+  "Don't wish for it, work for it.",
+  "Sweat is just fat crying.",
+  "You don't have to be extreme, just consistent.",
+  "The only way to define your limits is by going beyond them.",
+  "Your health is an investment, not an expense."
+];
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [exercises, setExercises] = useState<FrontendExercise[]>(() => {
+  const [exercises, setExercises] = useState<Exercise[]>(() => {
     if (typeof window !== "undefined") {
       const savedExercises = localStorage.getItem("currentWorkout");
       return savedExercises ? JSON.parse(savedExercises) : [];
@@ -46,6 +183,10 @@ export default function HomePage() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [earnedCoins, setEarnedCoins] = useState(0);
   const [earnedXP, setEarnedXP] = useState(0);
+  // Add a new state variable for earned badges after the earnedXP state
+  const [earnedBadges, setEarnedBadges] = useState<
+    Array<{ id: string; name: string; icon: string }>
+  >([]);
   const [restMode, setRestMode] = useState(false);
   const [restTimeRemaining, setRestTimeRemaining] = useState(0);
   const [level, setLevel] = useState(1);
@@ -182,7 +323,7 @@ export default function HomePage() {
       const parsedExercises = JSON.parse(savedExercises);
       // Check if workout was completed
       const allCompleted = parsedExercises.every(
-        (ex: FrontendExercise) =>
+        (ex: Exercise) =>
           ex.sets.filter((set) => set.completed).length === ex.targetSets
       );
 
@@ -261,6 +402,64 @@ export default function HomePage() {
       localStorage.setItem("userLevel", newLevel.toString());
     }
 
+    // Check for any badges earned
+    const checkForEarnedBadges = () => {
+      const newBadges = [];
+
+      // Example badge conditions - replace with your actual badge logic
+      if (totalXP > 300) {
+        newBadges.push({
+          id: "high-performer",
+          name: "High Performer",
+          icon: "🏆"
+        });
+      }
+
+      if (
+        exercises.every(
+          (ex) =>
+            ex.sets.filter((set) => set.completed).length === ex.targetSets
+        )
+      ) {
+        newBadges.push({
+          id: "completionist",
+          name: "Completionist",
+          icon: "✅"
+        });
+      }
+
+      // First workout badge
+      if (workoutHistory.length === 0) {
+        newBadges.push({
+          id: "first-workout",
+          name: "First Steps",
+          icon: "🌱"
+        });
+      }
+
+      // Add badges to user's collection if they're new
+      if (newBadges.length > 0) {
+        const userBadges = JSON.parse(
+          localStorage.getItem("userBadges") || "[]"
+        );
+        const newUserBadges = [...userBadges];
+
+        newBadges.forEach((badge) => {
+          if (!userBadges.some((b: FrontendBadge) => b.id === badge.id)) {
+            newUserBadges.push({
+              ...badge,
+              earnedAt: new Date().toISOString()
+            });
+          }
+        });
+
+        localStorage.setItem("userBadges", JSON.stringify(newUserBadges));
+        setEarnedBadges(newBadges);
+      }
+    };
+
+    checkForEarnedBadges();
+
     // Show confetti and coin animation
     setShowConfetti(true);
     localStorage.removeItem("currentWorkout");
@@ -308,19 +507,6 @@ export default function HomePage() {
 
   const currentExercise = exercises[currentExerciseIndex];
 
-  // Get the current date for the upcoming workout section
-  // const today = new Date();
-  // const daysOfWeek = [
-  //   "Sunday",
-  //   "Monday",
-  //   "Tuesday",
-  //   "Wednesday",
-  //   "Thursday",
-  //   "Friday",
-  //   "Saturday"
-  // ];
-  // const dayName = daysOfWeek[today.getDay()];
-
   const startDailyChallenge = () => {
     if (isDailyChallengeDone) return;
 
@@ -362,15 +548,10 @@ export default function HomePage() {
               transition={{ type: "spring", duration: 0.5 }}
               className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full mx-4"
             >
-              <div className="mb-6 relative">
-                <div className="flex justify-center">
-                  <Trophy className="w-24 h-24 text-yellow-300 opacity-20" />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <h2 className="text-3xl font-bold text-purple-800 relative z-10">
-                    Workout Complete!
-                  </h2>
-                </div>
+              <div className="mb-6">
+                <h2 className="text-3xl font-bold text-purple-800 relative z-10">
+                  Workout Complete!
+                </h2>
               </div>
               <div className="h-1 w-20 bg-purple-600 mx-auto mb-6"></div>
 
@@ -392,12 +573,50 @@ export default function HomePage() {
               </div>
 
               <div className="bg-purple-50 p-4 rounded-lg mb-6">
-                <Flame className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-                <p className="text-sm text-purple-600">Current Streak</p>
+                <BarChart className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                <p className="text-sm text-purple-600">Workout Score</p>
                 <p className="text-2xl font-bold text-purple-800">
-                  {streak} days
+                  {Math.min(Math.round(earnedXP / 2), 100)}/100
                 </p>
+                <div className="w-full bg-purple-200 h-2 rounded-full mt-2">
+                  <div
+                    className="h-full bg-purple-600 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.min(Math.round(earnedXP / 2), 100)}%`
+                    }}
+                  />
+                </div>
               </div>
+
+              {earnedBadges.length > 0 && (
+                <div className="bg-purple-50 p-4 rounded-lg mb-6">
+                  <Trophy className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
+                  <p className="text-sm text-purple-600 mb-3">Badges Earned</p>
+
+                  <div className="flex justify-center gap-4">
+                    {earnedBadges.map((badge) => (
+                      <motion.div
+                        key={badge.id}
+                        initial={{ scale: 0, rotate: -10 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{
+                          type: "spring",
+                          delay: 0.3,
+                          duration: 0.5
+                        }}
+                        className="flex flex-col items-center"
+                      >
+                        <div className="text-4xl mb-1 bg-white w-14 h-14 rounded-full flex items-center justify-center shadow-md">
+                          {badge.icon}
+                        </div>
+                        <p className="text-xs font-medium text-purple-700 mt-1 max-w-[80px] text-center">
+                          {badge.name}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <Button
                 onClick={closePopup}
@@ -627,12 +846,6 @@ export default function HomePage() {
                   </span>
                 </div>
               </div>
-              <Button
-                className="w-full mt-4 bg-purple-600 hover:bg-purple-700"
-                onClick={startWorkout}
-              >
-                Start Workout Now
-              </Button>
             </CardContent>
           </Card>
 
