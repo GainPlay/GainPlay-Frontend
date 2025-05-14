@@ -1,11 +1,14 @@
 import axios from "axios";
+import { headers } from "./authService";
 // import { saveTokens, refresh } from "./authService";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_REACT_APP_API_URL + "/api",
   headers: {
-    "Content-type": "application/json"
-  }
+    "Content-type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    
+  },
 });
 
 // apiClient.interceptors.response.use(

@@ -1,7 +1,8 @@
 import apiClient from './apiClient';
 
 export interface AiAnswerRequest {
-    question: string;
+    userId: number;
+    message: string;
 }
 
 export interface AiAnswerResponse {

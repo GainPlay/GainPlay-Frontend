@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { signup, saveTokens, signin, googleSignIn } from "@/services/authService";
+import { signup, saveTokens, signin } from "@/services/authService";
 import { useCallback } from "react";
 export default function AuthPage() {
   const navigate = useNavigate();

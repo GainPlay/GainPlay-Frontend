@@ -229,7 +229,7 @@ export default function ExerciseAssistant({
 // Function to generate responses based on user input
 async function generateResponse(input: string, exerciseName: string): Promise<AiAnswerResponse> {
   const inputLower = input.toLowerCase();
-  const answer = await getAiAnswer({question: `Regarding  ${exerciseName}, ${inputLower}`})
+  const answer = await getAiAnswer({userId:0,message: `Regarding  ${exerciseName}, ${inputLower}`})
   return answer
 
 
