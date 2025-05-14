@@ -165,7 +165,7 @@ export enum FriendshipStatus {
   FRIEND = "friend",
   PENDING_SENT = "pending-sent",
   PENDING_RECEIVED = "pending-received",
-  NONE = "none"
+  NONE = "none",
 }
 
 export interface FrontendFriend {
@@ -210,8 +210,15 @@ export type RefreshResponse = {
   refreshToken: string;
 };
 
-export type SigninResponse = GeneralResponse;
+export type SigninResponse = {
+  access_token: string;
+  refresh_token?: string;
+  error?: string;
+};
 
 export type GoogleSignInResponse = GeneralResponse;
 
-export type SignupResponse = User;
+export type SignupResponse = {
+  access_token: string;
+  error?: string;
+};
