@@ -81,6 +81,8 @@ export interface Friendship {
   status: string | null;
   created_at: Date | null;
   updated_at: Date | null;
+  sender: Partial<FrontendUserData> | null;
+  receiver: Partial<FrontendUserData> | null;
 }
 
 // Exercise related types

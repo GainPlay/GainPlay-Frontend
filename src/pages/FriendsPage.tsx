@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, Users, ArrowLeft, X, UserCheck, ChevronDown, ChevronUp, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { FriendshipStatus, FrontendUserData } from "@/types";
+import { FrontendUserData } from "@/types";
 import { friendsService } from "@/services/friendsService";
 import { mapFriendshipsToFrontend } from "@/utils/friendshipsUtils";
 import { allGoals } from "@/utils/constants/friendships.consts";
@@ -45,7 +45,7 @@ export default function FriendsPage() {
     handleSearch();
   }, [selectedGoals, searchTerm, allDiscoverableUsers]);
 
-  const handleSearch = () => {
+  const handleSearch = (): void => {
     const filtered = allDiscoverableUsers.filter((friend) => {
       const nameMatch = friend.name.toLowerCase().includes(searchTerm.toLowerCase());
       const emailMatch = friend.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -59,16 +59,16 @@ export default function FriendsPage() {
     setShowEmptyState(filtered.length === 0);
   };
 
-  const handleGoalToggle = (goal: string) => {
+  const handleGoalToggle = (goal: string): void => {
     setSelectedGoals((prev) => (prev.includes(goal) ? prev.filter((g) => g !== goal) : [...prev, goal]));
   };
 
-  const clearFilters = () => {
+  const clearFilters = (): void => {
     setSelectedGoals([]);
   };
 
-  const navigateToUserProfile = (userId: number, status: FriendshipStatus) => {
-    navigate(`/user-profile/${userId}`, { state: { status: status } });
+  const navigateToUserProfile = (userId: number): void => {
+    navigate(`/user-profile/${userId}`);
   };
 
   return (
@@ -252,7 +252,7 @@ export default function FriendsPage() {
                     transition={{ duration: 0.3 }}
                     whileHover={{ y: -5 }}
                     className="w-full"
-                    onClick={() => navigateToUserProfile(friend.id, FriendshipStatus.NOT_FRIENDS)}
+                    onClick={() => navigateToUserProfile(friend.id)}
                   >
                     <Card className="overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
                       <div className="p-4">
@@ -315,7 +315,7 @@ export default function FriendsPage() {
                     transition={{ duration: 0.3 }}
                     whileHover={{ y: -5 }}
                     className="w-full"
-                    onClick={() => navigateToUserProfile(friend.id, FriendshipStatus.ACCEPTED)}
+                    onClick={() => navigateToUserProfile(friend.id)}
                   >
                     <Card className="overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
                       <div className="p-4">
@@ -388,7 +388,7 @@ export default function FriendsPage() {
                     transition={{ duration: 0.3 }}
                     whileHover={{ y: -5 }}
                     className="w-full"
-                    onClick={() => navigateToUserProfile(friend.id, FriendshipStatus.PENDING)}
+                    onClick={() => navigateToUserProfile(friend.id)}
                   >
                     <Card className="overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border-l-4 border-l-amber-400">
                       <div className="p-4">

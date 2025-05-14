@@ -10,20 +10,28 @@ export const friendsService = {
     return (
       await apiClient.get("/friendships", {
         params: { userId: userId },
-        headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJuYWRhdmF6YUBnbWFpbC5jb20iLCJpYXQiOjE3NDcyNDIxOTMsImV4cCI6MTc0NzI0NTc5M30.I0RGO7UtM58Xs3tNhwqYckffeC6LlKiUhKnQfG9Bx6Y`,
-        },
       })
     ).data;
   },
+
+  getFriendship: async (userId: number, friendId: number): Promise<Friendship> => {
+    return (await apiClient.get(`/friendships/userId/${userId}/friendId/${friendId}`)).data;
+  },
+
   getDiscover: async (userId: number): Promise<FrontendUserData[]> => {
     return (
       await apiClient.get("/friendships/discover", {
         params: { userId: userId },
-        headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJuYWRhdmF6YUBnbWFpbC5jb20iLCJpYXQiOjE3NDcyNDIxOTMsImV4cCI6MTc0NzI0NTc5M30.I0RGO7UtM58Xs3tNhwqYckffeC6LlKiUhKnQfG9Bx6Y`,
-        },
       })
     ).data;
+  },
+  sendFriendRequest: async (friendship: Partial<Friendship>): Promise<Friendship> => {
+    return (await apiClient.post("/friendships", friendship)).data;
+  },
+  updateFriendship: async (id: number, updatedfriendship: Partial<Friendship>): Promise<Friendship> => {
+    return (await apiClient.put(`/friendships/${id}`, updatedfriendship)).data;
+  },
+  deleteFriendship: async (friendshipId: number): Promise<void> => {
+    await apiClient.delete(`/friendships/${friendshipId}`);
   },
 };
