@@ -39,7 +39,7 @@ export default function ExerciseAssistant({
           }
         ]);
         setIsTyping(false);
-      }, 1500);
+      }, 500);
     }
   }, [isOpen, exerciseName, messages.length]);
 
@@ -73,7 +73,7 @@ export default function ExerciseAssistant({
         }
       ]);
       setIsTyping(false);
-    }, 1500);
+    }, 1000);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
