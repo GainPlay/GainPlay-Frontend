@@ -70,6 +70,7 @@ export interface UserGoal {
   value: number | null;
   created_at: Date | null;
   updated_at: Date | null;
+  goals: Goal;
 }
 
 // Friendship related types
@@ -162,23 +163,13 @@ export interface FrontendAvatar {
 }
 
 export enum FriendshipStatus {
-  FRIEND = "friend",
-  PENDING_SENT = "pending-sent",
-  PENDING_RECEIVED = "pending-received",
-  NONE = "none"
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  BLOCKED = "blocked",
+  NOT_FRIENDS = "not_friends",
 }
-
-export interface FrontendFriend {
-  id: number;
-  name: string;
-  avatar: string;
-  email: string;
-  goals: string[];
-  level: number;
-  status?: FriendshipStatus;
-}
-
 export interface FrontendUserData {
+  id: number;
   name: string;
   email: string;
   avatar: string;
@@ -186,7 +177,10 @@ export interface FrontendUserData {
   height: string;
   weight: string;
   age: string;
+  level: number;
+  status?: FriendshipStatus;
   badges: FrontendBadge[];
+  user_goals: UserGoal[];
 }
 
 export interface WorkoutHistoryItem {
