@@ -3,9 +3,84 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-
+import { signup, saveTokens, signin } from "@/services/authService";
+import { useCallback } from "react";
 export default function AuthPage() {
   const navigate = useNavigate();
+
+  const handleLogin = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const email = (form.elements.namedItem("email") as HTMLInputElement)?.value;
+      const password = (form.elements.namedItem("password") as HTMLInputElement)?.value;
+      try {
+        const response = await signin(email, password);
+        if (response.status === 201 && response.data?.access_token) {
+          saveTokens({ accessToken: response.data.access_token });
+          navigate("/home");
+        } else {
+          if (response.status === 400) {
+            console.log(response.data.error);
+          }
+          throw new Error(response.data.error || "Signin failed");
+        }
+      } catch (error) {
+        console.error("Signin error:", error);
+      }
+    },
+    [navigate]
+  ); 
+
+  const handleRegister = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      const form = e.target as HTMLFormElement;
+      const username = (form.elements.namedItem("username") as HTMLInputElement)?.value;
+      const email = (form.elements.namedItem("email") as HTMLInputElement)?.value;
+      const password = (form.elements.namedItem("password") as HTMLInputElement)?.value;
+      try {
+        const response = await signup( username, email, password );
+        if (response.status === 201) {
+          if (response.data?.access_token) {
+          saveTokens({accessToken: response.data.access_token });
+          }
+        } else {
+          if (response.status === 400) {
+            console.log(response.data.error);
+          }
+
+          console.log(response.data.error);
+          throw new Error( response.data.error || "Signup failed");
+        }
+        navigate("/onboarding");
+      } catch (error) {
+        console.error("Signup error:", error);
+      }
+    },
+    [navigate]
+  )
+
+  // const HandleGoogleSignIn = useCallback(
+  //   async (e: React.MouseEvent<HTMLButtonElement>) => {
+  //     e.preventDefault();
+  //     try {
+  //       const response = await googleSignIn();
+  //       console.log(response)
+  //       if (response.status === 200) {
+  //         const data = await response.json();
+  //         saveTokens({ accessToken: data.access_token });
+  //         navigate("/home");
+  //       } else {
+  //         console.error("Google Sign In failed");
+  //       }
+  //     } catch (error) {
+  //       console.error("Google Sign In error:", error);
+  //     }
+  //   },
+  //   [navigate]
+  // );
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 overflow-hidden">
@@ -98,13 +173,15 @@ export default function AuthPage() {
             value="signin"
             className="p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg"
           >
-            <form className="space-y-4">
+            <form className="space-y-4"
+            onSubmit={handleLogin} >
               <div className="space-y-2">
                 <label className="text-sm font-medium text-purple-700">
                   Email
                 </label>
                 <div className="relative">
                   <Input
+                    name="email"
                     type="email"
                     placeholder="Enter your email"
                     className="pl-10 bg-white/70 border-purple-200 focus:border-purple-400 focus:ring focus:ring-purple-200 transition-all"
@@ -127,6 +204,7 @@ export default function AuthPage() {
                 </label>
                 <div className="relative">
                   <Input
+                    name="password"
                     type="password"
                     placeholder="Enter your password"
                     className="pl-10 bg-white/70 border-purple-200 focus:border-purple-400 focus:ring focus:ring-purple-200 transition-all"
@@ -147,7 +225,9 @@ export default function AuthPage() {
               </div>
 
               <div className="pt-2">
-                <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]">
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]">
                   Sign In
                 </Button>
               </div>
@@ -164,6 +244,7 @@ export default function AuthPage() {
               <Button
                 variant="outline"
                 className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-2"
+                // onClick={HandleGoogleSignIn}
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -195,97 +276,97 @@ export default function AuthPage() {
           >
             <form
               className="space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                navigate("/onboarding");
-              }}
+              onSubmit={handleRegister}
             >
               <div className="space-y-2">
-                <label className="text-sm font-medium text-purple-700">
-                  Username
-                </label>
-                <div className="relative">
-                  <Input
-                    type="text"
-                    placeholder="Choose a username"
-                    className="pl-10 bg-white/70 border-purple-200 focus:border-purple-400 focus:ring focus:ring-purple-200 transition-all"
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
+              <label className="text-sm font-medium text-purple-700">
+                Username
+              </label>
+              <div className="relative">
+                <Input
+                name="username"
+                type="text"
+                placeholder="Choose a username"
+                className="pl-10 bg-white/70 border-purple-200 focus:border-purple-400 focus:ring focus:ring-purple-200 transition-all"
+                />
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                >
+                <path
+                  fillRule="evenodd"
+                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                  clipRule="evenodd"
+                />
+                </svg>
+              </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-purple-700">
-                  Email
-                </label>
-                <div className="relative">
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="pl-10 bg-white/70 border-purple-200 focus:border-purple-400 focus:ring focus:ring-purple-200 transition-all"
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                  </svg>
-                </div>
+              <label className="text-sm font-medium text-purple-700">
+                Email
+              </label>
+              <div className="relative">
+                <Input
+                name="email"
+                type="email"
+                placeholder="Enter your email"
+                className="pl-10 bg-white/70 border-purple-200 focus:border-purple-400 focus:ring focus:ring-purple-200 transition-all"
+                />
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                >
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                </svg>
+              </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-purple-700">
-                  Password
-                </label>
-                <div className="relative">
-                  <Input
-                    type="password"
-                    placeholder="Create a password"
-                    className="pl-10 bg-white/70 border-purple-200 focus:border-purple-400 focus:ring focus:ring-purple-200 transition-all"
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
+              <label className="text-sm font-medium text-purple-700">
+                Password
+              </label>
+              <div className="relative">
+                <Input
+                name="password"
+                type="password"
+                placeholder="Create a password"
+                className="pl-10 bg-white/70 border-purple-200 focus:border-purple-400 focus:ring focus:ring-purple-200 transition-all"
+                />
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                >
+                <path
+                  fillRule="evenodd"
+                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  clipRule="evenodd"
+                />
+                </svg>
+              </div>
               </div>
 
               <div className="pt-2">
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]"
-                >
-                  Create Account
-                </Button>
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]"
+              >
+                Create Account
+              </Button>
               </div>
 
               <div className="relative flex items-center justify-center mt-4">
-                <div className="border-t border-gray-300 absolute w-full"></div>
-                <div className="bg-white px-4 relative text-sm text-gray-500">
-                  or sign up with
-                </div>
+              <div className="border-t border-gray-300 absolute w-full"></div>
+              <div className="bg-white px-4 relative text-sm text-gray-500">
+                or sign up with
+              </div>
               </div>
             </form>
 

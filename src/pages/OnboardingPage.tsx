@@ -15,7 +15,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, ArrowRight, ArrowLeft, Dumbbell } from "lucide-react";
-
+import { mapSurveyValuesToApi } from "@/utils/surveyMap";
+import { onboardingService } from "@/services/onboardingservice";
 // Type definitions
 type Option = {
   value: string;
@@ -253,6 +254,13 @@ export default function OnboardingPage() {
     } else {
       // Save answers and show loading animation
       localStorage.setItem("userGoals", JSON.stringify(answers));
+      const apiAnswers = mapSurveyValuesToApi(answers);
+      const response = onboardingService.saveOnboardingData(apiAnswers);
+
+      // if (response.status !== 200) {
+      //   console.error("Error saving onboarding data");
+      // }
+      console.log(response)
       setIsGeneratingWorkout(true);
 
       // Simulate workout generation with a timeout

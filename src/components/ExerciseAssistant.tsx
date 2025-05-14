@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { MessageCircle, X, Send, MinusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AiAnswerResponse, getAiAnswer } from "@/services/chatService";
 
 type Message = {
   id: string;
@@ -17,6 +18,7 @@ type ExerciseAssistantProps = {
 export default function ExerciseAssistant({
   exerciseName
 }: ExerciseAssistantProps) {
+  const startMessage =`Hi there! I'm your GainPlay assistant. Need help with ${exerciseName}? Just ask!`
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -32,12 +34,12 @@ export default function ExerciseAssistant({
         setMessages([
           {
             id: "1",
-            content: `Hi there! I'm your GainPlay assistant. Need help with ${exerciseName}? Just ask!`,
+            content: startMessage,
             sender: "assistant"
           }
         ]);
         setIsTyping(false);
-      }, 1000);
+      }, 500);
     }
   }, [isOpen, exerciseName, messages.length]);
 
@@ -60,18 +62,18 @@ export default function ExerciseAssistant({
     setIsTyping(true);
 
     // Simulate assistant response
-    setTimeout(() => {
-      const response = generateResponse(input, exerciseName);
+    setTimeout(async () => {
+      const response = await generateResponse(input, exerciseName);
       setMessages((prev) => [
         ...prev,
         {
-          id: (Date.now() + 1).toString(),
-          content: response,
+          id: response.dateTime,
+          content: response.answer,
           sender: "assistant"
         }
       ]);
       setIsTyping(false);
-    }, 1500);
+    }, 1000);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -225,55 +227,10 @@ export default function ExerciseAssistant({
 }
 
 // Function to generate responses based on user input
-function generateResponse(input: string, exerciseName: string): string {
+async function generateResponse(input: string, exerciseName: string): Promise<AiAnswerResponse> {
   const inputLower = input.toLowerCase();
+  const answer = await getAiAnswer({userId:0,message: `Regarding  ${exerciseName}, ${inputLower}`})
+  return answer
 
-  // Exercise form responses
-  if (
-    inputLower.includes("form") ||
-    inputLower.includes("how to") ||
-    inputLower.includes("technique")
-  ) {
-    if (exerciseName.toLowerCase().includes("push-up")) {
-      return "For proper push-up form: Start in a plank position with hands slightly wider than shoulders. Keep your body in a straight line, core engaged. Lower your chest to the floor by bending your elbows at a 45-degree angle, then push back up. Don't let your hips sag or pike up.";
-    } else if (exerciseName.toLowerCase().includes("squat")) {
-      return "For proper squat form: Stand with feet shoulder-width apart. Keep your chest up and back straight. Lower your body by bending your knees and pushing your hips back as if sitting in a chair. Go as low as comfortable, ideally thighs parallel to ground. Push through your heels to stand back up.";
-    } else if (exerciseName.toLowerCase().includes("plank")) {
-      return "For proper plank form: Position your forearms on the ground with elbows directly under your shoulders. Extend your legs behind you and rise up on your toes. Keep your body in a straight line from head to heels. Engage your core and don't let your hips sag or pike up.";
-    } else {
-      return `For proper ${exerciseName} form, focus on controlled movements and proper alignment. Keep your core engaged throughout the exercise. Would you like more specific tips?`;
-    }
-  }
 
-  // Difficulty modifications
-  else if (
-    inputLower.includes("easier") ||
-    inputLower.includes("too hard") ||
-    inputLower.includes("modify")
-  ) {
-    return `To make ${exerciseName} easier, you can try a modified version. For example, reduce the range of motion, use support, or decrease the repetitions. Would you like a specific modification suggestion?`;
-  }
-
-  // Benefits questions
-  else if (
-    inputLower.includes("benefit") ||
-    inputLower.includes("good for") ||
-    inputLower.includes("target")
-  ) {
-    return `${exerciseName} is great for building strength and endurance in your muscles. It primarily targets specific muscle groups and helps improve your overall fitness. Regular practice will enhance your performance in daily activities too!`;
-  }
-
-  // Pain or discomfort
-  else if (
-    inputLower.includes("pain") ||
-    inputLower.includes("hurt") ||
-    inputLower.includes("sore")
-  ) {
-    return "If you're experiencing pain (not just muscle fatigue), you should stop the exercise. Make sure your form is correct, and consider consulting with a fitness professional or healthcare provider if pain persists. Remember, discomfort from exertion is normal, but sharp pain is not.";
-  }
-
-  // Default response
-  else {
-    return `That's a great question about ${exerciseName}! I'm here to help with form, modifications, benefits, or any other questions you might have about this exercise. Could you provide more details about what you'd like to know?`;
-  }
 }

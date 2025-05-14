@@ -1,11 +1,14 @@
 import axios from "axios";
+import { headers } from "./authService";
 // import { saveTokens, refresh } from "./authService";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_REACT_APP_API_URL + "/api",
   headers: {
-    "Content-type": "application/json"
-  }
+    "Content-type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    
+  },
 });
 
 // apiClient.interceptors.response.use(
@@ -16,8 +19,8 @@ const apiClient = axios.create({
 //     const originalRequest = error.config;
 //     if (error.response && error.response.data === "Unauthorized") {
 //       try {
-//         // const accessToken = await refreshTokens();
-//         // originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+//         const accessToken = await refreshTokens();
+//         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 //         originalRequest._retry = true;
 //         return apiClient(originalRequest);
 //       } catch (refreshError) {
