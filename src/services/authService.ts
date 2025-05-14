@@ -1,5 +1,4 @@
-import { GoogleSignInResponse, SigninResponse, SignupResponse } from "@/types";
-import { CredentialResponse } from "@react-oauth/google";
+import {SigninResponse, SignupResponse } from "@/types";
 import { AxiosResponse } from "axios";
 import apiClient from "./apiClient";
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/utils/constants/index";
