@@ -16,8 +16,8 @@ const apiClient = axios.create({
 //     const originalRequest = error.config;
 //     if (error.response && error.response.data === "Unauthorized") {
 //       try {
-//         // const accessToken = await refreshTokens();
-//         // originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+//         const accessToken = await refreshTokens();
+//         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 //         originalRequest._retry = true;
 //         return apiClient(originalRequest);
 //       } catch (refreshError) {

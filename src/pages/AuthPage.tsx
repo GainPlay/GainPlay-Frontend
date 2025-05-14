@@ -244,7 +244,7 @@ export default function AuthPage() {
               <Button
                 variant="outline"
                 className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-2"
-                onClick={HandleGoogleSignIn}
+                // onClick={HandleGoogleSignIn}
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
