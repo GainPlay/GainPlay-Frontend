@@ -6,6 +6,7 @@ export interface AiAnswerRequest {
 
 export interface AiAnswerResponse {
     answer: string;
+    dateTime: string;
 }
 
 export async function getAiAnswer(

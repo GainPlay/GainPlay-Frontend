@@ -18,6 +18,7 @@ type ExerciseAssistantProps = {
 export default function ExerciseAssistant({
   exerciseName
 }: ExerciseAssistantProps) {
+  const startMessage =`Hi there! I'm your GainPlay assistant. Need help with ${exerciseName}? Just ask!`
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -33,7 +34,7 @@ export default function ExerciseAssistant({
         setMessages([
           {
             id: "1",
-            content: `Hi there! I'm your GainPlay assistant. Need help with ${exerciseName}? Just ask!`,
+            content: startMessage,
             sender: "assistant"
           }
         ]);
@@ -66,7 +67,7 @@ export default function ExerciseAssistant({
       setMessages((prev) => [
         ...prev,
         {
-          id: (Date.now() + 1).toString(),
+          id: response.dateTime,
           content: response.answer,
           sender: "assistant"
         }
