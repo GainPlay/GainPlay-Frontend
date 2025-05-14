@@ -13,11 +13,16 @@ export interface User {
 
 export interface UserSettings {
   id: number;
-  user_id: number | null;
-  exercise_frequency: number | null;
-  fitness_level: number | null;
-  created_at: Date | null;
-  updated_at: Date | null;
+  user_id: number;
+  exercise_frequency: number;
+  fitness_level: number;
+  workout_duration: number;
+  weight: number;
+  height: number;
+  age: number;
+  body_structure: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // Avatar related types
@@ -222,3 +227,47 @@ export type SignupResponse = {
   access_token: string;
   error?: string;
 };
+
+export type OnboardingData = {
+  fitnessLevel: number;
+  fitnessGoals: Record<number, number>;
+  workoutFrequency: number;
+  workoutDuration: number;
+  bodyStructure: string;
+  technicalData: {
+    age: number;
+    weight: number;
+    height: number;
+  };
+};
+
+export type OnboardingResponse = {
+  userGoals: UserGoal[];
+  userSettings: UserSettings;
+};
+
+export interface FrontendSurveyValues {
+  fitnessLevel: string;
+  fitnessGoals: Record<string, number>;
+  workoutFrequency: string;
+  workoutDuration: string;
+  bodyStructure: string;
+  technicalData: {
+    age: string;
+    weight: string;
+    height: string;
+  };
+}
+
+export interface ApiSurveyValues {
+  fitnessLevel: number;
+  fitnessGoals: Record<string, number>;
+  workoutFrequency: number;
+  workoutDuration: number;
+  bodyStructure: string;
+  technicalData: {
+    age: number;
+    weight: number;
+    height: number;
+  };
+}
