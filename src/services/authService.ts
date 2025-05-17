@@ -23,9 +23,7 @@ export const saveTokens = ({ accessToken }: { accessToken: string }) => {
 };
 
 export const setDefaultAxiosConfig = () => {
-  axios.defaults.headers.common.Authorization = `Bearer ${
-    getTokens().accessToken
-  }`;
+  axios.defaults.headers.Authorization = `Bearer ${getTokens().accessToken}`;
 };
 
 export const resetTokens = () => {

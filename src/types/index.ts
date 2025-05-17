@@ -173,7 +173,7 @@ export enum FriendshipStatus {
   FRIEND = "friend",
   PENDING_SENT = "pending-sent",
   PENDING_RECEIVED = "pending-received",
-  NONE = "none",
+  NONE = "none"
 }
 export interface FrontendUserData {
   id: number;
@@ -181,9 +181,9 @@ export interface FrontendUserData {
   email: string;
   avatar: string;
   coins: number;
-  height: string;
-  weight: string;
-  age: string;
+  height: number;
+  weight: number;
+  age: string | number;
   level: number;
   status?: FriendshipStatus;
   badges: FrontendBadge[];

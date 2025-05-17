@@ -6,7 +6,7 @@ import "./index.css";
 import axios from "axios";
 
 axios.defaults.baseURL = `${import.meta.env.VITE_REACT_APP_API_URL}/api`;
-axios.defaults.headers.common["Content-Type"] = "application/json";
+axios.defaults.headers["Content-Type"] = "application/json";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
