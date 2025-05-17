@@ -186,21 +186,22 @@ const questions: Question[] = [
       {
         value: "slim",
         label: "Slim Builder",
-        description: "Naturally lean, find it harder to gain weight or muscle",
-        image: slimBuilder, // slim person
+        description:
+          "Naturally lean, finds it harder to gain weight or muscle. Fast metabolism, narrow frame.",
+        image: slimBuilder,
       },
       {
         value: "athletic",
         label: "Athletic Builder",
         description:
-          "Naturally muscular, respond well to training, gain/lose weight easily",
+          "Naturally muscular and athletic. Gains muscle easily and maintains a balanced physique.",
         image: athleticBuilder,
       },
       {
         value: "solid",
         label: "Solid Builder",
         description:
-          "Naturally heavier, gain muscle easily but may also gain fat more easily",
+          "Naturally broader and rounder. Tends to store fat easily and may struggle with weight loss.",
         image: solidBuilder,
       },
     ],
@@ -482,7 +483,7 @@ export default function OnboardingPage() {
                   <img
                     src={option.image || "/placeholder.svg"}
                     alt={option.label}
-                    width={100}
+                    width={150}
                     height={200}
                     className="rounded-lg"
                   />
