@@ -112,7 +112,10 @@ export default function ProfilePage() {
         height: "175",
         weight: "70",
         age: "30",
-        badges: badges.slice(0, 3) // Give the user 3 random badges
+        badges: badges.slice(0, 3),
+        id: 0,
+        level: 0,
+        user_goals: []
       };
       setUserData(defaultUserData);
       setEditedName(defaultUserData.name);

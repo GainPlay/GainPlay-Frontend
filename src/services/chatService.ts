@@ -1,18 +1,18 @@
-import apiClient from './apiClient';
+import axios from "axios";
 
 export interface AiAnswerRequest {
-    userId: number;
-    message: string;
+  userId: number;
+  message: string;
 }
 
 export interface AiAnswerResponse {
-    answer: string;
-    dateTime: string;
+  answer: string;
+  dateTime: string;
 }
 
 export async function getAiAnswer(
-    data: AiAnswerRequest
+  data: AiAnswerRequest
 ): Promise<AiAnswerResponse> {
-    const response = await apiClient.post<AiAnswerResponse>('/chat', data);
-    return response.data;
+  const response = await axios.post<AiAnswerResponse>("/chat", data);
+  return response.data;
 }
