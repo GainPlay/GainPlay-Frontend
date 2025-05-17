@@ -37,41 +37,44 @@ type GoalOption = {
   label: string;
 };
 
-type Question = {
-  id: string;
+interface BaseQuestion {
+  id: keyof Answers;
   question: string;
   description: string;
-  type: string;
-  options?: Option[];
-  fields?: Field[];
   icon: string;
-};
+}
 
-type BodyTypeQuestion = Question & {
-  type: "bodyType";
-  options: Option[];
-};
-
-type RadioQuestion = Question & {
+interface RadioQuestion extends BaseQuestion {
   type: "radio";
   options: Option[];
-};
+}
 
-type MultiGoalQuestion = Question & {
+interface MultiGoalQuestion extends BaseQuestion {
   type: "multiGoal";
   options: GoalOption[];
-};
+}
 
-type TechnicalDataQuestion = Question & {
+interface BodyTypeQuestion extends BaseQuestion {
+  type: "bodyType";
+  options: Option[];
+}
+
+interface TechnicalDataQuestion extends BaseQuestion {
   type: "technicalData";
   fields: Field[];
-};
+}
 
-type AnyQuestion =
+type Question =
   | RadioQuestion
   | MultiGoalQuestion
   | BodyTypeQuestion
   | TechnicalDataQuestion;
+
+type TechnicalData = {
+  age: string;
+  weight: string;
+  height: string;
+};
 
 type Answers = {
   fitnessLevel: string;
@@ -79,14 +82,10 @@ type Answers = {
   workoutFrequency: string;
   workoutDuration: string;
   bodyStructure: string;
-  technicalData: {
-    age: string;
-    weight: string;
-    height: string;
-  };
+  technicalData: TechnicalData;
 };
 
-const questions: AnyQuestion[] = [
+const questions: Question[] = [
   {
     id: "fitnessLevel",
     question: "What's your current fitness level?",
@@ -122,42 +121,12 @@ const questions: AnyQuestion[] = [
     description: "Select all that apply and rate their importance to you",
     type: "multiGoal",
     options: [
-      {
-        id: "loseWeight",
-        label: "Lose Weight",
-        value: "loseWeight",
-        description: "Focus on reducing body weight"
-      },
-      {
-        id: "gainMuscle",
-        label: "Gain Muscle",
-        value: "gainMuscle",
-        description: "Build muscle mass and strength"
-      },
-      {
-        id: "improveEndurance",
-        label: "Improve Endurance",
-        value: "improveEndurance",
-        description: "Enhance stamina and endurance"
-      },
-      {
-        id: "increaseStrength",
-        label: "Increase Strength",
-        value: "increaseStrength",
-        description: "Boost physical strength"
-      },
-      {
-        id: "improveFlexibility",
-        label: "Improve Flexibility",
-        value: "improveFlexibility",
-        description: "Increase range of motion and flexibility"
-      },
-      {
-        id: "maintainHealth",
-        label: "Maintain Health",
-        value: "maintainHealth",
-        description: "Focus on overall health and wellness"
-      }
+      { id: "loseWeight", label: "Lose Weight" },
+      { id: "gainMuscle", label: "Gain Muscle" },
+      { id: "improveEndurance", label: "Improve Endurance" },
+      { id: "increaseStrength", label: "Increase Strength" },
+      { id: "improveFlexibility", label: "Improve Flexibility" },
+      { id: "maintainHealth", label: "Maintain Health" }
     ],
     icon: "🎯"
   },
@@ -260,7 +229,7 @@ const questions: AnyQuestion[] = [
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<Answers>({
     fitnessLevel: "beginner",
     fitnessGoals: {},
@@ -273,9 +242,10 @@ export default function OnboardingPage() {
       height: ""
     }
   });
-  const [direction, setDirection] = useState(0);
+  const [direction, setDirection] = useState<number>(0);
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
-  const [isGeneratingWorkout, setIsGeneratingWorkout] = useState(false);
+  const [isGeneratingWorkout, setIsGeneratingWorkout] =
+    useState<boolean>(false);
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
@@ -307,10 +277,11 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleAnswerChange = (value: unknown) => {
+  const handleAnswerChange = (value: string) => {
+    const currentQuestionId = questions[currentQuestion].id;
     setAnswers({
       ...answers,
-      [questions[currentQuestion].id]: value
+      [currentQuestionId]: value
     });
   };
 
@@ -343,7 +314,10 @@ export default function OnboardingPage() {
     });
   };
 
-  const handleTechnicalDataChange = (field: string, value: string) => {
+  const handleTechnicalDataChange = (
+    field: keyof TechnicalData,
+    value: string
+  ) => {
     setAnswers({
       ...answers,
       technicalData: {
@@ -375,117 +349,122 @@ export default function OnboardingPage() {
     const question = questions[currentQuestion];
 
     switch (question.type) {
-      case "radio":
+      case "radio": {
+        const radioQuestion = question as RadioQuestion;
         return (
           <RadioGroup
-            value={answers[question.id as keyof Answers] as string}
+            value={answers[radioQuestion.id] as string}
             onValueChange={handleAnswerChange}
             className="space-y-3 mt-4"
           >
-            {(question as RadioQuestion).options.map((option) => (
-              <div
+            {radioQuestion.options.map((option) => (
+              <Label
                 key={option.value}
-                className="flex items-start space-x-2 border border-purple-100 p-3 rounded-lg hover:bg-purple-50 transition-colors"
+                htmlFor={option.value}
+                className="flex items-center border border-purple-100 p-3 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer"
+                onClick={() => handleAnswerChange(option.value)}
               >
-                <RadioGroupItem
-                  value={option.value}
-                  id={option.value}
-                  className="mt-1"
-                />
-                <div className="grid gap-1">
-                  <Label
-                    htmlFor={option.value}
-                    className="font-medium text-purple-900"
-                  >
+                <div className="flex items-center">
+                  <RadioGroupItem
+                    value={option.value}
+                    id={option.value}
+                    className="mr-3"
+                  />
+                </div>
+                <div className="grid gap-1 flex-1">
+                  <div className="font-medium text-purple-900">
                     {option.label}
-                  </Label>
+                  </div>
                   <p className="text-sm text-purple-600">
                     {option.description}
                   </p>
                 </div>
-              </div>
+              </Label>
             ))}
           </RadioGroup>
         );
+      }
 
-      case "multiGoal":
+      case "multiGoal": {
+        const multiGoalQuestion = question as MultiGoalQuestion;
         return (
           <div className="space-y-4 mt-4">
-            {(question as MultiGoalQuestion).options.map(
-              (option: GoalOption) => (
-                <div key={option.id} className="space-y-2">
-                  <div className="flex items-start space-x-2 border border-purple-100 p-3 rounded-lg hover:bg-purple-50 transition-colors">
+            {multiGoalQuestion.options.map((option) => (
+              <div key={option.id} className="space-y-2">
+                <Label
+                  htmlFor={option.id}
+                  className="flex items-center border border-purple-100 p-3 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer"
+                  onClick={() => handleGoalToggle(option.id)}
+                >
+                  <div className="flex items-center">
                     <Checkbox
                       id={option.id}
                       checked={selectedGoals.includes(option.id)}
                       onCheckedChange={() => handleGoalToggle(option.id)}
-                      className="mt-1"
+                      className="mr-3"
                     />
-                    <div className="grid gap-1 w-full">
-                      <Label
-                        htmlFor={option.id}
-                        className="font-medium text-purple-900"
-                      >
-                        {option.label}
-                      </Label>
-                      {selectedGoals.includes(option.id) && (
-                        <div className="mt-2">
-                          <p className="text-sm text-purple-600 mb-1">
-                            How important is this goal to you?
-                          </p>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xs text-purple-500">Low</span>
-                            <Slider
-                              value={[answers.fitnessGoals[option.id] || 5]}
-                              onValueChange={(value) =>
-                                handleGoalImportanceChange(option.id, value[0])
-                              }
-                              max={10}
-                              step={1}
-                              className="flex-1"
-                            />
-                            <span className="text-xs text-purple-500">
-                              High
-                            </span>
-                            <span className="ml-2 min-w-[30px] text-center font-medium text-purple-700">
-                              {answers.fitnessGoals[option.id] || 5}
-                            </span>
-                          </div>
-                        </div>
-                      )}
+                  </div>
+                  <div className="grid gap-1 flex-1">
+                    <div className="font-medium text-purple-900">
+                      {option.label}
                     </div>
                   </div>
-                </div>
-              )
-            )}
+                </Label>
+
+                {selectedGoals.includes(option.id) && (
+                  <div className="mt-2 px-3">
+                    <p className="text-sm text-purple-600 mb-1">
+                      How important is this goal to you?
+                    </p>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs text-purple-500">Low</span>
+                      <Slider
+                        value={[answers.fitnessGoals[option.id] || 5]}
+                        onValueChange={(value) =>
+                          handleGoalImportanceChange(option.id, value[0])
+                        }
+                        max={10}
+                        step={1}
+                        className="flex-1"
+                      />
+                      <span className="text-xs text-purple-500">High</span>
+                      <span className="ml-2 min-w-[30px] text-center font-medium text-purple-700">
+                        {answers.fitnessGoals[option.id] || 5}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         );
+      }
 
-      case "bodyType":
+      case "bodyType": {
+        const bodyTypeQuestion = question as BodyTypeQuestion;
         return (
           <RadioGroup
-            value={answers[question.id as keyof Answers] as string}
+            value={answers[bodyTypeQuestion.id] as string}
             onValueChange={handleAnswerChange}
             className="space-y-4 mt-4"
           >
-            {(question as BodyTypeQuestion).options.map((option) => (
-              <div
+            {bodyTypeQuestion.options.map((option) => (
+              <Label
                 key={option.value}
-                className="flex flex-col border border-purple-100 p-4 rounded-lg hover:bg-purple-50 transition-colors"
+                htmlFor={option.value}
+                className="flex flex-col border border-purple-100 p-4 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer"
+                onClick={() => handleAnswerChange(option.value)}
               >
-                <div className="flex items-start space-x-3">
+                <div className="flex items-center">
                   <RadioGroupItem
                     value={option.value}
                     id={option.value}
-                    className="mt-1"
+                    className="mr-3"
                   />
-                  <div className="grid gap-1">
-                    <Label
-                      htmlFor={option.value}
-                      className="font-medium text-purple-900"
-                    >
+                  <div className="grid gap-1 flex-1">
+                    <div className="font-medium text-purple-900">
                       {option.label}
-                    </Label>
+                    </div>
                     <p className="text-sm text-purple-600">
                       {option.description}
                     </p>
@@ -500,15 +479,17 @@ export default function OnboardingPage() {
                     className="rounded-lg"
                   />
                 </div>
-              </div>
+              </Label>
             ))}
           </RadioGroup>
         );
+      }
 
-      case "technicalData":
+      case "technicalData": {
+        const technicalDataQuestion = question as TechnicalDataQuestion;
         return (
           <div className="space-y-4 mt-4">
-            {(question as TechnicalDataQuestion).fields.map((field) => (
+            {technicalDataQuestion.fields.map((field) => (
               <div key={field.id} className="space-y-2">
                 <Label
                   htmlFor={field.id}
@@ -520,13 +501,12 @@ export default function OnboardingPage() {
                   id={field.id}
                   type={field.type}
                   placeholder={field.placeholder}
-                  value={
-                    answers.technicalData[
-                      field.id as keyof typeof answers.technicalData
-                    ]
-                  }
+                  value={answers.technicalData[field.id as keyof TechnicalData]}
                   onChange={(e) =>
-                    handleTechnicalDataChange(field.id, e.target.value)
+                    handleTechnicalDataChange(
+                      field.id as keyof TechnicalData,
+                      e.target.value
+                    )
                   }
                   className="w-full"
                 />
@@ -534,13 +514,14 @@ export default function OnboardingPage() {
             ))}
           </div>
         );
+      }
 
       default:
         return null;
     }
   };
 
-  const isNextDisabled = () => {
+  const isNextDisabled = (): boolean => {
     const question = questions[currentQuestion];
 
     if (question.id === "fitnessGoals" && selectedGoals.length === 0) {
@@ -551,20 +532,11 @@ export default function OnboardingPage() {
       return true;
     }
 
-    if (
-      question.id === "technicalData" &&
-      (!answers.technicalData.age ||
-        !answers.technicalData.weight ||
-        !answers.technicalData.height)
-    ) {
-      return true;
-    }
-
     return false;
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-purple-50 to-purple-200">
+    <div className="flex flex-col items-center justify-center min-h-[100dvh] px-4 py-6 bg-gradient-to-b from-purple-50 to-purple-200">
       <div className="w-full max-w-md mb-8">
         <img
           src="/GainPlay.png"
@@ -682,33 +654,71 @@ export default function OnboardingPage() {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full"
+            className="bg-white p-8 rounded-2xl shadow-lg max-w-sm w-[90%] mx-auto"
           >
-            <div className="text-center">
-              <div className="relative mb-8">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-24 h-24 rounded-full border-4 border-purple-200"></div>
-                  <div className="w-24 h-24 rounded-full border-4 border-transparent border-t-purple-600 animate-spin absolute"></div>
-                </div>
+            <div className="flex flex-col items-center">
+              <div className="relative mb-6">
                 <motion.div
+                  className="w-20 h-20 rounded-full border-4 border-purple-100"
                   animate={{
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 180, 360],
-                    opacity: [0.8, 1, 0.8]
+                    boxShadow: [
+                      "0 0 0 0 rgba(147, 51, 234, 0.2)",
+                      "0 0 0 10px rgba(147, 51, 234, 0)",
+                      "0 0 0 0 rgba(147, 51, 234, 0)"
+                    ]
                   }}
                   transition={{
-                    duration: 3,
+                    duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
                     ease: "easeInOut"
                   }}
-                  className="relative z-10 flex items-center justify-center"
+                />
+                <motion.div
+                  className="absolute inset-0 flex items-center justify-center"
+                  animate={{ rotate: 360 }}
+                  transition={{
+                    duration: 2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "linear"
+                  }}
                 >
-                  <Dumbbell className="h-12 w-12 text-purple-600 mx-auto" />
+                  <div className="w-20 h-20 rounded-full border-4 border-transparent border-t-purple-600" />
+                </motion.div>
+                <motion.div
+                  className="absolute inset-0 flex items-center justify-center"
+                  animate={{
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <Dumbbell className="h-8 w-8 text-purple-600" />
                 </motion.div>
               </div>
-              <h3 className="text-xl font-bold text-purple-800">
+              <h3 className="text-xl font-bold text-purple-800 mb-2">
                 Creating your workout plan
               </h3>
+              <p className="text-purple-600 text-sm text-center">
+                Personalizing exercises based on your goals
+              </p>
+
+              <motion.div
+                className="w-full mt-4 h-1.5 bg-purple-100 rounded-full overflow-hidden"
+                initial={{ width: "100%" }}
+              >
+                <motion.div
+                  className="h-full bg-purple-600 rounded-full"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{
+                    duration: 4.5,
+                    ease: "easeInOut"
+                  }}
+                />
+              </motion.div>
             </div>
           </motion.div>
         </div>
