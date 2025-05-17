@@ -1,6 +1,7 @@
 import { SigninResponse, SignupResponse } from "@/types";
 import axios, { AxiosResponse } from "axios";
 import { ACCESS_TOKEN_KEY } from "@/utils/constants/index";
+import { jwtDecode } from "jwt-decode";
 
 export const headers = () => {
   const tokens = getTokens();
@@ -16,6 +17,21 @@ export const getTokens = () => {
   return {
     accessToken: localStorage.getItem(ACCESS_TOKEN_KEY)
   };
+};
+
+export const getValidAccessToken = (): string | null => {
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+
+  if (!token) return null;
+
+  try {
+    const decodedToken = jwtDecode<{ exp: number }>(token);
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    return decodedToken.exp > currentTime ? token : null;
+  } catch {
+    return null;
+  }
 };
 
 export const saveTokens = ({ accessToken }: { accessToken: string }) => {
