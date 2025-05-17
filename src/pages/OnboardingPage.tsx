@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription
+  CardDescription,
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, ArrowRight, ArrowLeft, Dumbbell } from "lucide-react";
 import { mapSurveyValuesToApi } from "@/utils/surveyMap";
 import { onboardingService } from "@/services/onboardingservice";
+import slimBuilder from "../assets/slim builder.png";
+import athleticBuilder from "../assets/Athletic Builder.png";
+import solidBuilder from "../assets/solid builder.png";
+
 // Type definitions
 type Option = {
   value: string;
@@ -95,25 +99,25 @@ const questions: Question[] = [
       {
         value: "beginner",
         label: "Beginner",
-        description: "New to fitness or returning after a long break"
+        description: "New to fitness or returning after a long break",
       },
       {
         value: "intermediate",
         label: "Intermediate",
-        description: "Exercise regularly with some experience"
+        description: "Exercise regularly with some experience",
       },
       {
         value: "advanced",
         label: "Advanced",
-        description: "Consistent training with good knowledge"
+        description: "Consistent training with good knowledge",
       },
       {
         value: "expert",
         label: "Expert",
-        description: "Highly trained with extensive experience"
-      }
+        description: "Highly trained with extensive experience",
+      },
     ],
-    icon: "📊"
+    icon: "📊",
   },
   {
     id: "fitnessGoals",
@@ -126,9 +130,9 @@ const questions: Question[] = [
       { id: "improveEndurance", label: "Improve Endurance" },
       { id: "increaseStrength", label: "Increase Strength" },
       { id: "improveFlexibility", label: "Improve Flexibility" },
-      { id: "maintainHealth", label: "Maintain Health" }
+      { id: "maintainHealth", label: "Maintain Health" },
     ],
-    icon: "🎯"
+    icon: "🎯",
   },
   {
     id: "workoutFrequency",
@@ -139,21 +143,21 @@ const questions: Question[] = [
       {
         value: "1-2",
         label: "1-2 times per week",
-        description: "Getting started"
+        description: "Getting started",
       },
       {
         value: "3-4",
         label: "3-4 times per week",
-        description: "Consistent routine"
+        description: "Consistent routine",
       },
       {
         value: "5-6",
         label: "5-6 times per week",
-        description: "Dedicated schedule"
+        description: "Dedicated schedule",
       },
-      { value: "daily", label: "Daily", description: "Full commitment" }
+      { value: "daily", label: "Daily", description: "Full commitment" },
     ],
-    icon: "📅"
+    icon: "📅",
   },
   {
     id: "workoutDuration",
@@ -165,9 +169,13 @@ const questions: Question[] = [
       { value: "30min", label: "30 minutes", description: "Standard sessions" },
       { value: "45min", label: "45 minutes", description: "Extended sessions" },
       { value: "60min", label: "60 minutes", description: "Full sessions" },
-      { value: "90min", label: "90+ minutes", description: "Extended training" }
+      {
+        value: "90min",
+        label: "90+ minutes",
+        description: "Extended training",
+      },
     ],
-    icon: "⏱️"
+    icon: "⏱️",
   },
   {
     id: "bodyStructure",
@@ -178,25 +186,26 @@ const questions: Question[] = [
       {
         value: "slim",
         label: "Slim Builder",
-        description: "Naturally lean, find it harder to gain weight or muscle",
-        image: "/placeholder.svg?height=200&width=100&text=Slim+Builder"
+        description:
+          "Naturally lean, finds it harder to gain weight or muscle. Fast metabolism, narrow frame.",
+        image: slimBuilder,
       },
       {
         value: "athletic",
         label: "Athletic Builder",
         description:
-          "Naturally muscular, respond well to training, gain/lose weight easily",
-        image: "/placeholder.svg?height=200&width=100&text=Athletic+Builder"
+          "Naturally muscular and athletic. Gains muscle easily and maintains a balanced physique.",
+        image: athleticBuilder,
       },
       {
         value: "solid",
         label: "Solid Builder",
         description:
-          "Naturally heavier, gain muscle easily but may also gain fat more easily",
-        image: "/placeholder.svg?height=200&width=100&text=Solid+Builder"
-      }
+          "Naturally broader and rounder. Tends to store fat easily and may struggle with weight loss.",
+        image: solidBuilder,
+      },
     ],
-    icon: "👤"
+    icon: "👤",
   },
   {
     id: "technicalData",
@@ -208,23 +217,23 @@ const questions: Question[] = [
         id: "age",
         label: "Age",
         type: "number",
-        placeholder: "Enter your age"
+        placeholder: "Enter your age",
       },
       {
         id: "weight",
         label: "Weight (kg)",
         type: "number",
-        placeholder: "Enter your weight in kg"
+        placeholder: "Enter your weight in kg",
       },
       {
         id: "height",
         label: "Height (cm)",
         type: "number",
-        placeholder: "Enter your height in cm"
-      }
+        placeholder: "Enter your height in cm",
+      },
     ],
-    icon: "📋"
-  }
+    icon: "📋",
+  },
 ];
 
 export default function OnboardingPage() {
@@ -239,8 +248,8 @@ export default function OnboardingPage() {
     technicalData: {
       age: "",
       weight: "",
-      height: ""
-    }
+      height: "",
+    },
   });
   const [direction, setDirection] = useState<number>(0);
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
@@ -260,7 +269,7 @@ export default function OnboardingPage() {
       // if (response.status !== 200) {
       //   console.error("Error saving onboarding data");
       // }
-      console.log(response)
+      console.log(response);
       setIsGeneratingWorkout(true);
 
       // Simulate workout generation with a timeout
@@ -281,7 +290,7 @@ export default function OnboardingPage() {
     const currentQuestionId = questions[currentQuestion].id;
     setAnswers({
       ...answers,
-      [currentQuestionId]: value
+      [currentQuestionId]: value,
     });
   };
 
@@ -299,7 +308,7 @@ export default function OnboardingPage() {
 
       setAnswers({
         ...answers,
-        fitnessGoals: updatedGoals
+        fitnessGoals: updatedGoals,
       });
     }
   };
@@ -309,8 +318,8 @@ export default function OnboardingPage() {
       ...answers,
       fitnessGoals: {
         ...answers.fitnessGoals,
-        [goalId]: importance
-      }
+        [goalId]: importance,
+      },
     });
   };
 
@@ -322,8 +331,8 @@ export default function OnboardingPage() {
       ...answers,
       technicalData: {
         ...answers.technicalData,
-        [field]: value
-      }
+        [field]: value,
+      },
     });
   };
 
@@ -331,18 +340,18 @@ export default function OnboardingPage() {
     enter: (direction: number) => ({
       x: direction > 0 ? 300 : -300,
       opacity: 0,
-      scale: 0.9
+      scale: 0.9,
     }),
     center: {
       x: 0,
       opacity: 1,
-      scale: 1
+      scale: 1,
     },
     exit: (direction: number) => ({
       x: direction < 0 ? 300 : -300,
       opacity: 0,
-      scale: 0.9
-    })
+      scale: 0.9,
+    }),
   };
 
   const renderQuestionInput = () => {
@@ -475,7 +484,7 @@ export default function OnboardingPage() {
                     src={option.image || "/placeholder.svg"}
                     alt={option.label}
                     width={100}
-                    height={200}
+                    height={50}
                     className="rounded-lg"
                   />
                 </div>
@@ -580,7 +589,7 @@ export default function OnboardingPage() {
             <div
               className="h-full bg-purple-600 transition-all duration-300"
               style={{
-                width: `${(currentQuestion / (questions.length - 1)) * 100}%`
+                width: `${(currentQuestion / (questions.length - 1)) * 100}%`,
               }}
             />
           </div>
@@ -612,7 +621,7 @@ export default function OnboardingPage() {
                 type: "spring",
                 stiffness: 400,
                 damping: 35,
-                mass: 1.5
+                mass: 1.5,
               }}
               className="w-full"
             >
@@ -664,13 +673,13 @@ export default function OnboardingPage() {
                     boxShadow: [
                       "0 0 0 0 rgba(147, 51, 234, 0.2)",
                       "0 0 0 10px rgba(147, 51, 234, 0)",
-                      "0 0 0 0 rgba(147, 51, 234, 0)"
-                    ]
+                      "0 0 0 0 rgba(147, 51, 234, 0)",
+                    ],
                   }}
                   transition={{
                     duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                 />
                 <motion.div
@@ -679,7 +688,7 @@ export default function OnboardingPage() {
                   transition={{
                     duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "linear"
+                    ease: "linear",
                   }}
                 >
                   <div className="w-20 h-20 rounded-full border-4 border-transparent border-t-purple-600" />
@@ -687,12 +696,12 @@ export default function OnboardingPage() {
                 <motion.div
                   className="absolute inset-0 flex items-center justify-center"
                   animate={{
-                    scale: [1, 1.1, 1]
+                    scale: [1, 1.1, 1],
                   }}
                   transition={{
                     duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                 >
                   <Dumbbell className="h-8 w-8 text-purple-600" />
@@ -715,7 +724,7 @@ export default function OnboardingPage() {
                   animate={{ width: "100%" }}
                   transition={{
                     duration: 4.5,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                 />
               </motion.div>
