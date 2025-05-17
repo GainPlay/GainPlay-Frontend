@@ -483,8 +483,8 @@ export default function OnboardingPage() {
                   <img
                     src={option.image || "/placeholder.svg"}
                     alt={option.label}
-                    width={150}
-                    height={200}
+                    width={100}
+                    height={50}
                     className="rounded-lg"
                   />
                 </div>
