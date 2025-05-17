@@ -1,10 +1,6 @@
 // import { useEffect, useState } from "react";
-import {
-  Navigate,
-  Route,
-  BrowserRouter as Router,
-  Routes
-} from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import { Toaster } from "./components/ui/toaster";
 import AuthPage from "./pages/AuthPage";
@@ -15,45 +11,23 @@ import OnboardingPage from "./pages/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import WorkoutHistoryPage from "./pages/WorkoutHistoryPage";
-// import { userService } from "./services/userService";
-// import type { UserData } from "./types";
+import { getTokens } from "./services/authService";
 
 function App() {
-  // const [userData, setUserData] = useState<UserData | null>(null);
+  const navigate = useNavigate();
+  const access_token = getTokens().accessToken;
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const storedUserData = localStorage.getItem("userData");
-  //     if (storedUserData) {
-  //       setUserData(JSON.parse(storedUserData));
-  //     } else {
-  //       const user = await userService.getUserData();
-  //       setUserData(user);
-  //       localStorage.setItem("userData", JSON.stringify(user));
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
-  // const updateUserData = (newData: Partial<UserData>) => {
-  //   setUserData((prevData) => {
-  //     if (prevData) {
-  //       const updatedData = { ...prevData, ...newData };
-  //       localStorage.setItem("userData", JSON.stringify(updatedData));
-  //       return updatedData;
-  //     }
-  //     return prevData;
-  //   });
-  // };
-
-  // if (!userData) {
-  //   return <div>Loading...</div>;
-  // }
+  // Redirect if trying to navigate from AuthPage to other routes
+  useEffect(() => {
+    if (location.pathname !== "/" && !access_token) {
+      // If user is not authenticated, redirect them to the / route
+      navigate("/");
+    }
+  }, [location, access_token]);
 
   return (
-    <Router>
-      <div className="bg-purple-100 text-purple-900 pb-16 min-h-screen">
+    <>
+      <div className="bg-purple-100 text-purple-900 min-h-screen">
         <Routes>
           <Route path="/" element={<AuthPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
@@ -65,10 +39,11 @@ function App() {
           <Route path="/user-profile/:id" element={<UserProfilePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <Navigation />
+        {/* Conditionally render Navigation based on the current route */}
+        {location.pathname !== "/" && <Navigation />}
         <Toaster />
       </div>
-    </Router>
+    </>
   );
 }
 
