@@ -75,6 +75,7 @@ export interface UserGoal {
   value: number | null;
   created_at: Date | null;
   updated_at: Date | null;
+  goals: Goal;
 }
 
 // Friendship related types
@@ -85,6 +86,8 @@ export interface Friendship {
   status: string | null;
   created_at: Date | null;
   updated_at: Date | null;
+  sender: Partial<FrontendUserData> | null;
+  receiver: Partial<FrontendUserData> | null;
 }
 
 // Exercise related types
@@ -172,18 +175,8 @@ export enum FriendshipStatus {
   PENDING_RECEIVED = "pending-received",
   NONE = "none",
 }
-
-export interface FrontendFriend {
-  id: number;
-  name: string;
-  avatar: string;
-  email: string;
-  goals: string[];
-  level: number;
-  status?: FriendshipStatus;
-}
-
 export interface FrontendUserData {
+  id: number;
   name: string;
   email: string;
   avatar: string;
@@ -191,7 +184,10 @@ export interface FrontendUserData {
   height: string;
   weight: string;
   age: string;
+  level: number;
+  status?: FriendshipStatus;
   badges: FrontendBadge[];
+  user_goals: UserGoal[];
 }
 
 export interface WorkoutHistoryItem {

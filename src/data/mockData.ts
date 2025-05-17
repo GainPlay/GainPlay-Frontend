@@ -1,9 +1,4 @@
-import type {
-  FrontendAvatar,
-  FrontendBadge,
-  FrontendExercise,
-  FrontendFriend
-} from "../types";
+import type { FrontendAvatar, FrontendBadge, FrontendExercise, FrontendFriend } from "../types";
 
 export const avatars: FrontendAvatar[] = [
   {
@@ -12,7 +7,7 @@ export const avatars: FrontendAvatar[] = [
     image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Sporty",
     price: 100,
     category: "sports",
-    rarity: "common"
+    rarity: "common",
   },
   {
     id: "2",
@@ -20,7 +15,7 @@ export const avatars: FrontendAvatar[] = [
     image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Zen",
     price: 150,
     category: "lifestyle",
-    rarity: "common"
+    rarity: "common",
   },
   {
     id: "3",
@@ -28,7 +23,7 @@ export const avatars: FrontendAvatar[] = [
     image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Power",
     price: 200,
     category: "sports",
-    rarity: "rare"
+    rarity: "rare",
   },
   {
     id: "4",
@@ -36,7 +31,7 @@ export const avatars: FrontendAvatar[] = [
     image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Yoga",
     price: 250,
     category: "lifestyle",
-    rarity: "rare"
+    rarity: "rare",
   },
   {
     id: "5",
@@ -44,7 +39,7 @@ export const avatars: FrontendAvatar[] = [
     image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Runner",
     price: 300,
     category: "sports",
-    rarity: "rare"
+    rarity: "rare",
   },
   {
     id: "6",
@@ -52,7 +47,7 @@ export const avatars: FrontendAvatar[] = [
     image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Swimmer",
     price: 350,
     category: "sports",
-    rarity: "epic"
+    rarity: "epic",
   },
   {
     id: "7",
@@ -60,7 +55,7 @@ export const avatars: FrontendAvatar[] = [
     image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Cyclist",
     price: 400,
     category: "sports",
-    rarity: "epic"
+    rarity: "epic",
   },
   {
     id: "8",
@@ -68,8 +63,8 @@ export const avatars: FrontendAvatar[] = [
     image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Boxer",
     price: 450,
     category: "sports",
-    rarity: "legendary"
-  }
+    rarity: "legendary",
+  },
 ];
 
 export const badges: FrontendBadge[] = [
@@ -77,32 +72,32 @@ export const badges: FrontendBadge[] = [
     id: "1",
     name: "Early Bird",
     icon: "🌅",
-    description: "Completed 5 workouts before 8 AM"
+    description: "Completed 5 workouts before 8 AM",
   },
   {
     id: "2",
     name: "Night Owl",
     icon: "🦉",
-    description: "Completed 10 workouts after 8 PM"
+    description: "Completed 10 workouts after 8 PM",
   },
   {
     id: "3",
     name: "Consistency King",
     icon: "👑",
-    description: "Maintained a 7-day workout streak"
+    description: "Maintained a 7-day workout streak",
   },
   {
     id: "4",
     name: "Muscle Master",
     icon: "💪",
-    description: "Completed 20 strength training workouts"
+    description: "Completed 20 strength training workouts",
   },
   {
     id: "5",
     name: "Cardio Crusher",
     icon: "🏃",
-    description: "Burned over 5000 calories in cardio exercises"
-  }
+    description: "Burned over 5000 calories in cardio exercises",
+  },
 ];
 
 export const friends: FrontendFriend[] = [
@@ -112,7 +107,7 @@ export const friends: FrontendFriend[] = [
     avatar: "https://api.dicebear.com/6.x/avataaars/svg?seed=Alice",
     email: "alice@example.com",
     goals: ["Gain Muscle", "Improve Flexibility"],
-    level: 5
+    level: 5,
   },
   {
     id: 2,
@@ -120,7 +115,7 @@ export const friends: FrontendFriend[] = [
     avatar: "https://api.dicebear.com/6.x/avataaars/svg?seed=Bob",
     email: "bob@example.com",
     goals: ["Lose Weight", "Increase Stamina"],
-    level: 3
+    level: 3,
   },
   {
     id: 3,
@@ -128,7 +123,7 @@ export const friends: FrontendFriend[] = [
     avatar: "https://api.dicebear.com/6.x/avataaars/svg?seed=Charlie",
     email: "charlie@example.com",
     goals: ["Improve Flexibility", "Increase Stamina"],
-    level: 4
+    level: 4,
   },
   {
     id: 4,
@@ -136,15 +131,8 @@ export const friends: FrontendFriend[] = [
     avatar: "https://api.dicebear.com/6.x/avataaars/svg?seed=Diana",
     email: "diana@example.com",
     goals: ["Gain Muscle", "Lose Weight"],
-    level: 6
-  }
-];
-
-export const allGoals = [
-  "Gain Muscle",
-  "Lose Weight",
-  "Improve Flexibility",
-  "Increase Stamina"
+    level: 6,
+  },
 ];
 
 export const initialExercises: FrontendExercise[] = [
@@ -154,8 +142,7 @@ export const initialExercises: FrontendExercise[] = [
     targetSets: 3,
     targetReps: 10,
     restTime: 60,
-    instruction:
-      "Keep your body straight, lower until your chest nearly touches the floor, then push back up.",
+    instruction: "Keep your body straight, lower until your chest nearly touches the floor, then push back up.",
     difficulty: "intermediate",
     muscleGroup: "Chest, Shoulders, Triceps",
     xpReward: 100,
@@ -166,8 +153,8 @@ export const initialExercises: FrontendExercise[] = [
       "Keep your core tight throughout the movement",
       "Don't let your hips sag or pike up",
       "Breathe out as you push up",
-      "For easier version, do push-ups on your knees"
-    ]
+      "For easier version, do push-ups on your knees",
+    ],
   },
   {
     id: "squats",
@@ -187,8 +174,8 @@ export const initialExercises: FrontendExercise[] = [
       "Keep your chest up and back straight",
       "Push your knees outward as you descend",
       "Go as low as comfortable, ideally thighs parallel to ground",
-      "Push through your heels when standing up"
-    ]
+      "Push through your heels when standing up",
+    ],
   },
   {
     id: "plank",
@@ -196,8 +183,7 @@ export const initialExercises: FrontendExercise[] = [
     targetSets: 3,
     targetReps: 30, // seconds
     restTime: 30,
-    instruction:
-      "Hold a push-up position with your weight on your forearms, keeping your body in a straight line.",
+    instruction: "Hold a push-up position with your weight on your forearms, keeping your body in a straight line.",
     difficulty: "intermediate",
     muscleGroup: "Core, Shoulders",
     xpReward: 150,
@@ -208,8 +194,8 @@ export const initialExercises: FrontendExercise[] = [
       "Keep your shoulders directly above your elbows",
       "Engage your core and glutes",
       "Don't let your hips sag or pike up",
-      "Look slightly forward, not straight down"
-    ]
+      "Look slightly forward, not straight down",
+    ],
   },
   {
     id: "lunges",
@@ -229,8 +215,8 @@ export const initialExercises: FrontendExercise[] = [
       "Keep your upper body straight",
       "Step far enough forward that your knee stays above your ankle",
       "Push back up through your front heel",
-      "Alternate legs for each rep"
-    ]
+      "Alternate legs for each rep",
+    ],
   },
   {
     id: "mountainClimbers",
@@ -238,8 +224,7 @@ export const initialExercises: FrontendExercise[] = [
     targetSets: 3,
     targetReps: 20,
     restTime: 30,
-    instruction:
-      "Start in a plank position and alternate bringing each knee toward your chest in a running motion.",
+    instruction: "Start in a plank position and alternate bringing each knee toward your chest in a running motion.",
     difficulty: "intermediate",
     muscleGroup: "Core, Shoulders, Hip Flexors",
     xpReward: 130,
@@ -250,9 +235,9 @@ export const initialExercises: FrontendExercise[] = [
       "Keep your hips down and core engaged",
       "Move your legs as quickly as you can while maintaining form",
       "Breathe rhythmically throughout the exercise",
-      "Each knee drive counts as one rep"
-    ]
-  }
+      "Each knee drive counts as one rep",
+    ],
+  },
 ];
 
 // Motivational quotes for fitness
@@ -266,5 +251,5 @@ export const motivationalQuotes = [
   "Sweat is just fat crying.",
   "You don't have to be extreme, just consistent.",
   "The only way to define your limits is by going beyond them.",
-  "Your health is an investment, not an expense."
+  "Your health is an investment, not an expense.",
 ];
