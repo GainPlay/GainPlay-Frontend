@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,167 +8,92 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Trophy, UserPlus, UserX, Check, X } from "lucide-react";
 import { badges, friends } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
-
-// Extended friend type with request status
-type FriendWithStatus = {
-  id: number;
-  name: string;
-  avatar: string;
-  email: string;
-  goals: string[];
-  level: number;
-  status?: "friend" | "pending-sent" | "pending-received" | "none";
-};
+import { Friendship, FriendshipStatus, FrontendUserData, UserGoal } from "@/types";
+import { get } from "http";
+import { userService } from "@/services/userService";
+import { friendsService } from "@/services/friendsService";
 
 export default function UserProfilePage() {
   const navigate = useNavigate();
   const params = useParams();
   const userId = Number(params.id);
 
-  const [user, setUser] = useState<FriendWithStatus | null>(null);
+  const [user, setUser] = useState<FrontendUserData | null>(null);
+  const [friendship, setFriendship] = useState<Friendship | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [allFriends, setAllFriends] = useState<FriendWithStatus[]>([]);
 
   useEffect(() => {
-    // Load all friends data from localStorage
-    const storedFriends = localStorage.getItem("friendsData");
-    let friendsData: FriendWithStatus[] = [];
-
-    if (storedFriends) {
-      friendsData = JSON.parse(storedFriends);
-      setAllFriends(friendsData);
-
-      // Find the specific user
-      const foundUser = friendsData.find((friend) => friend.id === userId);
-
-      if (foundUser) {
-        setUser(foundUser);
-        setIsLoading(false);
-      } else {
-        // If user not found in localStorage, try to find in mock data
-        const mockUser = friends.find((friend) => friend.id === userId);
-
-        if (mockUser) {
-          const userWithStatus = {
-            ...mockUser,
-            status: "none" as const
-          };
-          setUser(userWithStatus);
-
-          // Add this user to our friends data
-          const updatedFriends = [...friendsData, userWithStatus];
-          setAllFriends(updatedFriends);
-          localStorage.setItem("friendsData", JSON.stringify(updatedFriends));
-
-          setIsLoading(false);
-        } else {
-          // Handle user not found
-          toast({
-            title: "User not found",
-            description: "The requested user profile could not be found.",
-            variant: "destructive"
-          });
-          navigate("/friends");
-        }
-      }
-    } else {
-      // If no stored friends data, initialize with mock data
-      const mockUser = friends.find((friend) => friend.id === userId);
-
-      if (mockUser) {
-        const friendsWithStatus = friends.map((friend) => ({
-          ...friend,
-          status: "none" as const
-        }));
-
-        // Set the found user
-        const userWithStatus = friendsWithStatus.find(
-          (friend) => friend.id === userId
-        );
-        setUser(userWithStatus || null);
-
-        // Store all friends
-        setAllFriends(friendsWithStatus);
-        localStorage.setItem("friendsData", JSON.stringify(friendsWithStatus));
-
-        setIsLoading(false);
-      } else {
-        // Handle user not found
+    const getUserData = async (): Promise<void> => {
+      const fetchedUser = await userService.getUserData(userId);
+      if (!fetchedUser) {
         toast({
           title: "User not found",
           description: "The requested user profile could not be found.",
-          variant: "destructive"
+          variant: "destructive",
         });
         navigate("/friends");
+        return;
       }
-    }
+      setUser(fetchedUser);
+
+      const fetchedFriendship = await friendsService.getFriendship(1, userId); // Replace with actual user ID
+      setFriendship(fetchedFriendship);
+      setIsLoading(false);
+    };
+    getUserData();
   }, [userId, navigate]);
 
-  const handleFriendAction = (
-    action: "add" | "accept" | "reject" | "remove"
-  ) => {
-    if (!user) return;
+  const handleFriendAction = async (action: "add" | "accept" | "reject" | "remove"): Promise<void> => {
+    try {
+      let updated: Friendship | null = null;
 
-    // Create a copy of all friends
-    const updatedFriends = [...allFriends];
+      switch (action) {
+        case "add":
+          updated = await friendsService.sendFriendRequest({
+            user_id: 1, // Replace with actual user ID
+            friend_id: user?.id,
+            status: FriendshipStatus.PENDING,
+          });
+          toast({
+            title: "Friend Request Sent",
+            description: `You sent a friend request to ${user?.name}`,
+            variant: "default",
+          });
+          break;
+        case "accept":
+          if (friendship) {
+            updated = await friendsService.updateFriendship(friendship.id, { status: FriendshipStatus.ACCEPTED });
+          }
+          toast({
+            title: "Friend Request Accepted",
+            description: `You are now friends with ${user?.name}`,
+            variant: "default",
+          });
+          break;
+        case "reject":
+        case "remove":
+          if (friendship) {
+            await friendsService.deleteFriendship(friendship.id);
+          }
+          toast({
+            title: "Friend Removed",
+            description: `You removed ${user?.name} from your friends`,
+            variant: "destructive",
+          });
+          break;
+      }
 
-    // Find the user to update
-    const userIndex = updatedFriends.findIndex(
-      (friend) => friend.id === user.id
-    );
-
-    if (userIndex === -1) return;
-
-    // Update the user's status based on the action
-    switch (action) {
-      case "add":
-        updatedFriends[userIndex].status = "pending-sent";
-        toast({
-          title: "Friend Request Sent",
-          description: `You sent a friend request to ${user.name}`
-        });
-        break;
-      case "accept":
-        updatedFriends[userIndex].status = "friend";
-        toast({
-          title: "Friend Request Accepted",
-          description: `You are now friends with ${user.name}`,
-          variant: "default"
-        });
-        break;
-      case "reject":
-        updatedFriends[userIndex].status = "none";
-        toast({
-          title: "Friend Request Rejected",
-          description: `You rejected ${user.name}'s friend request`,
-          variant: "destructive"
-        });
-        break;
-      case "remove":
-        updatedFriends[userIndex].status = "none";
-        toast({
-          title: "Friend Removed",
-          description: `You removed ${user.name} from your friends`,
-          variant: "destructive"
-        });
-        break;
+      setFriendship(updated); // 🟢 update state
+    } catch (error) {
+      console.error("Friend action error:", error);
     }
-
-    // Update state and localStorage
-    setAllFriends(updatedFriends);
-    setUser(updatedFriends[userIndex]);
-    localStorage.setItem("friendsData", JSON.stringify(updatedFriends));
   };
 
   if (isLoading || !user) {
     return (
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
         <header className="flex items-center mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/friends")}
-            className="mr-2 p-2"
-          >
+          <Button variant="ghost" onClick={() => navigate("/friends")} className="mr-2 p-2">
             <ArrowLeft className="w-6 h-6 text-purple-600" />
           </Button>
           <h1 className="text-2xl font-bold text-purple-800">User Profile</h1>
@@ -184,29 +109,18 @@ export default function UserProfilePage() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
       <header className="flex items-center mb-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/friends")}
-          className="mr-2 p-2"
-        >
+        <Button variant="ghost" onClick={() => navigate("/friends")} className="mr-2 p-2">
           <ArrowLeft className="w-6 h-6 text-purple-600" />
         </Button>
         <h1 className="text-2xl font-bold text-purple-800">User Profile</h1>
       </header>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <Card className="mb-6 overflow-hidden">
           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 flex flex-col items-center">
             <div className="relative mb-4">
               <Avatar className="h-24 w-24 border-4 border-white">
-                <AvatarImage
-                  src={user.avatar || "/placeholder.svg"}
-                  alt={user.name}
-                />
+                <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
                 <AvatarFallback className="bg-purple-200 text-purple-700 text-2xl">
                   {user.name.charAt(0)}
                 </AvatarFallback>
@@ -221,48 +135,37 @@ export default function UserProfilePage() {
 
           <CardContent className="p-6">
             <div className="flex justify-center space-x-2 mb-6">
-              {user.status === "none" && (
-                <Button
-                  onClick={() => handleFriendAction("add")}
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
+              {!friendship && (
+                <Button onClick={() => handleFriendAction("add")} className="bg-purple-600 hover:bg-purple-700">
                   <UserPlus className="w-4 h-4 mr-2" />
                   Add Friend
                 </Button>
               )}
 
-              {user.status === "pending-sent" && (
-                <Button
-                  variant="outline"
-                  className="border-purple-200 text-purple-700"
-                  disabled
-                >
-                  <Check className="w-4 h-4 mr-2" />
-                  Request Sent
-                </Button>
-              )}
-
-              {user.status === "pending-received" && (
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => handleFriendAction("reject")}
-                    variant="outline"
-                    className="border-red-200 text-red-600 hover:bg-red-50"
-                  >
-                    <X className="w-4 h-4 mr-2" />
-                    Reject
-                  </Button>
-                  <Button
-                    onClick={() => handleFriendAction("accept")}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
+              {friendship?.status === FriendshipStatus.PENDING &&
+                (friendship.user_id === 1 ? ( // Replace with actual user ID from context or state
+                  <Button variant="outline" className="border-purple-200 text-purple-700" disabled>
                     <Check className="w-4 h-4 mr-2" />
-                    Accept
+                    Request Sent
                   </Button>
-                </div>
-              )}
+                ) : (
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={() => handleFriendAction("reject")}
+                      variant="outline"
+                      className="border-red-200 text-red-600 hover:bg-red-50"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Reject
+                    </Button>
+                    <Button onClick={() => handleFriendAction("accept")} className="bg-green-600 hover:bg-green-700">
+                      <Check className="w-4 h-4 mr-2" />
+                      Accept
+                    </Button>
+                  </div>
+                ))}
 
-              {user.status === "friend" && (
+              {friendship?.status === FriendshipStatus.ACCEPTED && (
                 <Button
                   onClick={() => handleFriendAction("remove")}
                   variant="outline"
@@ -281,27 +184,19 @@ export default function UserProfilePage() {
                   Fitness Goals
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {user.goals.map((goal: string, index: number) => (
-                    <Badge
-                      key={index}
-                      className="bg-purple-100 text-purple-700 px-3 py-1.5"
-                    >
-                      {goal}
+                  {user.user_goals?.map((goal: UserGoal, index: number) => (
+                    <Badge key={index} className="bg-purple-100 text-purple-700 px-3 py-1.5">
+                      {goal.goals.name}
                     </Badge>
                   ))}
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-purple-800 mb-3">
-                  Achievements
-                </h3>
+                <h3 className="text-lg font-semibold text-purple-800 mb-3">Achievements</h3>
                 <div className="grid grid-cols-3 gap-4">
-                  {badges.slice(0, 3).map((badge) => (
-                    <div
-                      key={badge.id}
-                      className="flex flex-col items-center text-center"
-                    >
+                  {badges?.slice(0, 3).map((badge) => (
+                    <div key={badge.id} className="flex flex-col items-center text-center">
                       <div className="text-4xl mb-1">{badge.icon}</div>
                       <div className="text-sm">{badge.name}</div>
                     </div>
@@ -310,26 +205,18 @@ export default function UserProfilePage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-purple-800 mb-3">
-                  Stats
-                </h3>
+                <h3 className="text-lg font-semibold text-purple-800 mb-3">Stats</h3>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div className="bg-purple-50 p-3 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-700">
-                      {Math.floor(Math.random() * 30) + 1}
-                    </div>
+                    <div className="text-2xl font-bold text-purple-700">{Math.floor(Math.random() * 30) + 1}</div>
                     <div className="text-xs text-purple-600">Workouts</div>
                   </div>
                   <div className="bg-purple-50 p-3 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-700">
-                      {Math.floor(Math.random() * 20) + 1}
-                    </div>
+                    <div className="text-2xl font-bold text-purple-700">{Math.floor(Math.random() * 20) + 1}</div>
                     <div className="text-xs text-purple-600">Day Streak</div>
                   </div>
                   <div className="bg-purple-50 p-3 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-700">
-                      {user.level}
-                    </div>
+                    <div className="text-2xl font-bold text-purple-700">{user.level}</div>
                     <div className="text-xs text-purple-600">Level</div>
                   </div>
                 </div>
