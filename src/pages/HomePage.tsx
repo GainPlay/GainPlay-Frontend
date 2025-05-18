@@ -27,7 +27,6 @@ import FallbackExerciseImage from "../components/FallbackExerciseImage";
 import ExerciseAssistant from "../components/ExerciseAssistant";
 import { useNavigate } from "react-router-dom";
 import { FrontendBadge } from "@/types";
-
 type Exercise = {
   id: string;
   name: string;
@@ -163,7 +162,95 @@ const motivationalQuotes = [
   "Sweat is just fat crying.",
   "You don't have to be extreme, just consistent.",
   "The only way to define your limits is by going beyond them.",
-  "Your health is an investment, not an expense."
+  "Your health is an investment, not an expense.",
+  "Success starts with self-discipline.",
+  "Train like a beast, look like a beauty.",
+  "Strive for progress, not perfection.",
+  "What seems impossible today will one day become your warm-up.",
+  "The difference between try and triumph is a little umph.",
+  "Good things come to those who sweat.",
+  "Motivation is what gets you started. Habit is what keeps you going.",
+  "The body achieves what the mind believes.",
+  "You're only one workout away from a good mood.",
+  "Sore today, strong tomorrow.",
+  "Don't stop when you're tired. Stop when you're done.",
+  "No pain, no gain. Shut up and train.",
+  "Your body is a reflection of your lifestyle.",
+  "Make yourself stronger than your excuses.",
+  "The only place where success comes before work is in the dictionary.",
+  "Hustle for that muscle.",
+  "Respect your body. It's the only one you get.",
+  "When you feel like quitting, remember why you started.",
+  "It's going to be a journey. It's not a sprint to get in shape.",
+  "If it doesn't challenge you, it doesn't change you.",
+  "The harder you work for something, the greater you'll feel when you achieve it.",
+  "Wake up with determination. Go to bed with satisfaction.",
+  "The successful warrior is the average person with laser-like focus.",
+  "You don't get the butt you want by sitting on it.",
+  "Strength does not come from physical capacity. It comes from an indomitable will.",
+  "The clock is ticking. Are you becoming the person you want to be?",
+  "You are stronger than you think.",
+  "The best way to predict the future is to create it.",
+  "Discipline is choosing between what you want now and what you want most.",
+  "The difference between who you are and who you want to be is what you do.",
+  "Fall in love with taking care of your body.",
+  "Exercise is king. Nutrition is queen. Put them together and you've got a kingdom.",
+  "The gym is not the only place to work out. Your mind is the best gym.",
+  "Fitness is like a relationship. You can't cheat and expect it to work.",
+  "The first step is you have to say that you can.",
+  "Take care of your body. It's the only place you have to live.",
+  "Push yourself because no one else is going to do it for you.",
+  "The best project you'll ever work on is you.",
+  "Strength doesn't come from what you can do. It comes from overcoming the things you once thought you couldn't.",
+  "Your body keeps an accurate journal regardless of what you write down.",
+  "Believe in yourself and you will be unstoppable.",
+  "The struggle you're in today is developing the strength you need for tomorrow.",
+  "Challenges are what make life interesting. Overcoming them is what makes life meaningful.",
+  "The only bad workout is the one you didn't do.",
+  "Tough times don't last. Tough people do.",
+  "The harder you fight, the higher you soar.",
+  "Action is the foundational key to all success.",
+  "You miss 100% of the shots you don't take.",
+  "If you want something you've never had, you must be willing to do something you've never done.",
+  "The secret of getting ahead is getting started.",
+  "Failure is not the falling down but the staying down.",
+  "The only limit to our realization of tomorrow will be our doubts of today.",
+  "The future belongs to those who believe in the beauty of their dreams.",
+  "Success is walking from failure to failure with no loss of enthusiasm.",
+  "It always seems impossible until it's done.",
+  "The way to get started is to quit talking and begin doing.",
+  "If you're going through hell, keep going.",
+  "Strength doesn't come from physical capacity. It comes from an indomitable will.",
+  "The only person you are destined to become is the person you decide to be.",
+  "Believe you can and you're halfway there.",
+  "Start where you are. Use what you have. Do what you can.",
+  "Our greatest glory is not in never falling, but in rising every time we fall.",
+  "The mind is everything. What you think you become.",
+  "Everything you've ever wanted is on the other side of fear.",
+  "The question isn't who is going to let me; it's who is going to stop me.",
+  "When you have a dream, you've got to grab it and never let go.",
+  "Nothing will work unless you do.",
+  "Keep your face always toward the sunshine, and shadows will fall behind you.",
+  "You are never too old to set another goal or to dream a new dream.",
+  "It is never too late to be what you might have been.",
+  "We can do anything we want to if we stick to it long enough.",
+  "Aim for the moon. If you miss, you may hit a star.",
+  "Don't watch the clock; do what it does. Keep going.",
+  "With the new day comes new strength and new thoughts.",
+  "Ever tried. Ever failed. No matter. Try again. Fail again. Fail better.",
+  "You are what you do, not what you say you'll do.",
+  "The past cannot be changed. The future is yet in your power.",
+  "It's not about having time, it's about making time.",
+  "The expert in anything was once a beginner.",
+  "A champion is someone who gets up when they can't.",
+  "What you get by achieving your goals is not as important as what you become by achieving your goals.",
+  "The key to success is to focus on goals, not obstacles.",
+  "If opportunity doesn't knock, build a door.",
+  "The harder the battle, the sweeter the victory.",
+  "Perseverance is not a long race; it is many short races one after the other.",
+  "Success is no accident. It is hard work, perseverance, learning, studying, sacrifice and most of all, love of what you are doing.",
+  "The only place where success comes before work is in the dictionary.",
+  "The difference between the impossible and the possible lies in a person's determination."
 ];
 
 export default function HomePage() {
@@ -211,10 +298,30 @@ export default function HomePage() {
     if (storedLevel) setLevel(Number.parseInt(storedLevel));
     if (storedStreak) setStreak(Number.parseInt(storedStreak));
 
-    // Set a random motivational quote
-    const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
-    setQuote(motivationalQuotes[randomIndex]);
+    // Check if we need a new daily quote
+    const today = new Date().toDateString();
+    const lastQuoteDate = localStorage.getItem("lastQuoteDate");
+    const storedQuote = localStorage.getItem("dailyQuote");
+
+    if (lastQuoteDate !== today || !storedQuote) {
+      // Need a new quote for today
+      getNewQuote();
+    } else {
+      // Use the stored quote
+      setQuote(storedQuote);
+    }
   }, []);
+
+  const getNewQuote = () => {
+    const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+    const newQuote = motivationalQuotes[randomIndex];
+    setQuote(newQuote);
+
+    // Store the new quote and date
+    const today = new Date().toDateString();
+    localStorage.setItem("dailyQuote", newQuote);
+    localStorage.setItem("lastQuoteDate", today);
+  };
 
   useEffect(() => {
     if (exercises.length > 0) {
@@ -852,10 +959,41 @@ export default function HomePage() {
           <Card className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-100">
             <CardContent className="p-4">
               <div className="flex flex-col items-center text-center">
-                <div className="text-purple-800 font-medium mb-2">
-                  Motivational Quote
+                <div className="flex items-center justify-between w-full mb-2">
+                  <div className="text-purple-800 font-medium">Daily Quote</div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={getNewQuote}
+                    className="h-8 w-8 p-0 rounded-full text-purple-600 hover:text-purple-800 hover:bg-purple-100"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                      <path d="M21 3v5h-5" />
+                      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                      <path d="M3 21v-5h5" />
+                    </svg>
+                    <span className="sr-only">Refresh Quote</span>
+                  </Button>
                 </div>
-                <p className="text-purple-700 italic">"{quote}"</p>
+                <motion.p
+                  key={quote}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-purple-700 italic"
+                >
+                  "{quote}"
+                </motion.p>
               </div>
             </CardContent>
           </Card>

@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import type { FrontendUserData, FrontendBadge } from "../types";
+import { userService } from "@/services/userService";
 
 const badgesWithDescriptions: FrontendBadge[] = [
   {
@@ -64,11 +65,9 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<FrontendUserData | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [editedName, setEditedName] = useState("");
-  const [editedEmail, setEditedEmail] = useState("");
-  const [editedHeight, setEditedHeight] = useState("");
-  const [editedWeight, setEditedWeight] = useState("");
-  const [editedAge, setEditedAge] = useState("");
+  const [editedHeight, setEditedHeight] = useState<number>();
+  const [editedWeight, setEditedWeight] = useState<number>();
+  const [editedAge, setEditedAge] = useState<number>();
   const [ownedAvatars, setOwnedAvatars] = useState<string[]>([]);
   const [selectedBadge, setSelectedBadge] = useState<FrontendBadge | null>(
     null
@@ -98,28 +97,27 @@ export default function ProfilePage() {
         coins: storedCoins ? Number.parseInt(storedCoins) : 500,
         badges: badges.slice(0, 3) // Give the user 3 random badges
       });
-      setEditedName(parsedUserData.name);
-      setEditedEmail(parsedUserData.email);
-      setEditedHeight(parsedUserData.height || "");
-      setEditedWeight(parsedUserData.weight || "");
-      setEditedAge(parsedUserData.age || "");
+      setEditedHeight(parsedUserData.height);
+      setEditedWeight(parsedUserData.weight);
+      setEditedAge(Number(parsedUserData.age));
     } else {
       const defaultUserData: FrontendUserData = {
         name: "John Doe",
         email: "john@example.com",
         avatar: storedAvatar || avatars[0].image,
         coins: storedCoins ? Number.parseInt(storedCoins) : 500,
-        height: "175",
-        weight: "70",
-        age: "30",
-        badges: badges.slice(0, 3) // Give the user 3 random badges
+        height: 175,
+        weight: 70,
+        age: 30,
+        badges: badges.slice(0, 3),
+        id: 0,
+        level: 0,
+        user_goals: []
       };
       setUserData(defaultUserData);
-      setEditedName(defaultUserData.name);
-      setEditedEmail(defaultUserData.email);
       setEditedHeight(defaultUserData.height);
       setEditedWeight(defaultUserData.weight);
-      setEditedAge(defaultUserData.age);
+      setEditedAge(Number(defaultUserData.age));
       localStorage.setItem("userData", JSON.stringify(defaultUserData));
     }
     if (storedOwnedAvatars) {
@@ -134,16 +132,21 @@ export default function ProfilePage() {
 
   const handleSave = () => {
     if (userData) {
+      const editableInformation = {
+        height: Number(editedHeight),
+        weight: Number(editedWeight),
+        age: Number(editedAge)
+      };
       const updatedUserData = {
         ...userData,
-        name: editedName,
-        email: editedEmail,
-        height: editedHeight,
-        weight: editedWeight,
-        age: editedAge
+        ...editableInformation
       };
+
       setUserData(updatedUserData);
       localStorage.setItem("userData", JSON.stringify(updatedUserData));
+      console.log(userData);
+
+      userService.updateUserSettings(6, editableInformation);
       setEditMode(false);
     }
   };
@@ -201,24 +204,8 @@ export default function ProfilePage() {
             className="rounded-full"
           />
           <div>
-            {editMode ? (
-              <Input
-                value={editedName}
-                onChange={(e) => setEditedName(e.target.value)}
-                className="mb-2"
-              />
-            ) : (
-              <h2 className="text-xl font-bold">{userData.name}</h2>
-            )}
-            {editMode ? (
-              <Input
-                value={editedEmail}
-                onChange={(e) => setEditedEmail(e.target.value)}
-                className="mb-2"
-              />
-            ) : (
-              <p className="text-gray-600">{userData.email}</p>
-            )}
+            <h2 className="text-xl font-bold">{userData.name}</h2>
+            <p className="text-gray-600">{userData.email}</p>
             <p className="text-purple-600 font-semibold mt-2 flex items-center">
               <Coins className="w-4 h-4 mr-1 text-yellow-500" />
               {userData.coins} coins
@@ -261,7 +248,7 @@ export default function ProfilePage() {
                 <Input
                   type="number"
                   value={editedAge}
-                  onChange={(e) => setEditedAge(e.target.value)}
+                  onChange={(e) => setEditedAge(Number(e.target.value))}
                 />
               ) : (
                 <p className="font-medium">{userData.age} years</p>
@@ -273,7 +260,7 @@ export default function ProfilePage() {
                 <Input
                   type="number"
                   value={editedWeight}
-                  onChange={(e) => setEditedWeight(e.target.value)}
+                  onChange={(e) => setEditedWeight(Number(e.target.value))}
                 />
               ) : (
                 <p className="font-medium">{userData.weight} kg</p>
@@ -286,7 +273,7 @@ export default function ProfilePage() {
               <Input
                 type="number"
                 value={editedHeight}
-                onChange={(e) => setEditedHeight(e.target.value)}
+                onChange={(e) => setEditedHeight(Number(e.target.value))}
               />
             ) : (
               <p className="font-medium">{userData.height} cm</p>

@@ -1,6 +1,6 @@
 import { initialExercises } from "@/data/mockData";
 import { FrontendExercise, Goal, WorkoutHistoryItem } from "@/types";
-import apiClient from "./apiClient";
+import axios from "axios";
 
 export const workoutService = {
   getWorkoutHistory: async (): Promise<WorkoutHistoryItem[]> => {
@@ -62,6 +62,6 @@ export const workoutService = {
     });
   },
   getGoals: async (): Promise<Goal[]> => {
-    return (await apiClient.get("/goals")).data;
+    return (await axios.get("/goals")).data;
   }
 };
