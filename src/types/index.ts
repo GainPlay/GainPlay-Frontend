@@ -4,11 +4,11 @@ export interface User {
   name: string | null;
   email: string | null;
   password_hash?: string | null;
-  avatar_url: string | null;
-  coins: number;
-  level: number;
-  experience: number;
-  created_at: Date | null;
+  avatar_url?: string | null;
+  coins?: number;
+  level?: number;
+  experience?: number;
+  created_at?: Date | null;
 }
 
 export interface UserSettings {
@@ -177,18 +177,20 @@ export enum FriendshipStatus {
 }
 export interface FrontendUserData {
   id: number;
-  name: string;
   email: string;
-  avatar: string;
-  coins: number;
-  height: string;
-  weight: string;
-  age: string;
-  level: number;
+  name?: string;
+  avatar?: string;
+  coins?: number;
+  height?: string;
+  weight?: string;
+  age?: string;
+  level?: number;
   status?: FriendshipStatus;
-  badges: FrontendBadge[];
-  user_goals: UserGoal[];
+  user_settings?: UserSettings;
+  user_badges?: FrontendBadge[];
+  user_goals?: UserGoal[];
 }
+
 
 export interface WorkoutHistoryItem {
   date: string;
@@ -212,6 +214,7 @@ export type RefreshResponse = {
 };
 
 export type SigninResponse = {
+  user: User;
   access_token: string;
   refresh_token?: string;
   error?: string;

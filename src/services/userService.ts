@@ -5,4 +5,10 @@ export const userService = {
   getUserData: async (userId: Number): Promise<FrontendUserData> => {
     return (await apiClient.get(`/users/${userId}`)).data;
   },
+  getUserDataByMail: async (email: string): Promise<FrontendUserData> => {
+    return (await apiClient.get(`/users/${email}/mail`)).data;
+  },
+  updateUser: async (userId: number, userData:any): Promise<FrontendUserData> => {
+    return (await apiClient.post(`/users/${userId}/updateUser`, {userData})).data;
+  },
 };
