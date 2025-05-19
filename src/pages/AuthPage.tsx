@@ -7,6 +7,7 @@ import {
   signup,
   saveTokens,
   signin,
+  setDefaultAxiosConfig,
 } from "@/services/authService";
 import { useCallback } from "react";
 import { useUserStore } from "@/stores/useUserStore";
@@ -33,6 +34,8 @@ export default function AuthPage() {
       //@ts-ignore
       user.setUser({...fetchedUser, ...fetchedUser.user_settings,...fetchedUser.user_badges,...fetchedUser.user_goals});
                 navigate("/home");
+          setDefaultAxiosConfig();
+          navigate("/home");
         } else {
           if (response.status === 400) {
             console.log(response.data.error);
@@ -64,6 +67,7 @@ export default function AuthPage() {
             saveTokens({ accessToken: response.data.access_token });
             const fetchedUser = await userService.getUserDataByMail(email);
             user.setUser({...fetchedUser, ...fetchedUser.user_settings,...fetchedUser.user_badges,...fetchedUser.user_goals});
+            setDefaultAxiosConfig();
           }
         } else {
           if (response.status === 400) {

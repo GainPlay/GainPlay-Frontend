@@ -11,11 +11,11 @@ import OnboardingPage from "./pages/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import WorkoutHistoryPage from "./pages/WorkoutHistoryPage";
-import { getTokens } from "./services/authService";
+import { getValidAccessToken } from "./services/authService";
 
 function App() {
   const navigate = useNavigate();
-  const access_token = getTokens().accessToken;
+  const access_token = getValidAccessToken();
 
   // Redirect if trying to navigate from AuthPage to other routes
   useEffect(() => {

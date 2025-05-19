@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
 import { ArrowLeft, Trophy, UserPlus, UserX, Check, X } from "lucide-react";
-import { badges, friends } from "@/data/mockData";
+import { badges } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
-import { Friendship, FriendshipStatus, FrontendUserData, UserGoal } from "@/types";
-import { get } from "http";
+import {
+  Friendship,
+  FriendshipStatus,
+  FrontendUserData,
+  UserGoal
+} from "@/types";
 import { userService } from "@/services/userService";
 import { friendsService } from "@/services/friendsService";
 
@@ -29,7 +33,7 @@ export default function UserProfilePage() {
         toast({
           title: "User not found",
           description: "The requested user profile could not be found.",
-          variant: "destructive",
+          variant: "destructive"
         });
         navigate("/friends");
         return;
@@ -43,7 +47,9 @@ export default function UserProfilePage() {
     getUserData();
   }, [userId, navigate]);
 
-  const handleFriendAction = async (action: "add" | "accept" | "reject" | "remove"): Promise<void> => {
+  const handleFriendAction = async (
+    action: "add" | "accept" | "reject" | "remove"
+  ): Promise<void> => {
     try {
       let updated: Friendship | null = null;
 
@@ -52,22 +58,24 @@ export default function UserProfilePage() {
           updated = await friendsService.sendFriendRequest({
             user_id: 1, // Replace with actual user ID
             friend_id: user?.id,
-            status: FriendshipStatus.PENDING,
+            status: FriendshipStatus.PENDING
           });
           toast({
             title: "Friend Request Sent",
             description: `You sent a friend request to ${user?.name}`,
-            variant: "default",
+            variant: "default"
           });
           break;
         case "accept":
           if (friendship) {
-            updated = await friendsService.updateFriendship(friendship.id, { status: FriendshipStatus.ACCEPTED });
+            updated = await friendsService.updateFriendship(friendship.id, {
+              status: FriendshipStatus.ACCEPTED
+            });
           }
           toast({
             title: "Friend Request Accepted",
             description: `You are now friends with ${user?.name}`,
-            variant: "default",
+            variant: "default"
           });
           break;
         case "reject":
@@ -78,7 +86,7 @@ export default function UserProfilePage() {
           toast({
             title: "Friend Removed",
             description: `You removed ${user?.name} from your friends`,
-            variant: "destructive",
+            variant: "destructive"
           });
           break;
       }
@@ -93,7 +101,11 @@ export default function UserProfilePage() {
     return (
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
         <header className="flex items-center mb-6">
-          <Button variant="ghost" onClick={() => navigate("/friends")} className="mr-2 p-2">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/friends")}
+            className="mr-2 p-2"
+          >
             <ArrowLeft className="w-6 h-6 text-purple-600" />
           </Button>
           <h1 className="text-2xl font-bold text-purple-800">User Profile</h1>
@@ -109,18 +121,29 @@ export default function UserProfilePage() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
       <header className="flex items-center mb-6">
-        <Button variant="ghost" onClick={() => navigate("/friends")} className="mr-2 p-2">
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/friends")}
+          className="mr-2 p-2"
+        >
           <ArrowLeft className="w-6 h-6 text-purple-600" />
         </Button>
         <h1 className="text-2xl font-bold text-purple-800">User Profile</h1>
       </header>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <Card className="mb-6 overflow-hidden">
           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 flex flex-col items-center">
             <div className="relative mb-4">
               <Avatar className="h-24 w-24 border-4 border-white">
-                <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+                <AvatarImage
+                  src={user.avatar || "/placeholder.svg"}
+                  alt={user.name}
+                />
                 <AvatarFallback className="bg-purple-200 text-purple-700 text-2xl">
                   {user.name?.charAt(0)}
                 </AvatarFallback>
@@ -136,15 +159,22 @@ export default function UserProfilePage() {
           <CardContent className="p-6">
             <div className="flex justify-center space-x-2 mb-6">
               {!friendship && (
-                <Button onClick={() => handleFriendAction("add")} className="bg-purple-600 hover:bg-purple-700">
+                <Button
+                  onClick={() => handleFriendAction("add")}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
                   <UserPlus className="w-4 h-4 mr-2" />
                   Add Friend
                 </Button>
               )}
 
               {friendship?.status === FriendshipStatus.PENDING &&
-                (friendship?.user_id === 1 ? ( // Replace with actual user ID from context or state
-                  <Button variant="outline" className="border-purple-200 text-purple-700" disabled>
+                (friendship.user_id === 1 ? ( // Replace with actual user ID from context or state
+                  <Button
+                    variant="outline"
+                    className="border-purple-200 text-purple-700"
+                    disabled
+                  >
                     <Check className="w-4 h-4 mr-2" />
                     Request Sent
                   </Button>
@@ -158,7 +188,10 @@ export default function UserProfilePage() {
                       <X className="w-4 h-4 mr-2" />
                       Reject
                     </Button>
-                    <Button onClick={() => handleFriendAction("accept")} className="bg-green-600 hover:bg-green-700">
+                    <Button
+                      onClick={() => handleFriendAction("accept")}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
                       <Check className="w-4 h-4 mr-2" />
                       Accept
                     </Button>
@@ -185,7 +218,10 @@ export default function UserProfilePage() {
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {user.user_goals?.map((goal: UserGoal, index: number) => (
-                    <Badge key={index} className="bg-purple-100 text-purple-700 px-3 py-1.5">
+                    <Badge
+                      key={index}
+                      className="bg-purple-100 text-purple-700 px-3 py-1.5"
+                    >
                       {goal.goals.name}
                     </Badge>
                   ))}
@@ -193,10 +229,15 @@ export default function UserProfilePage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-purple-800 mb-3">Achievements</h3>
+                <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                  Achievements
+                </h3>
                 <div className="grid grid-cols-3 gap-4">
                   {badges?.slice(0, 3).map((badge) => (
-                    <div key={badge.id} className="flex flex-col items-center text-center">
+                    <div
+                      key={badge.id}
+                      className="flex flex-col items-center text-center"
+                    >
                       <div className="text-4xl mb-1">{badge.icon}</div>
                       <div className="text-sm">{badge.name}</div>
                     </div>
@@ -205,18 +246,26 @@ export default function UserProfilePage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-purple-800 mb-3">Stats</h3>
+                <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                  Stats
+                </h3>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div className="bg-purple-50 p-3 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-700">{Math.floor(Math.random() * 30) + 1}</div>
+                    <div className="text-2xl font-bold text-purple-700">
+                      {Math.floor(Math.random() * 30) + 1}
+                    </div>
                     <div className="text-xs text-purple-600">Workouts</div>
                   </div>
                   <div className="bg-purple-50 p-3 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-700">{Math.floor(Math.random() * 20) + 1}</div>
+                    <div className="text-2xl font-bold text-purple-700">
+                      {Math.floor(Math.random() * 20) + 1}
+                    </div>
                     <div className="text-xs text-purple-600">Day Streak</div>
                   </div>
                   <div className="bg-purple-50 p-3 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-700">{user.level}</div>
+                    <div className="text-2xl font-bold text-purple-700">
+                      {user.level}
+                    </div>
                     <div className="text-xs text-purple-600">Level</div>
                   </div>
                 </div>

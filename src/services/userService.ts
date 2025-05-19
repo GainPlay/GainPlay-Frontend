@@ -12,4 +12,11 @@ export const userService = {
   updateUser: async (userId: number, userData:any): Promise<FrontendUserData> => {
     return (await apiClient.post(`/users/${userId}/updateUser`, {userData})).data;
   },
+
+  updateUserSettings: async (
+    userId: number,
+    settings: Partial<FrontendUserData>
+  ): Promise<FrontendUserData> => {
+    return (await axios.patch(`/user-settings/user/${userId}`, settings)).data;
+  }
 };
