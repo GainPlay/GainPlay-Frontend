@@ -6,7 +6,7 @@ const apiClient = axios.create({
   baseURL: import.meta.env.VITE_REACT_APP_API_URL + "/api",
   headers: {
     "Content-type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiIxMjNAZ21haWwuY29tIiwiaWF0IjoxNzQ3NjgzNjcwLCJleHAiOjE3NDc2ODcyNzB9.7vQIbyfq0yTj7h1vi3HrtlUqv3tLY4Nttz4TUo8J860`,
     
   },
 });

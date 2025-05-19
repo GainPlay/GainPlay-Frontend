@@ -122,7 +122,7 @@ export default function UserProfilePage() {
               <Avatar className="h-24 w-24 border-4 border-white">
                 <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
                 <AvatarFallback className="bg-purple-200 text-purple-700 text-2xl">
-                  {user.name.charAt(0)}
+                  {user.name?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="absolute -bottom-2 -right-2 bg-white text-purple-600 text-sm font-bold rounded-full h-8 w-8 flex items-center justify-center border-2 border-purple-600">
@@ -143,7 +143,7 @@ export default function UserProfilePage() {
               )}
 
               {friendship?.status === FriendshipStatus.PENDING &&
-                (friendship.user_id === 1 ? ( // Replace with actual user ID from context or state
+                (friendship?.user_id === 1 ? ( // Replace with actual user ID from context or state
                   <Button variant="outline" className="border-purple-200 text-purple-700" disabled>
                     <Check className="w-4 h-4 mr-2" />
                     Request Sent
