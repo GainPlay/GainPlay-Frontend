@@ -26,7 +26,7 @@ import { userService } from "@/services/userService";
 
 
 
-//implement the badges options fetch from the backend
+//TODO: implement the badges options fetch from the backend
 const badgesWithDescriptions: FrontendBadge[] = [
   {
     id: "1",
@@ -106,15 +106,14 @@ export default function ProfilePage() {
     }
   };
 
-  const changeAvatar = (newAvatar: string) => {
+  const changeAvatar = async (newAvatar: string) => {
     if (user) {
       const updatedUserData = {
-        ...user,
         avatar: newAvatar
       };
+      //TODO SAVE USER AVATAR HERE
       user.setUser(updatedUserData);
 
-      //TODO SAVE USER HERE
     }
   };
 
