@@ -7,12 +7,16 @@ import {
   signup,
   saveTokens,
   signin,
-  setDefaultAxiosConfig
+  setDefaultAxiosConfig,
 } from "@/services/authService";
 import { useCallback } from "react";
+import { useUserStore } from "@/stores/useUserStore";
+import { FriendshipStatus } from "@/types";
+import { userService } from "@/services/userService";
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const user = useUserStore();
 
   const handleLogin = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -26,6 +30,10 @@ export default function AuthPage() {
         const response = await signin(email, password);
         if (response.status === 201 && response.data?.access_token) {
           saveTokens({ accessToken: response.data.access_token });
+      const fetchedUser = await userService.getUserDataByMail(email);
+      //@ts-ignore
+      user.setUser({...fetchedUser, ...fetchedUser.user_settings,...fetchedUser.user_badges,...fetchedUser.user_goals});
+                navigate("/home");
           setDefaultAxiosConfig();
           navigate("/home");
         } else {
@@ -57,6 +65,8 @@ export default function AuthPage() {
         if (response.status === 201) {
           if (response.data?.access_token) {
             saveTokens({ accessToken: response.data.access_token });
+            const fetchedUser = await userService.getUserDataByMail(email);
+            user.setUser({...fetchedUser, ...fetchedUser.user_settings,...fetchedUser.user_badges,...fetchedUser.user_goals});
             setDefaultAxiosConfig();
           }
         } else {
