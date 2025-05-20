@@ -145,7 +145,7 @@ export default function UserProfilePage() {
                   alt={user.name}
                 />
                 <AvatarFallback className="bg-purple-200 text-purple-700 text-2xl">
-                  {user.name.charAt(0)}
+                  {user.name?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="absolute -bottom-2 -right-2 bg-white text-purple-600 text-sm font-bold rounded-full h-8 w-8 flex items-center justify-center border-2 border-purple-600">
