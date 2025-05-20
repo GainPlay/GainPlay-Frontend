@@ -1,15 +1,15 @@
-// import type { UserData, Friend, UserGoal, Exercise } from "../types";
-// import { defaultUserData, friends } from "../data/mockData";
-// import apiClient from "./apiClient";
-
 import { Friendship, FrontendUserData } from "@/types";
 import axios from "axios";
+import { getTokens } from "./authService";
 
 export const friendsService = {
-  getFriends: async (userId: number): Promise<Friendship[]> => {
+  getFriends: async (): Promise<Friendship[]> => {
+    const access_token = getTokens().accessToken;
     return (
       await axios.get("/friendships", {
-        params: { userId: userId }
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
       })
     ).data;
   },
@@ -23,10 +23,13 @@ export const friendsService = {
     ).data;
   },
 
-  getDiscover: async (userId: number): Promise<FrontendUserData[]> => {
+  getDiscover: async (): Promise<FrontendUserData[]> => {
+    const access_token = getTokens().accessToken;
     return (
       await axios.get("/friendships/discover", {
-        params: { userId: userId }
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
       })
     ).data;
   },
@@ -43,5 +46,5 @@ export const friendsService = {
   },
   deleteFriendship: async (friendshipId: number): Promise<void> => {
     await axios.delete(`/friendships/${friendshipId}`);
-  }
+  },
 };

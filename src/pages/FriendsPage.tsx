@@ -15,7 +15,7 @@ import {
   UserCheck,
   ChevronDown,
   ChevronUp,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -45,16 +45,14 @@ export default function FriendsPage() {
   useEffect(() => {
     const getFriendsData = async (): Promise<void> => {
       const currentUserId = 1; // Replace with actual user ID from context or state
-      const fetchedFriendships = await friendsService.getFriends(currentUserId);
+      const fetchedFriendships = await friendsService.getFriends();
       const { friends, pendingReceived } = mapFriendshipsToFrontend(
         fetchedFriendships,
         currentUserId
       );
       setMyFriends(friends);
       setPendingRequest(pendingReceived);
-      const fetchedDiscoverFriends = await friendsService.getDiscover(
-        currentUserId
-      );
+      const fetchedDiscoverFriends = await friendsService.getDiscover();
       setAllDiscoverableUsers(fetchedDiscoverFriends);
     };
     getFriendsData();

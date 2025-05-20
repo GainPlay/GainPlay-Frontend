@@ -90,66 +90,56 @@ export interface Friendship {
   receiver: Partial<FrontendUserData> | null;
 }
 
-// Exercise related types
-export interface Exercise {
-  id: number;
-  name: string | null;
-  description: string | null;
-  category: string | null;
-  difficulty_level: number | null;
-  muscle_group: string | null;
-}
-
-export interface ExerciseTemplate {
-  id: number;
-  exercise_id: number | null;
-  target_sets: number | null;
-  target_reps: number | null;
-  rest_time_seconds: number | null;
-  created_at: Date | null;
-}
-
-export interface ExerciseSet {
-  id: number;
-  workout_exercise_id: number | null;
-  set_number: number | null;
-  reps: number | null;
-  completed: boolean | null;
-  completed_at: Date | null;
-}
-
-// Workout related types
 export interface Workout {
   id: number;
-  user_id: number | null;
-  started_at: Date | null;
-  completed_at: Date | null;
-  coins_earned: number | null;
+  user_id?: number;
+  started_at?: string; // ISO string
+  completed_at?: string;
+  coins_earned?: number;
+  workout_exercises: WorkoutExercise[];
 }
 
 export interface WorkoutExercise {
   id: number;
-  workout_id: number | null;
-  exercise_id: number | null;
-  template_id: number | null;
-  total_reps: number | null;
+  workout_id?: number;
+  exercise_id?: number;
+  template_id?: number;
+  sets: SetData[]; // JSON[]: structured like { reps: number }
+  exercise_sets: ExerciseSet[];
+  exercises?: Exercise;
+  exercise_templates?: ExerciseTemplate;
 }
 
-// Frontend specific types
-export interface FrontendExercise {
-  id: string;
-  name: string;
-  targetSets: number;
-  targetReps: number;
-  restTime: number;
-  instruction: string;
-  difficulty: "beginner" | "intermediate" | "advanced";
-  muscleGroup: string;
-  xpReward: number;
-  sets: Array<{ completed: boolean; reps: number }>;
-  currentSet: number;
-  currentReps: number;
-  tips: string[];
+export interface SetData {
+  reps: number;
+}
+
+export interface ExerciseSet {
+  id: number;
+  workout_exercise_id?: number;
+  set_number?: number;
+  reps?: number;
+  completed?: boolean;
+  completed_at?: string;
+}
+
+export interface ExerciseTemplate {
+  id: number;
+  exercise_id?: number;
+  target_sets?: number;
+  target_reps?: number;
+  rest_time_seconds?: number;
+  created_at?: string;
+  exercises?: Exercise;
+}
+
+export interface Exercise {
+  id: number;
+  name?: string;
+  description?: string;
+  category?: string;
+  difficulty_level?: number;
+  muscle_group?: string;
 }
 
 export interface FrontendBadge {
@@ -170,10 +160,10 @@ export interface FrontendAvatar {
 }
 
 export enum FriendshipStatus {
-  FRIEND = "friend",
-  PENDING_SENT = "pending-sent",
-  PENDING_RECEIVED = "pending-received",
-  NONE = "none"
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  BLOCKED = "blocked",
+  NONE = "none",
 }
 export interface FrontendUserData {
   id: number;
