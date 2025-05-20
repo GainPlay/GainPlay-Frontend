@@ -49,6 +49,7 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover";
 import { workoutService } from "@/services/workoutService";
+import { useUserStore } from "@/stores/useUserStore";
 
 type WorkoutHistoryItem = {
   date: string;
@@ -80,26 +81,24 @@ export default function WorkoutHistoryPage() {
     []
   );
 
+  const user = useUserStore();
+  
+
   // For progress graph navigation
   const [progressGraphWeekStart, setProgressGraphWeekStart] = useState(
     startOfWeek(new Date())
   );
 
   useEffect(() => {
-    const storedHistory = JSON.parse(
-      localStorage.getItem("workoutHistory") || "[]"
-    );
+    const fetchAndSetHistory = async () => {
+      const workoutHistory = await fetchWorkoutHistory();
+      if (workoutHistory.length) {
+        setWorkoutHistory(workoutHistory);
+        setFilteredHistory(workoutHistory);
+      } 
+    };
 
-    // If no history exists, create some mock data for demonstration
-    if (storedHistory.length === 0) {
-      const mockHistory = generateMockWorkoutHistory(30);
-      localStorage.setItem("workoutHistory", JSON.stringify(mockHistory));
-      setWorkoutHistory(mockHistory);
-      setFilteredHistory(mockHistory);
-    } else {
-      setWorkoutHistory(storedHistory);
-      setFilteredHistory(storedHistory);
-    }
+    fetchAndSetHistory();
   }, []);
 
   useEffect(() => {
@@ -262,8 +261,8 @@ export default function WorkoutHistoryPage() {
   const topExercises = getTopExercises();
 
   // Generate mock workout history data
-  function generateMockWorkoutHistory(): WorkoutHistoryItem[] {
-    const history: WorkoutHistoryItem[] = workoutService.getWorkoutHistory();
+  async function fetchWorkoutHistory(): Promise<WorkoutHistoryItem[]> {
+    const history: WorkoutHistoryItem[] = await workoutService.getWorkoutHistory(user.id);
 
     return history;
   }
