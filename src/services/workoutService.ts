@@ -4,8 +4,7 @@ import axios from "axios";
 
 export const workoutService = {
   getWorkoutHistory: async (userId: number): Promise<WorkoutHistoryItem[]> => {
-        return (await axios.get(`/users/${userId}`)).data;
-    
+        return (await axios.get(`/workout?${userId}`)).data;
   },
 
 };
