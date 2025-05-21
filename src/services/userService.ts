@@ -8,8 +8,11 @@ export const userService = {
   getUserDataByMail: async (email: string): Promise<FrontendUserData> => {
     return (await axios.get(`/users/${email}/mail`)).data;
   },
-  updateUser: async (userId: number, userData:any): Promise<FrontendUserData> => {
-    return (await axios.post(`/users/${userId}/updateUser`, {userData})).data;
+  updateUser: async (
+    userId: number,
+    userData: unknown
+  ): Promise<FrontendUserData> => {
+    return (await axios.post(`/users/${userId}/updateUser`, { userData })).data;
   },
 
   updateUserSettings: async (
