@@ -4,7 +4,7 @@ import { create } from "zustand";
 interface WorkoutStore {
   currentWorkout: Workout | null;
   workoutHistory: Workout[];
-  setCurrentWorkout: (workout: Workout) => void;
+  setCurrentWorkout: (workout: Workout | null) => void;
   setWorkoutHistory: (workouts: Workout[]) => void;
 }
 

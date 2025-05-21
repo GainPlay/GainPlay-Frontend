@@ -14,13 +14,8 @@ export const friendsService = {
     ).data;
   },
 
-  getFriendship: async (
-    userId: number,
-    friendId: number
-  ): Promise<Friendship> => {
-    return (
-      await axios.get(`/friendships/userId/${userId}/friendId/${friendId}`)
-    ).data;
+  getFriendship: async (friendId: number): Promise<Friendship> => {
+    return (await axios.get(`/friendships/friendId/${friendId}`)).data;
   },
 
   getDiscover: async (): Promise<FrontendUserData[]> => {
@@ -33,15 +28,10 @@ export const friendsService = {
       })
     ).data;
   },
-  sendFriendRequest: async (
-    friendship: Partial<Friendship>
-  ): Promise<Friendship> => {
+  sendFriendRequest: async (friendship: Partial<Friendship>): Promise<Friendship> => {
     return (await axios.post("/friendships", friendship)).data;
   },
-  updateFriendship: async (
-    id: number,
-    updatedfriendship: Partial<Friendship>
-  ): Promise<Friendship> => {
+  updateFriendship: async (id: number, updatedfriendship: Partial<Friendship>): Promise<Friendship> => {
     return (await axios.put(`/friendships/${id}`, updatedfriendship)).data;
   },
   deleteFriendship: async (friendshipId: number): Promise<void> => {

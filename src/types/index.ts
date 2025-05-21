@@ -96,6 +96,8 @@ export interface Workout {
   started_at?: string; // ISO string
   completed_at?: string;
   coins_earned?: number;
+  experience_earned?: number;
+  score: number;
   workout_exercises: WorkoutExercise[];
 }
 
@@ -104,14 +106,9 @@ export interface WorkoutExercise {
   workout_id?: number;
   exercise_id?: number;
   template_id?: number;
-  sets: SetData[]; // JSON[]: structured like { reps: number }
   exercise_sets: ExerciseSet[];
   exercises?: Exercise;
   exercise_templates?: ExerciseTemplate;
-}
-
-export interface SetData {
-  reps: number;
 }
 
 export interface ExerciseSet {
@@ -119,8 +116,7 @@ export interface ExerciseSet {
   workout_exercise_id?: number;
   set_number?: number;
   reps?: number;
-  completed?: boolean;
-  completed_at?: string;
+  completed_reps?: number;
 }
 
 export interface ExerciseTemplate {
@@ -140,6 +136,36 @@ export interface Exercise {
   category?: string;
   difficulty_level?: number;
   muscle_group?: string;
+}
+
+export interface WorkoutHistoryItem {
+  date: string;
+  exercises: {
+    name: string;
+    sets: { completed: boolean; reps: number }[];
+    totalReps: number;
+    xpEarned?: number;
+  }[];
+}
+
+// Add a frontend-specific type for the workout UI
+export interface WorkoutUIExercise {
+  id: number;
+  name: string;
+  targetSets: number;
+  targetReps: number;
+  restTime: number;
+  instruction: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  muscleGroup: string;
+  xpReward: number;
+  sets: Array<{ id?: number; completed: boolean; reps: number }>;
+  currentSet: number;
+  currentReps: number;
+  tips: string[];
+  exerciseId: number;
+  workoutExerciseId: number;
+  templateId: number;
 }
 
 export interface FrontendBadge {
@@ -179,17 +205,6 @@ export interface FrontendUserData {
   user_settings?: UserSettings;
   user_badges?: FrontendBadge[];
   user_goals?: UserGoal[];
-}
-
-
-export interface WorkoutHistoryItem {
-  date: string;
-  exercises: {
-    name: string;
-    sets: { completed: boolean; reps: number }[];
-    totalReps: number;
-    xpEarned?: number;
-  }[];
 }
 
 type GeneralResponse = {
