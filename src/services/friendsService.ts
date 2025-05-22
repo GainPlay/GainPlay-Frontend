@@ -1,37 +1,40 @@
-// import type { UserData, Friend, UserGoal, Exercise } from "../types";
-// import { defaultUserData, friends } from "../data/mockData";
-// import apiClient from "./apiClient";
-
 import { Friendship, FrontendUserData } from "@/types";
-import apiClient from "./apiClient";
+import axios from "axios";
+import { getTokens } from "./authService";
 
 export const friendsService = {
-  getFriends: async (userId: number): Promise<Friendship[]> => {
+  getFriends: async (): Promise<Friendship[]> => {
+    const access_token = getTokens().accessToken;
     return (
-      await apiClient.get("/friendships", {
-        params: { userId: userId },
+      await axios.get("/friendships", {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
       })
     ).data;
   },
 
-  getFriendship: async (userId: number, friendId: number): Promise<Friendship> => {
-    return (await apiClient.get(`/friendships/userId/${userId}/friendId/${friendId}`)).data;
+  getFriendship: async (friendId: number): Promise<Friendship> => {
+    return (await axios.get(`/friendships/friendId/${friendId}`)).data;
   },
 
-  getDiscover: async (userId: number): Promise<FrontendUserData[]> => {
+  getDiscover: async (): Promise<FrontendUserData[]> => {
+    const access_token = getTokens().accessToken;
     return (
-      await apiClient.get("/friendships/discover", {
-        params: { userId: userId },
+      await axios.get("/friendships/discover", {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
       })
     ).data;
   },
   sendFriendRequest: async (friendship: Partial<Friendship>): Promise<Friendship> => {
-    return (await apiClient.post("/friendships", friendship)).data;
+    return (await axios.post("/friendships", friendship)).data;
   },
   updateFriendship: async (id: number, updatedfriendship: Partial<Friendship>): Promise<Friendship> => {
-    return (await apiClient.put(`/friendships/${id}`, updatedfriendship)).data;
+    return (await axios.put(`/friendships/${id}`, updatedfriendship)).data;
   },
   deleteFriendship: async (friendshipId: number): Promise<void> => {
-    await apiClient.delete(`/friendships/${friendshipId}`);
+    await axios.delete(`/friendships/${friendshipId}`);
   },
 };

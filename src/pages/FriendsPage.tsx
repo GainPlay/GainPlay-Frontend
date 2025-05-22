@@ -31,11 +31,11 @@ export default function FriendsPage() {
   useEffect(() => {
     const getFriendsData = async (): Promise<void> => {
       const currentUserId = 1; // Replace with actual user ID from context or state
-      const fetchedFriendships = await friendsService.getFriends(currentUserId);
+      const fetchedFriendships = await friendsService.getFriends();
       const { friends, pendingReceived } = mapFriendshipsToFrontend(fetchedFriendships, currentUserId);
       setMyFriends(friends);
       setPendingRequest(pendingReceived);
-      const fetchedDiscoverFriends = await friendsService.getDiscover(currentUserId);
+      const fetchedDiscoverFriends = await friendsService.getDiscover();
       setAllDiscoverableUsers(fetchedDiscoverFriends);
     };
     getFriendsData();
@@ -47,11 +47,11 @@ export default function FriendsPage() {
 
   const handleSearch = (): void => {
     const filtered = allDiscoverableUsers.filter((friend) => {
-      const nameMatch = friend.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const emailMatch = friend.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const nameMatch = friend.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      const emailMatch = friend.email?.toLowerCase().includes(searchTerm.toLowerCase());
       const goalsMatch =
         selectedGoals.length === 0 ||
-        selectedGoals.some((goal) => friend.user_goals.some((userGoal) => userGoal.goals.name === goal));
+        selectedGoals.some((goal) => friend.user_goals?.some((userGoal) => userGoal.goals.name === goal));
       return (nameMatch || emailMatch) && goalsMatch;
     });
 
@@ -261,7 +261,7 @@ export default function FriendsPage() {
                             <Avatar className="h-14 w-14 border-2 border-purple-100">
                               <AvatarImage src={friend.avatar || "/placeholder.svg"} alt={friend.name} />
                               <AvatarFallback className="bg-purple-200 text-purple-700">
-                                {friend.name.charAt(0)}
+                                {(friend?.name ?? "?").charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                             <div className="absolute -bottom-1 -right-1 bg-purple-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
@@ -283,12 +283,12 @@ export default function FriendsPage() {
                                   {goal.goals.name}
                                 </Badge>
                               ))}
-                              {friend.user_goals?.length > 1 && (
+                              {(friend.user_goals?.length ?? 0) > 1 && (
                                 <Badge
                                   variant="outline"
                                   className="bg-purple-50 text-purple-700 border-purple-200 text-xs"
                                 >
-                                  +{friend.user_goals?.length - 1} more
+                                  +{(friend.user_goals?.length ?? 0) - 1} more
                                 </Badge>
                               )}
                             </div>
@@ -324,7 +324,7 @@ export default function FriendsPage() {
                             <Avatar className="h-14 w-14 border-2 border-green-100">
                               <AvatarImage src={friend.avatar || "/placeholder.svg"} alt={friend.name} />
                               <AvatarFallback className="bg-green-200 text-green-700">
-                                {friend.name.charAt(0)}
+                                {(friend?.name ?? "?").charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                             <div className="absolute -bottom-1 -right-1 bg-green-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
@@ -346,12 +346,12 @@ export default function FriendsPage() {
                                   {goal.goals.name}
                                 </Badge>
                               ))}
-                              {friend.user_goals?.length > 1 && (
+                              {(friend.user_goals?.length ?? 0) > 1 && (
                                 <Badge
                                   variant="outline"
                                   className="bg-green-50 text-green-700 border-green-200 text-xs"
                                 >
-                                  +{friend.user_goals?.length - 1} more
+                                  +{(friend.user_goals?.length ?? 0) - 1} more
                                 </Badge>
                               )}
                             </div>
@@ -397,7 +397,7 @@ export default function FriendsPage() {
                             <Avatar className="h-14 w-14 border-2 border-amber-100">
                               <AvatarImage src={friend.avatar || "/placeholder.svg"} alt={friend.name} />
                               <AvatarFallback className="bg-amber-200 text-amber-700">
-                                {friend.name.charAt(0)}
+                                {(friend?.name ?? "?").charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                             <div className="absolute -bottom-1 -right-1 bg-amber-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,12 @@ import {
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import type { FrontendUserData, FrontendBadge } from "../types";
+import { useUserStore } from "@/stores/useUserStore";
+import { userService } from "@/services/userService";
 
+
+
+//TODO: implement the badges options fetch from the backend
 const badgesWithDescriptions: FrontendBadge[] = [
   {
     id: "1",
@@ -62,7 +67,6 @@ const badgesWithDescriptions: FrontendBadge[] = [
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState<FrontendUserData | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [editedEmail, setEditedEmail] = useState("");
@@ -75,88 +79,41 @@ export default function ProfilePage() {
   );
   const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
 
+  const user = useUserStore();
+
   useEffect(() => {
-    const storedUserData = localStorage.getItem("userData");
-    const storedAvatar = localStorage.getItem("currentAvatar");
-    const storedCoins = localStorage.getItem("userCoins");
-    const storedOwnedAvatars = localStorage.getItem("ownedAvatars");
+    if (user) {
+      setEditedName(user.name!);
+      setEditedEmail(user.email);
+      setEditedHeight(user.height || "");
+      setEditedWeight(user.weight || "");
+      setEditedAge(user.age || "");
+    } 
+  },[]);
 
-    let parsedUserData: FrontendUserData | null = null;
-
-    if (storedUserData) {
-      try {
-        parsedUserData = JSON.parse(storedUserData);
-      } catch (error) {
-        console.error("Error parsing stored user data:", error);
-      }
-    }
-
-    if (parsedUserData) {
-      setUserData({
-        ...parsedUserData,
-        avatar: storedAvatar || avatars[0].image,
-        coins: storedCoins ? Number.parseInt(storedCoins) : 500,
-        badges: badges.slice(0, 3) // Give the user 3 random badges
-      });
-      setEditedName(parsedUserData.name);
-      setEditedEmail(parsedUserData.email);
-      setEditedHeight(parsedUserData.height || "");
-      setEditedWeight(parsedUserData.weight || "");
-      setEditedAge(parsedUserData.age || "");
-    } else {
-      const defaultUserData: FrontendUserData = {
-        name: "John Doe",
-        email: "john@example.com",
-        avatar: storedAvatar || avatars[0].image,
-        coins: storedCoins ? Number.parseInt(storedCoins) : 500,
-        height: "175",
-        weight: "70",
-        age: "30",
-        badges: badges.slice(0, 3) // Give the user 3 random badges
-      };
-      setUserData(defaultUserData);
-      setEditedName(defaultUserData.name);
-      setEditedEmail(defaultUserData.email);
-      setEditedHeight(defaultUserData.height);
-      setEditedWeight(defaultUserData.weight);
-      setEditedAge(defaultUserData.age);
-      localStorage.setItem("userData", JSON.stringify(defaultUserData));
-    }
-    if (storedOwnedAvatars) {
-      try {
-        setOwnedAvatars(JSON.parse(storedOwnedAvatars));
-      } catch (error) {
-        console.error("Error parsing stored owned avatars:", error);
-        setOwnedAvatars([]);
-      }
-    }
-  }, []);
-
-  const handleSave = () => {
-    if (userData) {
+  const handleSave = async () => {
+    if (user) {
       const updatedUserData = {
-        ...userData,
         name: editedName,
         email: editedEmail,
         height: editedHeight,
         weight: editedWeight,
         age: editedAge
       };
-      setUserData(updatedUserData);
-      localStorage.setItem("userData", JSON.stringify(updatedUserData));
+      await userService.updateUser(user.id, updatedUserData);
+      user.setUser(updatedUserData);
       setEditMode(false);
     }
   };
 
-  const changeAvatar = (newAvatar: string) => {
-    if (userData) {
+  const changeAvatar = async (newAvatar: string) => {
+    if (user) {
       const updatedUserData = {
-        ...userData,
         avatar: newAvatar
       };
-      setUserData(updatedUserData);
-      localStorage.setItem("userData", JSON.stringify(updatedUserData));
-      localStorage.setItem("currentAvatar", newAvatar);
+      //TODO SAVE USER AVATAR HERE
+      user.setUser(updatedUserData);
+
     }
   };
 
@@ -183,7 +140,7 @@ export default function ProfilePage() {
     setBadgeDialogOpen(true);
   };
 
-  if (!userData) return <div>Loading...</div>;
+  if (!user) return <div>Loading...</div>;
 
   return (
     <div className="flex flex-col min-h-screen bg-purple-100 p-4 pb-20">
@@ -194,7 +151,7 @@ export default function ProfilePage() {
       <Card className="mb-6">
         <CardContent className="flex items-center space-x-4 pt-6">
           <img
-            src={userData.avatar || "/placeholder.svg"}
+            src={user.avatar || "/placeholder.svg"}
             alt="User Avatar"
             width={80}
             height={80}
@@ -208,7 +165,7 @@ export default function ProfilePage() {
                 className="mb-2"
               />
             ) : (
-              <h2 className="text-xl font-bold">{userData.name}</h2>
+              <h2 className="text-xl font-bold">{user.name}</h2>
             )}
             {editMode ? (
               <Input
@@ -217,11 +174,11 @@ export default function ProfilePage() {
                 className="mb-2"
               />
             ) : (
-              <p className="text-gray-600">{userData.email}</p>
+              <p className="text-gray-600">{user.email}</p>
             )}
             <p className="text-purple-600 font-semibold mt-2 flex items-center">
               <Coins className="w-4 h-4 mr-1 text-yellow-500" />
-              {userData.coins} coins
+              {user.coins} coins
             </p>
           </div>
         </CardContent>
@@ -264,7 +221,7 @@ export default function ProfilePage() {
                   onChange={(e) => setEditedAge(e.target.value)}
                 />
               ) : (
-                <p className="font-medium">{userData.age} years</p>
+                <p className="font-medium">{user.age} years</p>
               )}
             </div>
             <div>
@@ -276,7 +233,7 @@ export default function ProfilePage() {
                   onChange={(e) => setEditedWeight(e.target.value)}
                 />
               ) : (
-                <p className="font-medium">{userData.weight} kg</p>
+                <p className="font-medium">{user.weight} kg</p>
               )}
             </div>
           </div>
@@ -289,7 +246,7 @@ export default function ProfilePage() {
                 onChange={(e) => setEditedHeight(e.target.value)}
               />
             ) : (
-              <p className="font-medium">{userData.height} cm</p>
+              <p className="font-medium">{user.height} cm</p>
             )}
           </div>
         </CardContent>
@@ -304,7 +261,7 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap justify-center">
-            {userData.badges.map((badge) => (
+            {user.user_badges?.map((badge) => (
               <motion.div
                 key={badge.id}
                 className="flex flex-col items-center w-24 m-2 cursor-pointer"
@@ -341,7 +298,7 @@ export default function ProfilePage() {
                   key={avatarId}
                   variant="outline"
                   className={`p-0 h-14 w-14 rounded-full overflow-hidden ${
-                    userData?.avatar === avatar.image
+                    user?.avatar === avatar.image
                       ? "ring-2 ring-purple-600"
                       : ""
                   }`}

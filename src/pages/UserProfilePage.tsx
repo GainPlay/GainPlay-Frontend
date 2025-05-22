@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
 import { ArrowLeft, Trophy, UserPlus, UserX, Check, X } from "lucide-react";
-import { badges, friends } from "@/data/mockData";
+import { badges } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
 import { Friendship, FriendshipStatus, FrontendUserData, UserGoal } from "@/types";
-import { get } from "http";
 import { userService } from "@/services/userService";
 import { friendsService } from "@/services/friendsService";
 
@@ -36,7 +35,7 @@ export default function UserProfilePage() {
       }
       setUser(fetchedUser);
 
-      const fetchedFriendship = await friendsService.getFriendship(1, userId); // Replace with actual user ID
+      const fetchedFriendship = await friendsService.getFriendship(userId);
       setFriendship(fetchedFriendship);
       setIsLoading(false);
     };
@@ -62,7 +61,9 @@ export default function UserProfilePage() {
           break;
         case "accept":
           if (friendship) {
-            updated = await friendsService.updateFriendship(friendship.id, { status: FriendshipStatus.ACCEPTED });
+            updated = await friendsService.updateFriendship(friendship.id, {
+              status: FriendshipStatus.ACCEPTED,
+            });
           }
           toast({
             title: "Friend Request Accepted",
@@ -122,7 +123,7 @@ export default function UserProfilePage() {
               <Avatar className="h-24 w-24 border-4 border-white">
                 <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
                 <AvatarFallback className="bg-purple-200 text-purple-700 text-2xl">
-                  {user.name.charAt(0)}
+                  {user.name?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="absolute -bottom-2 -right-2 bg-white text-purple-600 text-sm font-bold rounded-full h-8 w-8 flex items-center justify-center border-2 border-purple-600">

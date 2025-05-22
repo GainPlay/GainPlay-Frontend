@@ -1,24 +1,19 @@
 // userStore.ts
+import { FrontendUserData } from "@/types";
 import { create } from "zustand";
 
 // Define the structure of the user data
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  isLoggedIn: boolean;
-  setUser: (user: UserData) => void;
+interface UserData extends FrontendUserData {
+  setUser: (user: any) => void;
   logout: () => void;
 }
 
 // Create the Zustand store for user data
 export const useUserStore = create<UserData>((set) => ({
-  id: "",
+  id: 0,
   name: "",
   email: "",
   isLoggedIn: false,
-  setUser: (user) => set(() => ({ ...user, isLoggedIn: true })),
-  logout: () => set(() => ({ id: "", name: "", email: "", isLoggedIn: false })),
+  setUser: (user) => set(() => ({ ...user})),
+  logout: () => set(() => ({ id: 0, name: "", email: "",password_hash: "",avatar_url: "", coins: 0, level: 0, experience: 0, created_at: null})),
 }));
-
-// const { name, email, isLoggedIn, setUser, logout } = useUserStore();
