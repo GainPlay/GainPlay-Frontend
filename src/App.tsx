@@ -40,7 +40,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         {/* Conditionally render Navigation based on the current route */}
-        {location.pathname !== "/" && <Navigation />}
+        {location.pathname !== "/" && location.pathname !== "/onboarding" && <Navigation />}
         <Toaster />
       </div>
     </>

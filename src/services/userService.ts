@@ -20,5 +20,5 @@ export const userService = {
     settings: Partial<FrontendUserData>
   ): Promise<FrontendUserData> => {
     return (await axios.patch(`/user-settings/user/${userId}`, settings)).data;
-  }
+  },
 };
