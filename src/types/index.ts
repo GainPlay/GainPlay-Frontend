@@ -36,14 +36,26 @@ export interface Avatar {
   rarity?: "common" | "rare" | "epic" | "legendary"; // Added to match frontend
 }
 
-export interface UserAvatar {
+// types.ts - Add this to your types file
+
+export interface FrontendAvatar {
   id: number;
-  user_id: number | null;
-  avatar_id: number | null;
-  is_current: boolean | null;
-  purchased_at: Date | null;
+  name: string;
+  image_url: string;
+  price: number;
+  rarity: "common" | "rare" | "epic" | "legendary";
+  created_at: string;
 }
 
+// Type for the user avatars response from the API
+export interface UserAvatar {
+  id: number;
+  user_id: number;
+  avatar_id: number;
+  is_current: boolean;
+  purchased_at: string;
+  avatars: FrontendAvatar;
+}
 // Badge related types
 export interface Badge {
   id: number;
@@ -177,7 +189,7 @@ export interface FrontendBadge {
 }
 
 export interface FrontendAvatar {
-  id: string;
+  id: number;
   name: string;
   image: string;
   price: number;

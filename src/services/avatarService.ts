@@ -1,54 +1,61 @@
-import { avatars } from "@/data/mockData";
-import { FrontendAvatar } from "@/types";
+import { FrontendAvatar, UserAvatar } from "@/types";
+import axios from "axios";
+import { getTokens } from "./authService";
+
+const API_BASE = "/avatars";
 
 export const avatarService = {
   getAvatars: async (): Promise<FrontendAvatar[]> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(avatars);
-      }, 100);
+    const accessToken = getTokens().accessToken;
+    const res = await axios.get(API_BASE, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
+    return res.data;
   },
 
-  getOwnedAvatars: async (): Promise<string[]> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const ownedAvatars = localStorage.getItem("ownedAvatars");
-        resolve(ownedAvatars ? JSON.parse(ownedAvatars) : []);
-      }, 100);
+  getOwnedAvatars: async (): Promise<UserAvatar[]> => {
+    const accessToken = getTokens().accessToken;
+    const res = await axios.get(`${API_BASE}/user`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
+    return res.data;
   },
 
-  buyAvatar: async (avatarId: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-        const avatar = avatars.find((a) => a.id === avatarId);
-        if (avatar && userData.coins >= avatar.price) {
-          userData.coins -= avatar.price;
-          const ownedAvatars = JSON.parse(
-            localStorage.getItem("ownedAvatars") || "[]"
-          );
-          ownedAvatars.push(avatarId);
-          localStorage.setItem("ownedAvatars", JSON.stringify(ownedAvatars));
-          localStorage.setItem("userData", JSON.stringify(userData));
-          resolve();
-        } else {
-          reject(new Error("Not enough coins or avatar not found"));
-        }
-      }, 100);
-    });
+  purchaseAvatar: async (
+    avatarId: number
+  ): Promise<{
+    success: boolean;
+    userAvatar: UserAvatar;
+    remainingCoins: number;
+  }> => {
+    const accessToken = getTokens().accessToken;
+    const res = await axios.post(
+      `${API_BASE}/purchase/${avatarId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return res.data;
   },
 
-  setCurrentAvatar: async (avatarImage: string): Promise<void> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        localStorage.setItem("currentAvatar", avatarImage);
-        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-        userData.avatar = avatarImage;
-        localStorage.setItem("userData", JSON.stringify(userData));
-        resolve();
-      }, 100);
-    });
-  }
+  setCurrentAvatar: async (avatarId: number): Promise<{ success: boolean }> => {
+    const accessToken = getTokens().accessToken;
+    const res = await axios.post(
+      `${API_BASE}/set-current/${avatarId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return res.data;
+  },
 };
