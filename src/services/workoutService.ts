@@ -1,5 +1,4 @@
-import { initialExercises } from "@/data/mockData";
-import { FrontendExercise, Goal, WorkoutHistoryItem } from "@/types";
+import { Workout, WorkoutHistoryItem } from "@/types";
 import axios from "axios";
 
 export const workoutService = {
@@ -7,4 +6,31 @@ export const workoutService = {
         return (await axios.get(`/workout`)).data;
   },
 
+  generateWorkout: async (): Promise<Workout> => {
+    try {
+      return (await axios.post("/workout/generate")).data;
+    } catch (error) {
+      console.error("Error generating workout:", error);
+      throw error;
+    }
+  },
+
+  getCurrentWorkout: async (): Promise<Workout> => {
+    try {
+      return (await axios.get("/workout/current")).data;
+    } catch (error) {
+      console.error("Error getting current workout:", error);
+      throw error;
+    }
+  },
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  finishWorkout: async (finishedWorkout: any): Promise<{ coins: number; experience_earned: number; score: number }> => {
+    try {
+      return (await axios.put(`/workout/finishWorkout`, finishedWorkout)).data;
+    } catch (error) {
+      console.error("Error finishing workout:", error);
+      throw error;
+    }
+  },
 };

@@ -16,10 +16,13 @@ import { Slider } from "@/components/ui/slider";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, ArrowRight, ArrowLeft, Dumbbell } from "lucide-react";
 import { mapSurveyValuesToApi } from "@/utils/surveyMap";
-import { onboardingService } from "@/services/onboardingservice";
 import slimBuilder from "../assets/slim builder.png";
+import { onboardingService } from "@/services/onboardingService";
 import athleticBuilder from "../assets/Athletic Builder.png";
 import solidBuilder from "../assets/solid builder.png";
+import { toast } from "@/hooks/use-toast";
+import { workoutService } from "@/services/workoutService";
+import { useWorkoutStore } from "@/stores/useWorkoutStore";
 
 // Type definitions
 type Option = {
@@ -255,27 +258,29 @@ export default function OnboardingPage() {
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   const [isGeneratingWorkout, setIsGeneratingWorkout] =
     useState<boolean>(false);
+  const { setCurrentWorkout } = useWorkoutStore();
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentQuestion < questions.length - 1) {
       setDirection(1);
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      // Save answers and show loading animation
-      localStorage.setItem("userGoals", JSON.stringify(answers));
       const apiAnswers = mapSurveyValuesToApi(answers);
-      const response = onboardingService.saveOnboardingData(apiAnswers);
-
-      // if (response.status !== 200) {
-      //   console.error("Error saving onboarding data");
-      // }
-      console.log(response);
-      setIsGeneratingWorkout(true);
-
-      // Simulate workout generation with a timeout
-      setTimeout(() => {
+      try {
+        setIsGeneratingWorkout(true);
+        await onboardingService.saveOnboardingData(apiAnswers);
+        const generatedWorkout = await workoutService.generateWorkout();
+        setCurrentWorkout(generatedWorkout);
         navigate("/home");
-      }, 5000);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        toast({
+          title: "Error saving onboarding data",
+          description: `please try again`,
+          variant: "destructive",
+        });
+        setIsGeneratingWorkout(false);
+      }
     }
   };
 

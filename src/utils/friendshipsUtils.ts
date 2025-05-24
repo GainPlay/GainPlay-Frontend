@@ -1,20 +1,20 @@
-import { FrontendFriend, FriendshipStatus, UserGoal } from "@/types";
+import { FrontendUserData, FriendshipStatus, UserGoal } from "@/types";
 
 export const mapFriendshipsToFrontend = (
   friendships: any[],
   currentUserId: number
 ): {
-  friends: FrontendFriend[];
-  pendingReceived: FrontendFriend[];
+  friends: any[];
+  pendingReceived: any[];
 } => {
-  const friends: FrontendFriend[] = [];
-  const pendingReceived: FrontendFriend[] = [];
+  const friends: any[] = [];
+  const pendingReceived: any[] = [];
 
   for (const friendship of friendships) {
     const isSender = friendship.user_id === currentUserId;
     const otherUser = isSender ? friendship.receiver : friendship.sender;
 
-    const frontendFriend: FrontendFriend = {
+    const frontendFriend = {
       id: otherUser.id,
       name: otherUser.name,
       avatar: otherUser.avatar_url,
