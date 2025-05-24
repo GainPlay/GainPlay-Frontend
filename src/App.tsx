@@ -11,7 +11,10 @@ import OnboardingPage from "./pages/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import WorkoutHistoryPage from "./pages/WorkoutHistoryPage";
-import { getValidAccessToken } from "./services/authService";
+import {
+  getValidAccessToken,
+  setDefaultAxiosConfig
+} from "./services/authService";
 
 function App() {
   const navigate = useNavigate();
@@ -24,6 +27,8 @@ function App() {
       navigate("/");
     }
   }, [location, access_token]);
+
+  setDefaultAxiosConfig();
 
   return (
     <>
@@ -40,7 +45,9 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         {/* Conditionally render Navigation based on the current route */}
-        {location.pathname !== "/" && location.pathname !== "/onboarding" && <Navigation />}
+        {location.pathname !== "/" && location.pathname !== "/onboarding" && (
+          <Navigation />
+        )}
         <Toaster />
       </div>
     </>

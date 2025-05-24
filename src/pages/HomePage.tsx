@@ -20,7 +20,7 @@ import {
   Dumbbell,
   FlameIcon as Fire,
   Trophy,
-  Loader2,
+  Loader2
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion, AnimatePresence } from "framer-motion";
@@ -57,7 +57,7 @@ const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
     const sets = workoutExercise.exercise_sets.map((set) => ({
       id: set.id, // Include the set ID
       completed: (set.completed_reps || 0) > 0,
-      reps: set.completed_reps || 0,
+      reps: set.completed_reps || 0
     }));
 
     // Find the current set (first incomplete set)
@@ -81,11 +81,11 @@ const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
         "Keep proper form throughout the exercise",
         "Breathe properly during the movement",
         "Focus on muscle contraction",
-        "Maintain a controlled tempo",
+        "Maintain a controlled tempo"
       ],
       exerciseId: exercise?.id || 0,
       workoutExerciseId: workoutExercise.id,
-      templateId: template?.id || 0,
+      templateId: template?.id || 0
     };
   });
 };
@@ -189,7 +189,7 @@ const motivationalQuotes = [
   "Perseverance is not a long race; it is many short races one after the other.",
   "Success is no accident. It is hard work, perseverance, learning, studying, sacrifice and most of all, love of what you are doing.",
   "The only place where success comes before work is in the dictionary.",
-  "The difference between the impossible and the possible lies in a person's determination.",
+  "The difference between the impossible and the possible lies in a person's determination."
 ];
 
 export default function HomePage() {
@@ -205,7 +205,7 @@ export default function HomePage() {
   const [earnedCoins, setEarnedCoins] = useState(0);
   const [earnedXP, setEarnedXP] = useState(0);
   const [earnedScore, setEarnedScore] = useState(0);
-  const [earnedBadges, setEarnedBadges] = useState<
+  const [earnedBadges] = useState<
     Array<{ id: string; name: string; icon: string }>
   >([]);
   const [restMode, setRestMode] = useState(false);
@@ -351,14 +351,14 @@ export default function HomePage() {
           newSets[exercise.currentSet] = {
             ...newSets[exercise.currentSet],
             completed: true,
-            reps: exercise.currentReps,
+            reps: exercise.currentReps
           };
 
           newExercises[currentExerciseIndex] = {
             ...exercise,
             sets: newSets,
             currentSet: exercise.currentSet + 1,
-            currentReps: 0,
+            currentReps: 0
           };
 
           return newExercises;
@@ -445,7 +445,7 @@ export default function HomePage() {
         totalReps: exercise.sets.reduce(
           (total, set) => total + (set.reps || 0),
           0
-        ),
+        )
       }));
 
       const workoutHistory = JSON.parse(
@@ -454,7 +454,7 @@ export default function HomePage() {
       workoutHistory.push({
         date: new Date().toISOString(),
         exercises: completedExercises,
-        score, // Save score for UI/stats
+        score // Save score for UI/stats
       });
       localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
 
@@ -585,32 +585,19 @@ export default function HomePage() {
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 1000 : -1000,
-      opacity: 0,
+      opacity: 0
     }),
     center: {
       x: 0,
-      opacity: 1,
+      opacity: 1
     },
     exit: (direction: number) => ({
       x: direction < 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
+      opacity: 0
+    })
   };
 
   const currentExercise = exercises[currentExerciseIndex];
-
-  // Get the current date for the upcoming workout section
-  const today = new Date();
-  const daysOfWeek = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  const dayName = daysOfWeek[today.getDay()];
 
   const startDailyChallenge = async () => {
     if (isDailyChallengeDone) return;
@@ -620,8 +607,9 @@ export default function HomePage() {
 
     // If challenge is completed
     if (dailyChallengeProgress + 5 >= 50) {
-      originalWorkout?.user_id &&
-        (await challengeService.finishChallenge(originalWorkout?.user_id));
+      if (originalWorkout?.user_id) {
+        await challengeService.finishChallenge(originalWorkout.user_id);
+      }
 
       setIsDailyChallengeDone(true);
       // Add coins and save to localStorage
@@ -690,7 +678,7 @@ export default function HomePage() {
                   <div
                     className="h-full bg-purple-600 rounded-full transition-all duration-500"
                     style={{
-                      width: `${Math.min(Math.round(earnedXP / 2), 100)}%`,
+                      width: `${Math.min(Math.round(earnedXP / 2), 100)}%`
                     }}
                   />
                 </div>
@@ -710,7 +698,7 @@ export default function HomePage() {
                         transition={{
                           type: "spring",
                           delay: 0.3,
-                          duration: 0.5,
+                          duration: 0.5
                         }}
                         className="flex flex-col items-center"
                       >
@@ -1030,7 +1018,7 @@ export default function HomePage() {
                       (restTimeRemaining /
                         exercises[currentExerciseIndex].restTime) *
                       100
-                    }%`,
+                    }%`
                   }}
                 />
               </div>
@@ -1063,7 +1051,7 @@ export default function HomePage() {
               <div
                 className="bg-purple-600 h-full rounded-full"
                 style={{
-                  width: `${(currentExerciseIndex / exercises.length) * 100}%`,
+                  width: `${(currentExerciseIndex / exercises.length) * 100}%`
                 }}
               />
             </div>
