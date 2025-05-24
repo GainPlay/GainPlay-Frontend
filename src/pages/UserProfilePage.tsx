@@ -50,6 +50,8 @@ export default function UserProfilePage() {
   const { allBadges, initializeBadges } = useBadgeStore();
 
   useEffect(() => {
+    console.log("heyyyyyyyyyyy");
+
     initializeBadges();
   }, []);
 

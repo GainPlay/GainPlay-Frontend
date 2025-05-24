@@ -23,7 +23,8 @@ export const useBadgeStore = create<BadgeStore>()(
     initializeBadges: async () => {
       set({ loading: true, error: null });
       try {
-        const response = await fetch("/badges");
+        const response = await fetch("/api/badges");
+        console.log({ response });
         if (!response.ok) {
           throw new Error("Failed to fetch badges");
         }

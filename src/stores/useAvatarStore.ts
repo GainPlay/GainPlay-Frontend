@@ -21,15 +21,32 @@ export const useAvatarStore = create<AvatarStore>()(
 
     initializeAvatars: async () => {
       set({ loading: true, error: null });
+
       try {
-        const response = await fetch("/avatars");
+        const response = await fetch("/api/avatars");
+
         if (!response.ok) {
-          throw new Error("Failed to fetch avatars");
+          throw new Error(
+            `Failed to fetch avatars: ${response.status} ${response.statusText}`
+          );
         }
+
+        const contentType = response.headers.get("content-type") || "";
+
+        // Check if response is JSON
+        if (!contentType.includes("application/json")) {
+          const rawText = await response.text();
+          console.error("Unexpected response format:", rawText);
+          throw new Error("Expected JSON but received non-JSON response");
+        }
+
         const data: Avatar[] = await response.json();
+        console.log("Fetched avatars:", data);
+
         set({ allAvatars: data, loading: false });
       } catch (err: any) {
-        set({ error: err.message, loading: false });
+        console.error("Error fetching avatars:", err);
+        set({ error: err.message || "Unknown error", loading: false });
       }
     },
 
