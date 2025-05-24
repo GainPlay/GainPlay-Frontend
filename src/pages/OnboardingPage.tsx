@@ -310,12 +310,20 @@ export default function OnboardingPage() {
     if (selectedGoals.includes(goalId)) {
       const updatedGoals = { ...answers.fitnessGoals };
       delete updatedGoals[goalId];
-
+      
       setAnswers({
         ...answers,
         fitnessGoals: updatedGoals,
       });
     }
+    
+    setAnswers({
+      ...answers,
+      fitnessGoals: {
+        ...answers.fitnessGoals,
+        [goalId]: 5,
+      },
+    });
   };
 
   const handleGoalImportanceChange = (goalId: string, importance: number) => {
