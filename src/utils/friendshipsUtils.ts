@@ -1,4 +1,5 @@
-import { FrontendUserData, FriendshipStatus, UserGoal } from "@/types";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { FriendshipStatus, UserGoal } from "@/types";
 
 export const mapFriendshipsToFrontend = (
   friendships: any[],
@@ -19,9 +20,11 @@ export const mapFriendshipsToFrontend = (
       name: otherUser.name,
       avatar: otherUser.avatar_url,
       email: otherUser.email,
-      goals: otherUser.user_goals.map((userGoal: UserGoal) => userGoal.goals.name) || [], // safe default
+      goals:
+        otherUser.user_goals.map((userGoal: UserGoal) => userGoal.goals.name) ||
+        [],
       level: otherUser.level,
-      status: friendship.status as FriendshipStatus,
+      status: friendship.status as FriendshipStatus
     };
 
     if (friendship.status === "accepted") {
