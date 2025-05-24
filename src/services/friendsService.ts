@@ -1,17 +1,9 @@
 import { Friendship, FrontendUserData } from "@/types";
 import axios from "axios";
-import { getTokens } from "./authService";
 
 export const friendsService = {
   getFriends: async (): Promise<Friendship[]> => {
-    const access_token = getTokens().accessToken;
-    return (
-      await axios.get("/friendships", {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      })
-    ).data;
+    return (await axios.get("/friendships")).data;
   },
 
   getFriendship: async (friendId: number): Promise<Friendship> => {
@@ -19,22 +11,20 @@ export const friendsService = {
   },
 
   getDiscover: async (): Promise<FrontendUserData[]> => {
-    const access_token = getTokens().accessToken;
-    return (
-      await axios.get("/friendships/discover", {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      })
-    ).data;
+    return (await axios.get("/friendships/discover")).data;
   },
-  sendFriendRequest: async (friendship: Partial<Friendship>): Promise<Friendship> => {
+  sendFriendRequest: async (
+    friendship: Partial<Friendship>
+  ): Promise<Friendship> => {
     return (await axios.post("/friendships", friendship)).data;
   },
-  updateFriendship: async (id: number, updatedfriendship: Partial<Friendship>): Promise<Friendship> => {
-    return (await axios.put(`/friendships/${id}`, updatedfriendship)).data;
+  updateFriendship: async (
+    id: number,
+    updatedFriendship: Partial<Friendship>
+  ): Promise<Friendship> => {
+    return (await axios.put(`/friendships/${id}`, updatedFriendship)).data;
   },
   deleteFriendship: async (friendshipId: number): Promise<void> => {
     await axios.delete(`/friendships/${friendshipId}`);
-  },
+  }
 };
