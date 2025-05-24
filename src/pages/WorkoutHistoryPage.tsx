@@ -262,7 +262,7 @@ export default function WorkoutHistoryPage() {
 
   // Generate mock workout history data
   async function fetchWorkoutHistory(): Promise<WorkoutHistoryItem[]> {
-    const history: WorkoutHistoryItem[] = await workoutService.getWorkoutHistory(user.id);
+    const history: WorkoutHistoryItem[] = await workoutService.getWorkoutHistory();
 
     return history;
   }

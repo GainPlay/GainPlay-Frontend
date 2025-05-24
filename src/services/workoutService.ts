@@ -3,8 +3,8 @@ import { FrontendExercise, Goal, WorkoutHistoryItem } from "@/types";
 import axios from "axios";
 
 export const workoutService = {
-  getWorkoutHistory: async (userId: number): Promise<WorkoutHistoryItem[]> => {
-        return (await axios.get(`/workout?${userId}`)).data;
+  getWorkoutHistory: async (): Promise<WorkoutHistoryItem[]> => {
+        return (await axios.get(`/workout`)).data;
   },
 
 };
