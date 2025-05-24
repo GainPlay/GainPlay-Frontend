@@ -33,6 +33,7 @@ import type { Workout, WorkoutUIExercise } from "../types";
 import { workoutService } from "@/services/workoutService";
 import { updateSetUtils, XP_CONST } from "@/utils/workout.utils";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { challengeService } from "@/services/challegeService";
 
 // Convert API workout to UI format
 const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
@@ -43,10 +44,12 @@ const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
     const template = workoutExercise.exercise_templates;
 
     // Map difficulty level to string
-    let difficultyString: "beginner" | "intermediate" | "advanced" = "intermediate";
+    let difficultyString: "beginner" | "intermediate" | "advanced" =
+      "intermediate";
     if (exercise?.difficulty_level) {
       if (exercise.difficulty_level <= 3) difficultyString = "beginner";
-      else if (exercise.difficulty_level <= 6) difficultyString = "intermediate";
+      else if (exercise.difficulty_level <= 6)
+        difficultyString = "intermediate";
       else difficultyString = "advanced";
     }
 
@@ -66,7 +69,8 @@ const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
       targetSets: template?.target_sets || 3,
       targetReps: template?.target_reps || 10,
       restTime: template?.rest_time_seconds || 60,
-      instruction: exercise?.description || "Perform the exercise with proper form.",
+      instruction:
+        exercise?.description || "Perform the exercise with proper form.",
       difficulty: difficultyString,
       muscleGroup: exercise?.muscle_group || "Full Body",
       xpReward: XP_CONST * (exercise?.difficulty_level ?? 1),
@@ -201,7 +205,9 @@ export default function HomePage() {
   const [earnedCoins, setEarnedCoins] = useState(0);
   const [earnedXP, setEarnedXP] = useState(0);
   const [earnedScore, setEarnedScore] = useState(0);
-  const [earnedBadges, setEarnedBadges] = useState<Array<{ id: string; name: string; icon: string }>>([]);
+  const [earnedBadges, setEarnedBadges] = useState<
+    Array<{ id: string; name: string; icon: string }>
+  >([]);
   const [restMode, setRestMode] = useState(false);
   const [restTimeRemaining, setRestTimeRemaining] = useState(0);
   const [level, setLevel] = useState(1);
@@ -283,7 +289,10 @@ export default function HomePage() {
     setExercises((prevExercises) => {
       const newExercises = [...prevExercises];
       const exercise = newExercises[currentExerciseIndex];
-      exercise.currentReps = Math.max(0, increment ? exercise.currentReps + 1 : exercise.currentReps - 1);
+      exercise.currentReps = Math.max(
+        0,
+        increment ? exercise.currentReps + 1 : exercise.currentReps - 1
+      );
       return newExercises;
     });
   };
@@ -410,7 +419,10 @@ export default function HomePage() {
 
   const skipRest = () => {
     setRestMode(false);
-    if (exercises[currentExerciseIndex].currentSet >= exercises[currentExerciseIndex].targetSets) {
+    if (
+      exercises[currentExerciseIndex].currentSet >=
+      exercises[currentExerciseIndex].targetSets
+    ) {
       moveToNextExercise();
     }
   };
@@ -423,16 +435,22 @@ export default function HomePage() {
       setIsLoading(true);
 
       // Finish the workout and receive rewards from the backend
-      const { coins, experience_earned, score } = await workoutService.finishWorkout(originalWorkout);
+      const { coins, experience_earned, score } =
+        await workoutService.finishWorkout(originalWorkout);
 
       // Save the completed workout to local storage
       const completedExercises = exercises.map((exercise) => ({
         name: exercise.name,
         sets: exercise.sets,
-        totalReps: exercise.sets.reduce((total, set) => total + (set.reps || 0), 0),
+        totalReps: exercise.sets.reduce(
+          (total, set) => total + (set.reps || 0),
+          0
+        ),
       }));
 
-      const workoutHistory = JSON.parse(localStorage.getItem("workoutHistory") || "[]");
+      const workoutHistory = JSON.parse(
+        localStorage.getItem("workoutHistory") || "[]"
+      );
       workoutHistory.push({
         date: new Date().toISOString(),
         exercises: completedExercises,
@@ -446,7 +464,8 @@ export default function HomePage() {
       localStorage.setItem("userStreak", newStreak.toString());
 
       // Update coins
-      const newCoins = coins + parseInt(localStorage.getItem("userCoins") || "0");
+      const newCoins =
+        coins + parseInt(localStorage.getItem("userCoins") || "0");
       setCoins(newCoins);
       setEarnedCoins(coins);
       localStorage.setItem("userCoins", newCoins.toString());
@@ -582,10 +601,18 @@ export default function HomePage() {
 
   // Get the current date for the upcoming workout section
   const today = new Date();
-  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
   const dayName = daysOfWeek[today.getDay()];
 
-  const startDailyChallenge = () => {
+  const startDailyChallenge = async () => {
     if (isDailyChallengeDone) return;
 
     // Simulate progress update
@@ -593,6 +620,9 @@ export default function HomePage() {
 
     // If challenge is completed
     if (dailyChallengeProgress + 5 >= 50) {
+      originalWorkout?.user_id &&
+        (await challengeService.finishChallenge(originalWorkout?.user_id));
+
       setIsDailyChallengeDone(true);
       // Add coins and save to localStorage
       const newCoins = coins + 50;
@@ -627,7 +657,9 @@ export default function HomePage() {
               className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full mx-4"
             >
               <div className="mb-6">
-                <h2 className="text-3xl font-bold text-purple-800 relative z-10">Workout Complete!</h2>
+                <h2 className="text-3xl font-bold text-purple-800 relative z-10">
+                  Workout Complete!
+                </h2>
               </div>
               <div className="h-1 w-20 bg-purple-600 mx-auto mb-6"></div>
 
@@ -635,23 +667,31 @@ export default function HomePage() {
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <Zap className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                   <p className="text-sm text-purple-600">XP Earned</p>
-                  <p className="text-2xl font-bold text-purple-800">{earnedXP}</p>
+                  <p className="text-2xl font-bold text-purple-800">
+                    {earnedXP}
+                  </p>
                 </div>
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <Coins className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
                   <p className="text-sm text-purple-600">Coins Earned</p>
-                  <p className="text-2xl font-bold text-purple-800">{earnedCoins}</p>
+                  <p className="text-2xl font-bold text-purple-800">
+                    {earnedCoins}
+                  </p>
                 </div>
               </div>
 
               <div className="bg-purple-50 p-4 rounded-lg mb-6">
                 <BarChart className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                 <p className="text-sm text-purple-600">Workout Score</p>
-                <p className="text-2xl font-bold text-purple-800">{earnedScore}</p>
+                <p className="text-2xl font-bold text-purple-800">
+                  {earnedScore}
+                </p>
                 <div className="w-full bg-purple-200 h-2 rounded-full mt-2">
                   <div
                     className="h-full bg-purple-600 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(Math.round(earnedXP / 2), 100)}%` }}
+                    style={{
+                      width: `${Math.min(Math.round(earnedXP / 2), 100)}%`,
+                    }}
                   />
                 </div>
               </div>
@@ -686,7 +726,10 @@ export default function HomePage() {
                 </div>
               )}
 
-              <Button onClick={closePopup} className="bg-purple-600 hover:bg-purple-700 w-full">
+              <Button
+                onClick={closePopup}
+                className="bg-purple-600 hover:bg-purple-700 w-full"
+              >
                 Continue
               </Button>
             </motion.div>
@@ -701,7 +744,10 @@ export default function HomePage() {
           className="p-0 h-10 w-10 rounded-full overflow-hidden"
         >
           <img
-            src={userAvatar || "https://api.dicebear.com/6.x/avataaars/svg?seed=default"}
+            src={
+              userAvatar ||
+              "https://api.dicebear.com/6.x/avataaars/svg?seed=default"
+            }
             alt="User Avatar"
             className="h-full w-full object-cover"
           />
@@ -714,7 +760,10 @@ export default function HomePage() {
       </header>
 
       {error && (
-        <Alert variant="destructive" className="mb-4 animate-in slide-in-from-top">
+        <Alert
+          variant="destructive"
+          className="mb-4 animate-in slide-in-from-top"
+        >
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
@@ -722,10 +771,15 @@ export default function HomePage() {
       )}
 
       {showMaxSetsAlert && (
-        <Alert variant="destructive" className="mb-4 animate-in slide-in-from-top">
+        <Alert
+          variant="destructive"
+          className="mb-4 animate-in slide-in-from-top"
+        >
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Maximum Sets Reached</AlertTitle>
-          <AlertDescription>You've reached the maximum sets for this exercise. Great work! 💪</AlertDescription>
+          <AlertDescription>
+            You've reached the maximum sets for this exercise. Great work! 💪
+          </AlertDescription>
         </Alert>
       )}
 
@@ -743,22 +797,33 @@ export default function HomePage() {
         <>
           <Card className="mb-6 overflow-hidden border-none shadow-md">
             <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6">
-              <h3 className="text-xl font-bold text-white mb-2">Today's Focus</h3>
-              <p className="text-purple-100 text-sm">Stay consistent and track your progress</p>
+              <h3 className="text-xl font-bold text-white mb-2">
+                Today's Focus
+              </h3>
+              <p className="text-purple-100 text-sm">
+                Stay consistent and track your progress
+              </p>
             </div>
             <CardContent className="p-0">
               <div className="grid grid-cols-3 divide-x divide-y">
                 <div className="p-4 text-center hover:bg-purple-50 transition-colors">
-                  <div className="font-bold text-2xl text-purple-700 mb-1">{streak}</div>
+                  <div className="font-bold text-2xl text-purple-700 mb-1">
+                    {streak}
+                  </div>
                   <div className="text-xs text-purple-600">Day Streak</div>
                 </div>
                 <div className="p-4 text-center hover:bg-purple-50 transition-colors">
-                  <div className="font-bold text-2xl text-purple-700 mb-1">{level}</div>
+                  <div className="font-bold text-2xl text-purple-700 mb-1">
+                    {level}
+                  </div>
                   <div className="text-xs text-purple-600">Current Level</div>
                 </div>
                 <div className="p-4 text-center hover:bg-purple-50 transition-colors">
                   <div className="font-bold text-2xl text-purple-700 mb-1">
-                    {JSON.parse(localStorage.getItem("workoutHistory") || "[]").length}
+                    {
+                      JSON.parse(localStorage.getItem("workoutHistory") || "[]")
+                        .length
+                    }
                   </div>
                   <div className="text-xs text-purple-600">Workouts Done</div>
                 </div>
@@ -767,8 +832,16 @@ export default function HomePage() {
                   onClick={startWorkout}
                 >
                   <div className="flex items-center justify-center gap-2 text-purple-700 font-medium">
-                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <PlayCircle className="w-5 h-5" />}
-                    <span>{isLoading ? "Loading Workout..." : "Start Today's Workout"}</span>
+                    {isLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <PlayCircle className="w-5 h-5" />
+                    )}
+                    <span>
+                      {isLoading
+                        ? "Loading Workout..."
+                        : "Start Today's Workout"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -784,8 +857,12 @@ export default function HomePage() {
             </CardHeader>
             <CardContent className="p-4">
               <div className="mb-4">
-                <h3 className="font-medium text-gray-800 mb-1">Complete 50 Push-ups Today</h3>
-                <p className="text-sm text-gray-600">Earn bonus XP and coins by completing this challenge</p>
+                <h3 className="font-medium text-gray-800 mb-1">
+                  Complete 50 Push-ups Today
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Earn bonus XP and coins by completing this challenge
+                </p>
               </div>
               <div className="w-full bg-gray-200 h-2 rounded-full mb-2">
                 <div
@@ -806,7 +883,9 @@ export default function HomePage() {
                 onClick={startDailyChallenge}
                 disabled={isDailyChallengeDone}
               >
-                {isDailyChallengeDone ? "Challenge Completed! ✓" : "Do 5 Push-ups"}
+                {isDailyChallengeDone
+                  ? "Challenge Completed! ✓"
+                  : "Do 5 Push-ups"}
               </Button>
             </CardContent>
           </Card>
@@ -819,8 +898,12 @@ export default function HomePage() {
                     <BarChart className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-green-800">Workout History</h3>
-                    <p className="text-xs text-green-600">Track your progress over time</p>
+                    <h3 className="font-semibold text-green-800">
+                      Workout History
+                    </h3>
+                    <p className="text-xs text-green-600">
+                      Track your progress over time
+                    </p>
                   </div>
                 </div>
                 <Button
@@ -845,9 +928,13 @@ export default function HomePage() {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <h3 className="font-medium">Your Next Workout</h3>
-                  <p className="text-sm text-muted-foreground">Focus: Full Body</p>
+                  <p className="text-sm text-muted-foreground">
+                    Focus: Full Body
+                  </p>
                 </div>
-                <div className="bg-purple-100 px-2 py-1 rounded text-xs font-medium text-purple-700">3 exercises</div>
+                <div className="bg-purple-100 px-2 py-1 rounded text-xs font-medium text-purple-700">
+                  3 exercises
+                </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
@@ -858,12 +945,16 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 text-sm">
                   <Dumbbell className="h-4 w-4 text-purple-500" />
                   <span>Pull Up</span>
-                  <span className="ml-auto text-xs text-purple-600">3 × 10</span>
+                  <span className="ml-auto text-xs text-purple-600">
+                    3 × 10
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Dumbbell className="h-4 w-4 text-purple-500" />
                   <span>Bench Press</span>
-                  <span className="ml-auto text-xs text-purple-600">3 × 30</span>
+                  <span className="ml-auto text-xs text-purple-600">
+                    3 × 30
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -921,20 +1012,32 @@ export default function HomePage() {
               className="w-full"
             >
               <Clock className="w-16 h-16 text-purple-600 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-purple-800 mb-2">Rest Time</h2>
+              <h2 className="text-2xl font-bold text-purple-800 mb-2">
+                Rest Time
+              </h2>
               <p className="text-purple-600 mb-2">
                 Take a breather before the next{" "}
-                {currentExercise.currentSet >= currentExercise.targetSets ? "exercise" : "set"}
+                {currentExercise.currentSet >= currentExercise.targetSets
+                  ? "exercise"
+                  : "set"}
               </p>
 
               <div className="w-full bg-purple-200 h-4 rounded-full mb-4 overflow-hidden">
                 <div
                   className="h-full bg-purple-600"
-                  style={{ width: `${(restTimeRemaining / exercises[currentExerciseIndex].restTime) * 100}%` }}
+                  style={{
+                    width: `${
+                      (restTimeRemaining /
+                        exercises[currentExerciseIndex].restTime) *
+                      100
+                    }%`,
+                  }}
                 />
               </div>
 
-              <p className="text-4xl font-bold text-purple-800 mb-6">{formatTime(restTimeRemaining)}</p>
+              <p className="text-4xl font-bold text-purple-800 mb-6">
+                {formatTime(restTimeRemaining)}
+              </p>
 
               <Button
                 onClick={skipRest}
@@ -949,7 +1052,9 @@ export default function HomePage() {
         <>
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-purple-600">Workout Progress</span>
+              <span className="text-sm font-medium text-purple-600">
+                Workout Progress
+              </span>
               <span className="text-sm font-medium text-purple-600">
                 {currentExerciseIndex + 1} of {exercises.length} exercises
               </span>
@@ -957,7 +1062,9 @@ export default function HomePage() {
             <div className="w-full bg-purple-200 h-2 rounded-full">
               <div
                 className="bg-purple-600 h-full rounded-full"
-                style={{ width: `${(currentExerciseIndex / exercises.length) * 100}%` }}
+                style={{
+                  width: `${(currentExerciseIndex / exercises.length) * 100}%`,
+                }}
               />
             </div>
           </div>
@@ -977,7 +1084,9 @@ export default function HomePage() {
               variant="outline"
               size="sm"
               onClick={moveToNextExercise}
-              disabled={currentExerciseIndex === exercises.length - 1 || isLoading}
+              disabled={
+                currentExerciseIndex === exercises.length - 1 || isLoading
+              }
               className="text-purple-600 border-purple-300"
             >
               Next
@@ -996,7 +1105,10 @@ export default function HomePage() {
             >
               <Card className="mb-6 overflow-hidden">
                 <div className="relative h-64 bg-purple-50">
-                  <FallbackExerciseImage exerciseName={currentExercise.name} className="h-64" />
+                  <FallbackExerciseImage
+                    exerciseName={currentExercise.name}
+                    className="h-64"
+                  />
                   <div className="absolute top-2 right-2">
                     <span
                       className={cn(
@@ -1011,13 +1123,19 @@ export default function HomePage() {
 
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-xl font-bold text-purple-800">{currentExercise.name}</CardTitle>
+                    <CardTitle className="text-xl font-bold text-purple-800">
+                      {currentExercise.name}
+                    </CardTitle>
                     <div className="flex items-center bg-purple-100 px-2 py-1 rounded-full">
                       <Star className="w-4 h-4 mr-1 text-yellow-500" />
-                      <span className="text-sm font-medium text-purple-700">{currentExercise.xpReward} XP</span>
+                      <span className="text-sm font-medium text-purple-700">
+                        {currentExercise.xpReward} XP
+                      </span>
                     </div>
                   </div>
-                  <p className="text-sm text-purple-600">{currentExercise.muscleGroup}</p>
+                  <p className="text-sm text-purple-600">
+                    {currentExercise.muscleGroup}
+                  </p>
                 </CardHeader>
 
                 <CardContent>
@@ -1032,7 +1150,9 @@ export default function HomePage() {
                       exit={{ opacity: 0, height: 0 }}
                       className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg mb-4"
                     >
-                      <h4 className="font-medium text-yellow-800 mb-2">Pro Tips:</h4>
+                      <h4 className="font-medium text-yellow-800 mb-2">
+                        Pro Tips:
+                      </h4>
                       <ul className="list-disc pl-5 text-sm text-yellow-700 space-y-1">
                         {currentExercise.tips.map((tip, index) => (
                           <li key={index}>{tip}</li>
@@ -1044,19 +1164,33 @@ export default function HomePage() {
                   <div className="mb-4">
                     <div className="flex justify-between mb-1">
                       <span className="text-sm font-medium">
-                        Set {currentExercise.currentSet + 1} of {currentExercise.targetSets}
+                        Set {currentExercise.currentSet + 1} of{" "}
+                        {currentExercise.targetSets}
                       </span>
                       <span className="text-sm text-purple-600">
-                        {currentExercise.sets.filter((set) => set.completed).length} sets completed
+                        {
+                          currentExercise.sets.filter((set) => set.completed)
+                            .length
+                        }{" "}
+                        sets completed
                       </span>
                     </div>
-                    <Progress value={(currentExercise.currentSet / currentExercise.targetSets) * 100} className="h-2" />
+                    <Progress
+                      value={
+                        (currentExercise.currentSet /
+                          currentExercise.targetSets) *
+                        100
+                      }
+                      className="h-2"
+                    />
                   </div>
 
                   {currentExercise.currentSet < currentExercise.targetSets ? (
                     <div className="space-y-4">
                       <div className="flex flex-col items-center">
-                        <p className="text-sm text-purple-600 mb-2">Target: {currentExercise.targetReps} reps</p>
+                        <p className="text-sm text-purple-600 mb-2">
+                          Target: {currentExercise.targetReps} reps
+                        </p>
                         <div className="flex items-center gap-4">
                           <Button
                             variant="outline"
@@ -1065,10 +1199,14 @@ export default function HomePage() {
                             className="h-12 w-12 rounded-full border-2 border-purple-300"
                             disabled={isLoading}
                           >
-                            <span className="text-2xl font-bold text-purple-600">-</span>
+                            <span className="text-2xl font-bold text-purple-600">
+                              -
+                            </span>
                           </Button>
                           <div className="bg-purple-100 h-20 w-20 rounded-full flex items-center justify-center">
-                            <span className="text-3xl font-bold text-purple-800">{currentExercise.currentReps}</span>
+                            <span className="text-3xl font-bold text-purple-800">
+                              {currentExercise.currentReps}
+                            </span>
                           </div>
                           <Button
                             variant="outline"
@@ -1077,7 +1215,9 @@ export default function HomePage() {
                             className="h-12 w-12 rounded-full border-2 border-purple-300"
                             disabled={isLoading}
                           >
-                            <span className="text-2xl font-bold text-purple-600">+</span>
+                            <span className="text-2xl font-bold text-purple-600">
+                              +
+                            </span>
                           </Button>
                         </div>
                       </div>
@@ -1100,8 +1240,12 @@ export default function HomePage() {
                   ) : (
                     <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
                       <Check className="w-6 h-6 text-green-500 mx-auto mb-2" />
-                      <p className="text-sm font-medium text-green-700">All sets completed! 🎉</p>
-                      <p className="text-xs text-green-600 mt-1">Move to the next exercise</p>
+                      <p className="text-sm font-medium text-green-700">
+                        All sets completed! 🎉
+                      </p>
+                      <p className="text-xs text-green-600 mt-1">
+                        Move to the next exercise
+                      </p>
                     </div>
                   )}
 
@@ -1110,11 +1254,17 @@ export default function HomePage() {
                       <div
                         key={setIndex}
                         className={`text-center p-2 rounded ${
-                          set.completed ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-400"
+                          set.completed
+                            ? "bg-purple-100 text-purple-700"
+                            : "bg-gray-100 text-gray-400"
                         }`}
                       >
-                        <div className="text-xs font-medium">Set {setIndex + 1}</div>
-                        <div className="text-sm">{set.completed ? set.reps : "-"}</div>
+                        <div className="text-xs font-medium">
+                          Set {setIndex + 1}
+                        </div>
+                        <div className="text-sm">
+                          {set.completed ? set.reps : "-"}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1141,7 +1291,9 @@ export default function HomePage() {
           </div>
         </>
       )}
-      {workoutStarted && !restMode && currentExercise && <ExerciseAssistant exerciseName={currentExercise.name} />}
+      {workoutStarted && !restMode && currentExercise && (
+        <ExerciseAssistant exerciseName={currentExercise.name} />
+      )}
       {showChallengeComplete && (
         <>
           <Confetti
@@ -1164,7 +1316,9 @@ export default function HomePage() {
                   <Fire className="w-20 h-20 text-orange-300 opacity-20" />
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <h2 className="text-2xl font-bold text-purple-800 relative z-10">Challenge Complete!</h2>
+                  <h2 className="text-2xl font-bold text-purple-800 relative z-10">
+                    Challenge Complete!
+                  </h2>
                 </div>
               </div>
               <div className="h-1 w-20 bg-orange-500 mx-auto mb-4"></div>
