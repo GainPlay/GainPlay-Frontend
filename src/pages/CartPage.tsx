@@ -7,7 +7,8 @@ import {
   Coins,
   CheckCircle,
   ChevronLeft,
-  Search
+  Search,
+  Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -15,114 +16,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
-
-type Avatar = {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-  category: string;
-  rarity: "common" | "rare" | "epic" | "legendary";
-};
-
-const avatars: Avatar[] = [
-  {
-    id: "1",
-    name: "Sporty Spice",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Sporty",
-    price: 100,
-    category: "sports",
-    rarity: "common"
-  },
-  {
-    id: "2",
-    name: "Zen Master",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Zen",
-    price: 150,
-    category: "lifestyle",
-    rarity: "common"
-  },
-  {
-    id: "3",
-    name: "Power Lifter",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Power",
-    price: 200,
-    category: "sports",
-    rarity: "rare"
-  },
-  {
-    id: "4",
-    name: "Yoga Guru",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Yoga",
-    price: 250,
-    category: "lifestyle",
-    rarity: "rare"
-  },
-  {
-    id: "5",
-    name: "Runner",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Runner",
-    price: 300,
-    category: "sports",
-    rarity: "rare"
-  },
-  {
-    id: "6",
-    name: "Swimmer",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Swimmer",
-    price: 350,
-    category: "sports",
-    rarity: "epic"
-  },
-  {
-    id: "7",
-    name: "Cyclist",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Cyclist",
-    price: 400,
-    category: "sports",
-    rarity: "epic"
-  },
-  {
-    id: "8",
-    name: "Boxer",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Boxer",
-    price: 450,
-    category: "sports",
-    rarity: "legendary"
-  },
-  {
-    id: "9",
-    name: "Ninja",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Ninja",
-    price: 500,
-    category: "fantasy",
-    rarity: "legendary"
-  },
-  {
-    id: "10",
-    name: "Wizard",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Wizard",
-    price: 550,
-    category: "fantasy",
-    rarity: "legendary"
-  },
-  {
-    id: "11",
-    name: "Astronaut",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Astronaut",
-    price: 600,
-    category: "fantasy",
-    rarity: "legendary"
-  },
-  {
-    id: "12",
-    name: "Pirate",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Pirate",
-    price: 650,
-    category: "fantasy",
-    rarity: "epic"
-  }
-];
+import { avatarService } from "@/services/avatarService";
+import { FrontendAvatar } from "@/types";
 
 const rarityColors = {
   common: "bg-gray-200 text-gray-700",
@@ -134,92 +29,149 @@ const rarityColors = {
 export default function CartPage() {
   const navigate = useNavigate();
   const [coins, setCoins] = useState(0);
-  const [ownedAvatars, setOwnedAvatars] = useState<string[]>([]);
-  const [currentAvatar, setCurrentAvatar] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState<Avatar | null>(null);
+  const [avatars, setAvatars] = useState<FrontendAvatar[]>([]);
+  const [ownedAvatars, setOwnedAvatars] = useState<number[]>([]);
+  const [currentAvatar, setCurrentAvatar] = useState<number | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<FrontendAvatar | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeRarity, setActiveRarity] = useState("all");
   const [showPurchaseAnimation, setShowPurchaseAnimation] = useState(false);
-  const [purchasedAvatar, setPurchasedAvatar] = useState<Avatar | null>(null);
-  const [filteredAvatars, setFilteredAvatars] = useState(avatars);
+  const [purchasedAvatar, setPurchasedAvatar] = useState<FrontendAvatar | null>(null);
+  const [filteredAvatars, setFilteredAvatars] = useState<FrontendAvatar[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [purchasing, setPurchasing] = useState(false);
   const shopRef = useRef<HTMLDivElement>(null);
 
+  // Load initial data
   useEffect(() => {
-    const storedCoins = localStorage.getItem("userCoins");
-    const storedOwnedAvatars = localStorage.getItem("ownedAvatars");
-    const storedCurrentAvatar = localStorage.getItem("currentAvatar");
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        
+        // Load avatars and user data in parallel
+        const [avatarsData, userAvatarsData] = await Promise.all([
+          avatarService.getAvatars(),
+          avatarService.getOwnedAvatars()
+        ]);
 
-    if (storedCoins) setCoins(Number.parseInt(storedCoins));
-    if (storedOwnedAvatars) setOwnedAvatars(JSON.parse(storedOwnedAvatars));
-    if (storedCurrentAvatar) setCurrentAvatar(storedCurrentAvatar);
+        setAvatars(avatarsData);
+        
+        // Extract owned avatar IDs and current avatar from user avatars data
+        const ownedIds = userAvatarsData.map(ua => ua.avatars.id);
+        const current = userAvatarsData.find(ua => ua.is_current)?.avatars.id || null;
+        
+        setOwnedAvatars(ownedIds);
+        setCurrentAvatar(current);
+
+        // Get user coins from localStorage or API
+        const storedCoins = localStorage.getItem("userCoins");
+        if (storedCoins) {
+          setCoins(Number.parseInt(storedCoins));
+        }
+        
+      } catch (error) {
+        console.error("Failed to load data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load avatar data. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
+  // Filter avatars based on search and rarity
   useEffect(() => {
     let filtered = avatars;
 
-    // Apply category filter
-    if (activeCategory !== "all") {
-      filtered = filtered.filter(
-        (avatar) => avatar.category === activeCategory
-      );
+    // Apply rarity filter
+    if (activeRarity !== "all") {
+      filtered = filtered.filter(avatar => avatar.rarity === activeRarity);
     }
 
     // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter((avatar) =>
+      filtered = filtered.filter(avatar =>
         avatar.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     setFilteredAvatars(filtered);
-  }, [activeCategory, searchTerm]);
+  }, [avatars, activeRarity, searchTerm]);
 
-  const buyAvatar = (avatar: Avatar) => {
+  const buyAvatar = async (avatar: FrontendAvatar) => {
     if (ownedAvatars.includes(avatar.id)) {
-      setCurrentAvatar(avatar.image);
-      localStorage.setItem("currentAvatar", avatar.image);
-
-      // Update userData in localStorage
-      const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-      userData.avatar = avatar.image;
-      localStorage.setItem("userData", JSON.stringify(userData));
-
-      toast({
-        title: "Avatar Changed",
-        description: `You're now using the ${avatar.name} avatar.`,
-        variant: "default"
-      });
+      // User already owns this avatar, just set it as current
+      try {
+        setPurchasing(true);
+        await avatarService.setCurrentAvatar(avatar.id);
+        
+        setCurrentAvatar(avatar.id);
+        
+        toast({
+          title: "Avatar Changed",
+          description: `You're now using the ${avatar.name} avatar.`,
+          variant: "default"
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to change avatar. Please try again.",
+          value: String(error),
+          variant: "destructive"
+        });
+      } finally {
+        setPurchasing(false);
+      }
       return;
     }
 
     if (coins >= avatar.price) {
-      const newCoins = coins - avatar.price;
-      const newOwnedAvatars = [...ownedAvatars, avatar.id];
+      try {
+        setPurchasing(true);
+        
+        // Purchase the avatar
+        await avatarService.purchaseAvatar(avatar.id);
+        
+        // Update local state
+        const newCoins = coins - avatar.price;
+        const newOwnedAvatars = [...ownedAvatars, avatar.id];
 
-      setCoins(newCoins);
-      setOwnedAvatars(newOwnedAvatars);
-      setCurrentAvatar(avatar.image);
+        setCoins(newCoins);
+        setOwnedAvatars(newOwnedAvatars);
+        setCurrentAvatar(avatar.id);
 
-      localStorage.setItem("userCoins", newCoins.toString());
-      localStorage.setItem("ownedAvatars", JSON.stringify(newOwnedAvatars));
-      localStorage.setItem("currentAvatar", avatar.image);
+        // Update localStorage
+        localStorage.setItem("userCoins", newCoins.toString());
 
-      // Update userData in localStorage
-      const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-      userData.avatar = avatar.image;
-      localStorage.setItem("userData", JSON.stringify(userData));
+        // Show purchase animation
+        setPurchasedAvatar(avatar);
+        setShowPurchaseAnimation(true);
+        setTimeout(() => {
+          setShowPurchaseAnimation(false);
+        }, 2000);
 
-      // Show purchase animation
-      setPurchasedAvatar(avatar);
-      setShowPurchaseAnimation(true);
-      setTimeout(() => {
-        setShowPurchaseAnimation(false);
-      }, 2000);
-
-      toast({
-        title: "Avatar Purchased!",
-        description: `You've successfully bought ${avatar.name} and set it as your profile picture.`
-      });
+        toast({
+          title: "Avatar Purchased!",
+          description: `You've successfully bought ${avatar.name} and set it as your profile picture.`
+        });
+        
+      } catch (error) {
+        toast({
+          title: "Purchase Failed",
+          description:
+            typeof error === "object" && error !== null && "message" in error
+              ? (error as { message?: string }).message
+              : "Failed to purchase avatar. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setPurchasing(false);
+      }
     } else {
       toast({
         title: "Insufficient Coins",
@@ -236,7 +188,7 @@ export default function CartPage() {
     }
   };
 
-  const handleAvatarSelect = (avatar: Avatar) => {
+  const handleAvatarSelect = (avatar: FrontendAvatar) => {
     setSelectedAvatar(avatar);
 
     // Scroll to top when selecting an avatar on mobile
@@ -252,12 +204,22 @@ export default function CartPage() {
     setSelectedAvatar(null);
   };
 
-  const categories = [
+  const rarityFilters = [
     { id: "all", name: "All" },
-    { id: "sports", name: "Sports" },
-    { id: "lifestyle", name: "Lifestyle" },
-    { id: "fantasy", name: "Fantasy" }
+    { id: "common", name: "Common" },
+    { id: "rare", name: "Rare" },
+    { id: "epic", name: "Epic" },
+    { id: "legendary", name: "Legendary" }
   ];
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-purple-50 to-purple-100">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-600 mb-4" />
+        <p className="text-purple-600">Loading avatars...</p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -294,24 +256,24 @@ export default function CartPage() {
       </div>
 
       <div className="flex overflow-x-auto pb-2 mb-4 scrollbar-hide">
-        {categories.map((category) => (
+        {rarityFilters.map((rarity) => (
           <Button
-            key={category.id}
-            variant={activeCategory === category.id ? "default" : "outline"}
+            key={rarity.id}
+            variant={activeRarity === rarity.id ? "default" : "outline"}
             className={`mr-2 whitespace-nowrap ${
-              activeCategory === category.id
+              activeRarity === rarity.id
                 ? "bg-purple-600 hover:bg-purple-700"
                 : "bg-white hover:bg-purple-50"
             }`}
-            onClick={() => setActiveCategory(category.id)}
+            onClick={() => setActiveRarity(rarity.id)}
           >
-            {category.name}
+            {rarity.name}
           </Button>
         ))}
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Avatar details panel (visible on larger screens or when selected on mobile) */}
+        {/* Avatar details panel */}
         <AnimatePresence mode="wait">
           {(selectedAvatar || window.innerWidth >= 768) && (
             <motion.div
@@ -350,8 +312,8 @@ export default function CartPage() {
                         className="w-28 h-28"
                       >
                         <img
-                          src={selectedAvatar?.image || avatars[0].image}
-                          alt={selectedAvatar?.name || avatars[0].name}
+                          src={selectedAvatar?.image_url || (avatars[0]?.image_url || "/placeholder.svg")}
+                          alt={selectedAvatar?.name || (avatars[0]?.name || "Avatar")}
                           width={112}
                           height={112}
                           className="rounded-full"
@@ -362,40 +324,38 @@ export default function CartPage() {
                     <Badge
                       className={cn(
                         "absolute -top-1 -right-1 px-2 py-1",
-                        rarityColors[selectedAvatar?.rarity || "common"]
+                        rarityColors[selectedAvatar?.rarity || avatars[0]?.rarity || "common"]
                       )}
                     >
-                      {selectedAvatar?.rarity || "common"}
+                      {selectedAvatar?.rarity || avatars[0]?.rarity || "common"}
                     </Badge>
                   </div>
 
                   <h2 className="text-xl font-bold text-purple-800 mb-1">
-                    {selectedAvatar?.name || avatars[0].name}
+                    {selectedAvatar?.name || avatars[0]?.name || "Select an Avatar"}
                   </h2>
 
                   <div className="flex items-center mb-6">
                     <Coins className="w-4 h-4 mr-1 text-yellow-500" />
                     <span className="font-semibold text-purple-600">
-                      {selectedAvatar?.price || avatars[0].price}
+                      {selectedAvatar?.price || avatars[0]?.price || 0}
                     </span>
                   </div>
 
-                  {ownedAvatars.includes(
-                    selectedAvatar?.id || avatars[0].id
-                  ) ? (
+                  {selectedAvatar && ownedAvatars.includes(selectedAvatar.id) ? (
                     <Button
-                      onClick={() => buyAvatar(selectedAvatar || avatars[0])}
+                      onClick={() => buyAvatar(selectedAvatar)}
                       className={cn(
                         "w-full relative overflow-hidden",
-                        currentAvatar ===
-                          (selectedAvatar?.image || avatars[0].image)
+                        currentAvatar === selectedAvatar.id
                           ? "bg-green-600 hover:bg-green-700"
                           : "bg-blue-600 hover:bg-blue-700"
                       )}
-                      disabled={!selectedAvatar && window.innerWidth >= 768}
+                      disabled={purchasing || !selectedAvatar}
                     >
-                      {currentAvatar ===
-                      (selectedAvatar?.image || avatars[0].image) ? (
+                      {purchasing ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : currentAvatar === selectedAvatar.id ? (
                         <>
                           <CheckCircle className="w-4 h-4 mr-2" />
                           Current
@@ -409,18 +369,25 @@ export default function CartPage() {
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => buyAvatar(selectedAvatar || avatars[0])}
+                      onClick={() => selectedAvatar && buyAvatar(selectedAvatar)}
                       className={cn(
                         "w-full relative overflow-hidden",
                         "bg-purple-600 hover:bg-purple-700"
                       )}
                       disabled={
-                        (!selectedAvatar && window.innerWidth >= 768) ||
-                        coins < (selectedAvatar?.price || avatars[0].price)
+                        purchasing ||
+                        !selectedAvatar ||
+                        coins < (selectedAvatar?.price || 0)
                       }
                     >
-                      <Coins className="w-4 h-4 mr-2" />
-                      Buy
+                      {purchasing ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <>
+                          <Coins className="w-4 h-4 mr-2" />
+                          Buy
+                        </>
+                      )}
                       <span className="absolute inset-0 overflow-hidden">
                         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 hover:opacity-20 transform -translate-x-full hover:translate-x-full transition-all duration-1000"></span>
                       </span>
@@ -485,7 +452,7 @@ export default function CartPage() {
                         <div className="flex justify-center">
                           <div className="relative w-20 h-20">
                             <img
-                              src={avatar.image || "/placeholder.svg"}
+                              src={avatar.image_url || "/placeholder.svg"}
                               alt={avatar.name}
                               width={80}
                               height={80}
@@ -544,7 +511,7 @@ export default function CartPage() {
                       <CardContent className="p-3 flex items-center">
                         <div className="relative mr-3">
                           <img
-                            src={avatar.image || "/placeholder.svg"}
+                            src={avatar.image_url || "/placeholder.svg"}
                             alt={avatar.name}
                             width={40}
                             height={40}
@@ -610,7 +577,7 @@ export default function CartPage() {
                 <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-50"></div>
                 <div className="relative z-10">
                   <img
-                    src={purchasedAvatar.image || "/placeholder.svg"}
+                    src={purchasedAvatar.image_url || "/placeholder.svg"}
                     alt={purchasedAvatar.name}
                     width={100}
                     height={100}
