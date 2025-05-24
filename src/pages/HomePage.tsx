@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -131,6 +129,24 @@ export default function HomePage() {
   const [originalWorkout, setOriginalWorkout] = useState<Workout | null>(null);
 
   const { currentWorkout, setCurrentWorkout } = useWorkoutStore();
+  const [upcomingWorkout, setUpcomingWorkout] = useState<Workout | null>(null);
+
+  useEffect(() => {
+    const fetchUpcomingWorkout = async () => {
+      try {
+        if (!currentWorkout) {
+          const fetchedWorkout = await workoutService.getCurrentWorkout();
+          setUpcomingWorkout(fetchedWorkout);
+        } else {
+          setUpcomingWorkout(currentWorkout);
+        }
+      } catch (error) {
+        console.error("Error fetching upcoming workout:", error);
+      }
+    };
+
+    fetchUpcomingWorkout();
+  }, [currentWorkout]);
 
   useEffect(() => {
     const storedAvatar = localStorage.getItem("currentAvatar");
@@ -814,38 +830,88 @@ export default function HomePage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="font-medium">Your Next Workout</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Focus: Full Body
-                  </p>
+              {upcomingWorkout ? (
+                <>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="font-medium">Your Next Workout</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Focus:{" "}
+                        {upcomingWorkout.workout_exercises.length > 0
+                          ? upcomingWorkout.workout_exercises
+                              .map((we) => we.exercises?.muscle_group)
+                              .filter(
+                                (group, index, arr) =>
+                                  arr.indexOf(group) === index
+                              )
+                              .join(", ") || "Full Body"
+                          : "Full Body"}
+                      </p>
+                    </div>
+                    <div className="bg-purple-100 px-2 py-1 rounded text-xs font-medium text-purple-700">
+                      {upcomingWorkout.workout_exercises.length} exercises
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {upcomingWorkout.workout_exercises.map(
+                      (workoutExercise) => (
+                        <div
+                          key={workoutExercise.id}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <Dumbbell className="h-4 w-4 text-purple-500" />
+                          <span className="flex-1">
+                            {workoutExercise.exercises?.name ||
+                              "Unknown Exercise"}
+                          </span>
+                          <span className="text-xs text-purple-600">
+                            {workoutExercise.exercise_templates?.target_sets ||
+                              3}{" "}
+                            ×{" "}
+                            {workoutExercise.exercise_templates?.target_reps ||
+                              10}
+                          </span>
+                        </div>
+                      )
+                    )}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-purple-100">
+                    <div className="text-xs text-purple-600 space-y-1">
+                      <div className="flex justify-between">
+                        <span>Total Sets:</span>
+                        <span className="font-medium">
+                          {upcomingWorkout.workout_exercises.reduce(
+                            (total, we) =>
+                              total + (we.exercise_templates?.target_sets || 0),
+                            0
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Est. Duration:</span>
+                        <span className="font-medium">
+                          {Math.ceil(
+                            upcomingWorkout.workout_exercises.reduce(
+                              (total, we) =>
+                                total +
+                                (we.exercise_templates?.target_sets || 0) *
+                                  (we.exercise_templates?.rest_time_seconds ||
+                                    60),
+                              0
+                            ) / 60
+                          )}{" "}
+                          min
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="w-5 h-5 animate-spin text-purple-600 mr-2" />
+                  <span className="text-purple-600">Loading workout...</span>
                 </div>
-                <div className="bg-purple-100 px-2 py-1 rounded text-xs font-medium text-purple-700">
-                  3 exercises
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm">
-                  <Dumbbell className="h-4 w-4 text-purple-500" />
-                  <span>Push Up</span>
-                  <span className="ml-auto text-xs text-purple-600">3 × 8</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Dumbbell className="h-4 w-4 text-purple-500" />
-                  <span>Pull Up</span>
-                  <span className="ml-auto text-xs text-purple-600">
-                    3 × 10
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Dumbbell className="h-4 w-4 text-purple-500" />
-                  <span>Bench Press</span>
-                  <span className="ml-auto text-xs text-purple-600">
-                    3 × 30
-                  </span>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
 

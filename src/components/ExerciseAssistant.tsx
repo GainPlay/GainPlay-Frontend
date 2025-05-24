@@ -18,7 +18,7 @@ type ExerciseAssistantProps = {
 export default function ExerciseAssistant({
   exerciseName
 }: ExerciseAssistantProps) {
-  const startMessage =`Hi there! I'm your GainPlay assistant. Need help with ${exerciseName}? Just ask!`
+  const startMessage = `Hi there! I'm your GainPlay assistant. Need help with ${exerciseName}? Just ask!`;
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -63,7 +63,7 @@ export default function ExerciseAssistant({
 
     // Simulate assistant response
     setTimeout(async () => {
-      const response = await generateResponse(input, exerciseName);
+      const response = await generateResponse(input, exerciseName, messages);
       setMessages((prev) => [
         ...prev,
         {
@@ -227,10 +227,26 @@ export default function ExerciseAssistant({
 }
 
 // Function to generate responses based on user input
-async function generateResponse(input: string, exerciseName: string): Promise<AiAnswerResponse> {
+async function generateResponse(
+  input: string,
+  exerciseName: string,
+  messages: Message[]
+): Promise<AiAnswerResponse> {
   const inputLower = input.toLowerCase();
-  const answer = await getAiAnswer({userId:0,message: `Regarding  ${exerciseName}, ${inputLower}`})
-  return answer
 
+  const conversationHistory = messages
+    .map(
+      (msg) => `${msg.sender === "user" ? "User" : "Assistant"}: ${msg.content}`
+    )
+    .join("\n");
 
+  const fullMessage = conversationHistory
+    ? `Conversation history:\n${conversationHistory}\n\nRegarding ${exerciseName}, ${inputLower}`
+    : `Regarding ${exerciseName}, ${inputLower}`;
+
+  const answer = await getAiAnswer({
+    userId: 0,
+    message: fullMessage
+  });
+  return answer;
 }
