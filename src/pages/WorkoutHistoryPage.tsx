@@ -79,10 +79,7 @@ export default function WorkoutHistoryPage() {
   );
   const [weeklyWorkouts, setWeeklyWorkouts] = useState<WorkoutHistoryItem[]>(
     []
-  );
-
-  const user = useUserStore();
-  
+  );  
 
   // For progress graph navigation
   const [progressGraphWeekStart, setProgressGraphWeekStart] = useState(
