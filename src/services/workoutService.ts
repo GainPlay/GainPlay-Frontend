@@ -1,7 +1,11 @@
-import { Workout } from "@/types";
+import { Workout, WorkoutHistoryItem } from "@/types";
 import axios from "axios";
 
 export const workoutService = {
+  getWorkoutHistory: async (): Promise<WorkoutHistoryItem[]> => {
+        return (await axios.get(`/workout`)).data;
+  },
+
   generateWorkout: async (): Promise<Workout> => {
     try {
       return (await axios.post("/workout/generate")).data;
