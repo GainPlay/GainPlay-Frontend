@@ -1,104 +1,4 @@
-import type { FrontendAvatar, FrontendBadge, FrontendExercise, FrontendFriend } from "../types";
-
-export const avatars: FrontendAvatar[] = [
-  {
-    id: "1",
-    name: "Sporty Spice",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Sporty",
-    price: 100,
-    category: "sports",
-    rarity: "common",
-  },
-  {
-    id: "2",
-    name: "Zen Master",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Zen",
-    price: 150,
-    category: "lifestyle",
-    rarity: "common",
-  },
-  {
-    id: "3",
-    name: "Power Lifter",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Power",
-    price: 200,
-    category: "sports",
-    rarity: "rare",
-  },
-  {
-    id: "4",
-    name: "Yoga Guru",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Yoga",
-    price: 250,
-    category: "lifestyle",
-    rarity: "rare",
-  },
-  {
-    id: "5",
-    name: "Runner",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Runner",
-    price: 300,
-    category: "sports",
-    rarity: "rare",
-  },
-  {
-    id: "6",
-    name: "Swimmer",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Swimmer",
-    price: 350,
-    category: "sports",
-    rarity: "epic",
-  },
-  {
-    id: "7",
-    name: "Cyclist",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Cyclist",
-    price: 400,
-    category: "sports",
-    rarity: "epic",
-  },
-  {
-    id: "8",
-    name: "Boxer",
-    image: "https://api.dicebear.com/6.x/avataaars/svg?seed=Boxer",
-    price: 450,
-    category: "sports",
-    rarity: "legendary",
-  },
-];
-
-export const badges: FrontendBadge[] = [
-  {
-    id: "1",
-    name: "Early Bird",
-    icon: "🌅",
-    description: "Completed 5 workouts before 8 AM",
-  },
-  {
-    id: "2",
-    name: "Night Owl",
-    icon: "🦉",
-    description: "Completed 10 workouts after 8 PM",
-  },
-  {
-    id: "3",
-    name: "Consistency King",
-    icon: "👑",
-    description: "Maintained a 7-day workout streak",
-  },
-  {
-    id: "4",
-    name: "Muscle Master",
-    icon: "💪",
-    description: "Completed 20 strength training workouts",
-  },
-  {
-    id: "5",
-    name: "Cardio Crusher",
-    icon: "🏃",
-    description: "Burned over 5000 calories in cardio exercises",
-  },
-];
+import type { FrontendExercise, FrontendFriend } from "../types";
 
 export const friends: FrontendFriend[] = [
   {
@@ -142,7 +42,8 @@ export const initialExercises: FrontendExercise[] = [
     targetSets: 3,
     targetReps: 10,
     restTime: 60,
-    instruction: "Keep your body straight, lower until your chest nearly touches the floor, then push back up.",
+    instruction:
+      "Keep your body straight, lower until your chest nearly touches the floor, then push back up.",
     difficulty: "intermediate",
     muscleGroup: "Chest, Shoulders, Triceps",
     xpReward: 100,
@@ -183,7 +84,8 @@ export const initialExercises: FrontendExercise[] = [
     targetSets: 3,
     targetReps: 30, // seconds
     restTime: 30,
-    instruction: "Hold a push-up position with your weight on your forearms, keeping your body in a straight line.",
+    instruction:
+      "Hold a push-up position with your weight on your forearms, keeping your body in a straight line.",
     difficulty: "intermediate",
     muscleGroup: "Core, Shoulders",
     xpReward: 150,
@@ -224,7 +126,8 @@ export const initialExercises: FrontendExercise[] = [
     targetSets: 3,
     targetReps: 20,
     restTime: 30,
-    instruction: "Start in a plank position and alternate bringing each knee toward your chest in a running motion.",
+    instruction:
+      "Start in a plank position and alternate bringing each knee toward your chest in a running motion.",
     difficulty: "intermediate",
     muscleGroup: "Core, Shoulders, Hip Flexors",
     xpReward: 130,

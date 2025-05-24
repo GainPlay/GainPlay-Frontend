@@ -1,30 +1,28 @@
-import { useState, useEffect, use } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Trophy,
-  User,
-  Edit,
-  Check,
-  Coins,
-  History,
-  Dumbbell
-} from "lucide-react";
-import { avatars, badges } from "../data/mockData";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { motion } from "framer-motion";
-import type { FrontendUserData, FrontendBadge } from "../types";
-import { useUserStore } from "@/stores/useUserStore";
+import { Input } from "@/components/ui/input";
 import { userService } from "@/services/userService";
-
-
+import { useAvatarStore } from "@/stores/useAvatarStore";
+import { useUserStore } from "@/stores/useUserStore";
+import { motion } from "framer-motion";
+import {
+  Check,
+  Coins,
+  Dumbbell,
+  Edit,
+  History,
+  Trophy,
+  User,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import type { FrontendBadge } from "../types";
 
 //TODO: implement the badges options fetch from the backend
 const badgesWithDescriptions: FrontendBadge[] = [
@@ -33,36 +31,36 @@ const badgesWithDescriptions: FrontendBadge[] = [
     name: "Early Bird",
     icon: "🌅",
     description: "Completed 5 workouts before 8 AM",
-    earnedOn: "2 weeks ago"
+    earnedOn: "2 weeks ago",
   },
   {
     id: "2",
     name: "Night Owl",
     icon: "🦉",
     description: "Completed 10 workouts after 8 PM",
-    earnedOn: "1 month ago"
+    earnedOn: "1 month ago",
   },
   {
     id: "3",
     name: "Consistency King",
     icon: "👑",
     description: "Maintained a 7-day workout streak",
-    earnedOn: "3 days ago"
+    earnedOn: "3 days ago",
   },
   {
     id: "4",
     name: "Muscle Master",
     icon: "💪",
     description: "Completed 20 strength training workouts",
-    earnedOn: "2 months ago"
+    earnedOn: "2 months ago",
   },
   {
     id: "5",
     name: "Cardio Crusher",
     icon: "🏃",
     description: "Burned over 5000 calories in cardio exercises",
-    earnedOn: "3 weeks ago"
-  }
+    earnedOn: "3 weeks ago",
+  },
 ];
 
 export default function ProfilePage() {
@@ -73,13 +71,22 @@ export default function ProfilePage() {
   const [editedHeight, setEditedHeight] = useState("");
   const [editedWeight, setEditedWeight] = useState("");
   const [editedAge, setEditedAge] = useState("");
-  const [ownedAvatars, setOwnedAvatars] = useState<string[]>([]);
+  const [ownedAvatars, setOwnedAvatars] = useState<number[]>([]);
   const [selectedBadge, setSelectedBadge] = useState<FrontendBadge | null>(
     null
   );
   const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
 
   const user = useUserStore();
+
+  const { allAvatars, initializeAvatars } = useAvatarStore();
+
+  useEffect(() => {
+    initializeAvatars();
+  }, []);
+
+  // if (loading) return <p>Loading avatars...</p>;
+  // if (error) return <p>Error: {error}</p>;
 
   useEffect(() => {
     if (user) {
@@ -88,8 +95,8 @@ export default function ProfilePage() {
       setEditedHeight(user.height || "");
       setEditedWeight(user.weight || "");
       setEditedAge(user.age || "");
-    } 
-  },[]);
+    }
+  }, []);
 
   const handleSave = async () => {
     if (user) {
@@ -98,7 +105,7 @@ export default function ProfilePage() {
         email: editedEmail,
         height: editedHeight,
         weight: editedWeight,
-        age: editedAge
+        age: editedAge,
       };
       await userService.updateUser(user.id, updatedUserData);
       user.setUser(updatedUserData);
@@ -109,11 +116,10 @@ export default function ProfilePage() {
   const changeAvatar = async (newAvatar: string) => {
     if (user) {
       const updatedUserData = {
-        avatar: newAvatar
+        avatar: newAvatar,
       };
       //TODO SAVE USER AVATAR HERE
       user.setUser(updatedUserData);
-
     }
   };
 
@@ -133,7 +139,7 @@ export default function ProfilePage() {
       name: badge?.name || "Unknown Badge",
       icon: badge?.icon || "❓",
       description: "Achievement unlocked for your fitness journey!",
-      earnedOn: "Recently"
+      earnedOn: "Recently",
     };
 
     setSelectedBadge(badgeWithDesc);
@@ -291,22 +297,24 @@ export default function ProfilePage() {
         <CardContent>
           <div className="flex flex-wrap justify-center gap-4">
             {ownedAvatars.map((avatarId) => {
-              const avatar = avatars.find((a) => a.id === avatarId);
+              const avatar = allAvatars.find((a) => a.id === avatarId);
               if (!avatar) return null;
               return (
                 <Button
                   key={avatarId}
                   variant="outline"
                   className={`p-0 h-14 w-14 rounded-full overflow-hidden ${
-                    user?.avatar === avatar.image
+                    user?.avatar === avatar.image_url
                       ? "ring-2 ring-purple-600"
                       : ""
                   }`}
-                  onClick={() => changeAvatar(avatar.image)}
+                  onClick={() =>
+                    avatar.image_url && changeAvatar(avatar.image_url)
+                  }
                 >
                   <img
-                    src={avatar.image || "/placeholder.svg"}
-                    alt={avatar.name}
+                    src={avatar.image_url || "/placeholder.svg"}
+                    alt={avatar.name ?? undefined}
                     width={56}
                     height={56}
                     className="h-full w-full object-cover"
