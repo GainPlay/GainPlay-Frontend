@@ -20,6 +20,7 @@ export const workoutService = {
     }
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   finishWorkout: async (finishedWorkout: any): Promise<{ coins: number; experience_earned: number; score: number }> => {
     try {
       return (await axios.put(`/workout/finishWorkout`, finishedWorkout)).data;

@@ -272,6 +272,7 @@ export default function OnboardingPage() {
         const generatedWorkout = await workoutService.generateWorkout();
         setCurrentWorkout(generatedWorkout);
         navigate("/home");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast({
           title: "Error saving onboarding data",
