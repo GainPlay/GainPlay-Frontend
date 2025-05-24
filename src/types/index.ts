@@ -160,6 +160,26 @@ export interface WorkoutHistoryItem {
   }[];
 }
 
+export type ExerciseDifficulty =
+  | "beginner"
+  | "intermediate"
+  | "advanced"
+  | "expert";
+
+export enum DifficultyLevel {
+  BEGINNER = 1,
+  INTERMEDIATE,
+  ADVANCED,
+  EXPERT
+}
+
+export const difficultyMap: Record<DifficultyLevel, ExerciseDifficulty> = {
+  [DifficultyLevel.BEGINNER]: "beginner",
+  [DifficultyLevel.INTERMEDIATE]: "intermediate",
+  [DifficultyLevel.ADVANCED]: "advanced",
+  [DifficultyLevel.EXPERT]: "expert"
+};
+
 // Add a frontend-specific type for the workout UI
 export interface WorkoutUIExercise {
   id: number;
@@ -168,7 +188,7 @@ export interface WorkoutUIExercise {
   targetReps: number;
   restTime: number;
   instruction: string;
-  difficulty: "beginner" | "intermediate" | "advanced";
+  difficulty: ExerciseDifficulty;
   muscleGroup: string;
   xpReward: number;
   sets: Array<{ id?: number; completed: boolean; reps: number }>;
@@ -201,7 +221,7 @@ export enum FriendshipStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
   BLOCKED = "blocked",
-  NONE = "none",
+  NONE = "none"
 }
 export interface FrontendUserData {
   id: number;
@@ -209,9 +229,9 @@ export interface FrontendUserData {
   name?: string;
   avatar?: string;
   coins?: number;
-  height?: string;
-  weight?: string;
-  age?: string;
+  height?: number;
+  weight?: number;
+  age?: number;
   level?: number;
   status?: FriendshipStatus;
   user_settings?: UserSettings;

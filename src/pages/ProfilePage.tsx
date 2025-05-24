@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ import {
   History,
   Dumbbell
 } from "lucide-react";
-import { avatars, badges } from "../data/mockData";
 import {
   Dialog,
   DialogContent,
@@ -20,11 +19,9 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import type { FrontendUserData, FrontendBadge } from "../types";
+import type { FrontendBadge } from "../types";
 import { useUserStore } from "@/stores/useUserStore";
 import { userService } from "@/services/userService";
-
-
 
 //TODO: implement the badges options fetch from the backend
 const badgesWithDescriptions: FrontendBadge[] = [
@@ -70,10 +67,10 @@ export default function ProfilePage() {
   const [editMode, setEditMode] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [editedEmail, setEditedEmail] = useState("");
-  const [editedHeight, setEditedHeight] = useState("");
-  const [editedWeight, setEditedWeight] = useState("");
-  const [editedAge, setEditedAge] = useState("");
-  const [ownedAvatars, setOwnedAvatars] = useState<string[]>([]);
+  const [editedHeight, setEditedHeight] = useState<number>();
+  const [editedWeight, setEditedWeight] = useState<number>();
+  const [editedAge, setEditedAge] = useState<number>();
+  const [ownedAvatars] = useState<string[]>([]);
   const [selectedBadge, setSelectedBadge] = useState<FrontendBadge | null>(
     null
   );
@@ -85,11 +82,11 @@ export default function ProfilePage() {
     if (user) {
       setEditedName(user.name!);
       setEditedEmail(user.email);
-      setEditedHeight(user.height || "");
-      setEditedWeight(user.weight || "");
-      setEditedAge(user.age || "");
-    } 
-  },[]);
+      setEditedHeight(user.height);
+      setEditedWeight(user.weight);
+      setEditedAge(user.age);
+    }
+  }, []);
 
   const handleSave = async () => {
     if (user) {
@@ -113,7 +110,6 @@ export default function ProfilePage() {
       };
       //TODO SAVE USER AVATAR HERE
       user.setUser(updatedUserData);
-
     }
   };
 
@@ -218,7 +214,7 @@ export default function ProfilePage() {
                 <Input
                   type="number"
                   value={editedAge}
-                  onChange={(e) => setEditedAge(e.target.value)}
+                  onChange={(e) => setEditedAge(parseInt(e.target.value))}
                 />
               ) : (
                 <p className="font-medium">{user.age} years</p>
@@ -230,7 +226,7 @@ export default function ProfilePage() {
                 <Input
                   type="number"
                   value={editedWeight}
-                  onChange={(e) => setEditedWeight(e.target.value)}
+                  onChange={(e) => setEditedWeight(parseInt(e.target.value))}
                 />
               ) : (
                 <p className="font-medium">{user.weight} kg</p>
@@ -243,7 +239,7 @@ export default function ProfilePage() {
               <Input
                 type="number"
                 value={editedHeight}
-                onChange={(e) => setEditedHeight(e.target.value)}
+                onChange={(e) => setEditedHeight(parseInt(e.target.value))}
               />
             ) : (
               <p className="font-medium">{user.height} cm</p>
@@ -291,7 +287,13 @@ export default function ProfilePage() {
         <CardContent>
           <div className="flex flex-wrap justify-center gap-4">
             {ownedAvatars.map((avatarId) => {
-              const avatar = avatars.find((a) => a.id === avatarId);
+              // TODO: Replace with actual avatar fetching logic
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const avatars: any[] = [];
+
+              const avatar = avatars.find(
+                (a: { id: number }) => String(a.id) === avatarId
+              );
               if (!avatar) return null;
               return (
                 <Button

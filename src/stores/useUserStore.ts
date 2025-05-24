@@ -4,7 +4,7 @@ import { create } from "zustand";
 
 // Define the structure of the user data
 interface UserData extends FrontendUserData {
-  setUser: (user: any) => void;
+  setUser: (user: Partial<FrontendUserData>) => void;
   logout: () => void;
 }
 
@@ -14,6 +14,17 @@ export const useUserStore = create<UserData>((set) => ({
   name: "",
   email: "",
   isLoggedIn: false,
-  setUser: (user) => set(() => ({ ...user})),
-  logout: () => set(() => ({ id: 0, name: "", email: "",password_hash: "",avatar_url: "", coins: 0, level: 0, experience: 0, created_at: null})),
+  setUser: (user: Partial<FrontendUserData>) => set(() => ({ ...user })),
+  logout: () =>
+    set(() => ({
+      id: 0,
+      name: "",
+      email: "",
+      password_hash: "",
+      avatar_url: "",
+      coins: 0,
+      level: 0,
+      experience: 0,
+      created_at: null
+    }))
 }));
