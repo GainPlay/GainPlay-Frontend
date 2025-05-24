@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Dumbbell } from "lucide-react";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 interface FallbackExerciseImageProps {
   exerciseName: string;
@@ -10,7 +11,7 @@ export default function FallbackExerciseImage({
   exerciseName,
   className = ""
 }: FallbackExerciseImageProps) {
-  const [imageError, setImageError] = useState(false);
+  const [lottieError, setLottieError] = useState(false);
 
   // Generate a unique but consistent color based on exercise name
   const getColorFromString = (str: string) => {
@@ -24,12 +25,10 @@ export default function FallbackExerciseImage({
 
   const bgColor = getColorFromString(exerciseName);
 
-  // Try to load a placeholder image first
-  const placeholderUrl = `/placeholder.svg?height=200&width=200&text=${encodeURIComponent(
-    exerciseName
-  )}`;
+  // Lottie animation path based on exercise name
+  const lottiePath = `/src/assets/lottie/${exerciseName}.lottie`;
 
-  if (imageError) {
+  if (lottieError) {
     return (
       <div
         className={`flex flex-col items-center justify-center ${className}`}
@@ -43,16 +42,29 @@ export default function FallbackExerciseImage({
     );
   }
 
+  console.log(lottiePath);
+
   return (
     <div className={className}>
-      <img
-        src={placeholderUrl || "/placeholder.svg"}
-        alt={exerciseName}
-        width={400}
-        height={200}
-        className="w-full h-full object-cover"
-        onError={() => setImageError(true)}
-      />
+      {exerciseName ? (
+        <DotLottieReact
+          src={lottiePath}
+          loop
+          autoplay
+          className="w-full h-full object-cover"
+          onError={() => setLottieError(true)}
+        />
+      ) : (
+        <div
+          className={`flex flex-col items-center justify-center h-full w-full`}
+          style={{ backgroundColor: bgColor || "hsl(240, 70%, 80%)" }}
+        >
+          <Dumbbell className="h-16 w-16 text-purple-600 mb-2" />
+          <p className="text-purple-800 font-medium text-center px-4">
+            Exercise
+          </p>
+        </div>
+      )}
     </div>
   );
 }

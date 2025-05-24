@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const workoutService = {
   getWorkoutHistory: async (): Promise<WorkoutHistoryItem[]> => {
-        return (await axios.get(`/workout`)).data;
+    return (await axios.get(`/workout`)).data;
   },
 
   generateWorkout: async (): Promise<Workout> => {
@@ -24,13 +24,14 @@ export const workoutService = {
     }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  finishWorkout: async (finishedWorkout: any): Promise<{ coins: number; experience_earned: number; score: number }> => {
+  finishWorkout: async (
+    finishedWorkout: unknown
+  ): Promise<{ coins: number; experience_earned: number; score: number }> => {
     try {
       return (await axios.put(`/workout/finishWorkout`, finishedWorkout)).data;
     } catch (error) {
       console.error("Error finishing workout:", error);
       throw error;
     }
-  },
+  }
 };

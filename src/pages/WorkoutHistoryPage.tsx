@@ -49,7 +49,6 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover";
 import { workoutService } from "@/services/workoutService";
-import { useUserStore } from "@/stores/useUserStore";
 
 type WorkoutHistoryItem = {
   date: string;
@@ -79,7 +78,7 @@ export default function WorkoutHistoryPage() {
   );
   const [weeklyWorkouts, setWeeklyWorkouts] = useState<WorkoutHistoryItem[]>(
     []
-  );  
+  );
 
   // For progress graph navigation
   const [progressGraphWeekStart, setProgressGraphWeekStart] = useState(
@@ -92,7 +91,7 @@ export default function WorkoutHistoryPage() {
       if (workoutHistory.length) {
         setWorkoutHistory(workoutHistory);
         setFilteredHistory(workoutHistory);
-      } 
+      }
     };
 
     fetchAndSetHistory();
@@ -259,7 +258,8 @@ export default function WorkoutHistoryPage() {
 
   // Generate mock workout history data
   async function fetchWorkoutHistory(): Promise<WorkoutHistoryItem[]> {
-    const history: WorkoutHistoryItem[] = await workoutService.getWorkoutHistory();
+    const history: WorkoutHistoryItem[] =
+      await workoutService.getWorkoutHistory();
 
     return history;
   }
@@ -362,9 +362,7 @@ export default function WorkoutHistoryPage() {
                     </p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg text-center">
-                    <p className="text-sm text-purple-600 mb-1">
-                      Avg Reps/Workout
-                    </p>
+                    <p className="text-sm text-purple-600 mb-1">Avg Reps</p>
                     <p className="text-3xl font-bold text-purple-800">
                       {metrics.avgRepsPerWorkout}
                     </p>
