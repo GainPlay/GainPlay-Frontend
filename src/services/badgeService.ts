@@ -1,5 +1,3 @@
-// services/badge.service.ts (Frontend)
-
 import { Badge } from "@/types";
 import axios from "axios";
 

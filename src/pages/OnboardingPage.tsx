@@ -23,6 +23,8 @@ import solidBuilder from "../assets/solid builder.png";
 import { toast } from "@/hooks/use-toast";
 import { workoutService } from "@/services/workoutService";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { useUserStore } from "@/stores/useUserStore";
+import { userService } from "@/services/userService";
 
 // Type definitions
 type Option = {
@@ -91,6 +93,7 @@ type Answers = {
   bodyStructure: string;
   technicalData: TechnicalData;
 };
+
 
 const questions: Question[] = [
   {
@@ -240,6 +243,8 @@ const questions: Question[] = [
 ];
 
 export default function OnboardingPage() {
+  const user = useUserStore();
+
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<Answers>({
@@ -269,6 +274,13 @@ export default function OnboardingPage() {
       try {
         setIsGeneratingWorkout(true);
         await onboardingService.saveOnboardingData(apiAnswers);
+          const fetchedUser = await userService.getUserDataByMail(user.email);
+            user.setUser({
+              ...fetchedUser,
+              ...fetchedUser.user_settings,
+              ...fetchedUser.user_badges,
+              ...fetchedUser.user_goals
+            });
         const generatedWorkout = await workoutService.generateWorkout();
         setCurrentWorkout(generatedWorkout);
         navigate("/home");
