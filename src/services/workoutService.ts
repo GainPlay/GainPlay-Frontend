@@ -1,4 +1,4 @@
-import { Workout, WorkoutHistoryItem } from "@/types";
+import { FrontendBadge, Workout, WorkoutHistoryItem } from "@/types";
 import axios from "axios";
 
 export const workoutService = {
@@ -26,12 +26,17 @@ export const workoutService = {
 
   finishWorkout: async (
     finishedWorkout: unknown
-  ): Promise<{ coins: number; experience_earned: number; score: number }> => {
+  ): Promise<{
+    coins: number;
+    experience_earned: number;
+    score: number;
+    newBadges: FrontendBadge[];
+  }> => {
     try {
       return (await axios.put(`/workout/finishWorkout`, finishedWorkout)).data;
     } catch (error) {
       console.error("Error finishing workout:", error);
       throw error;
     }
-  }
+  },
 };
