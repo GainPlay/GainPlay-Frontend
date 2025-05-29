@@ -39,6 +39,8 @@ import { updateSetUtils, XP_CONST } from "@/utils/workout.utils";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { Challenge, challengeService } from "@/services/challegeService";
 import { motivationalQuotes } from "@/utils/constants/motivationalQuotes";
+import { userService } from "@/services/userService";
+import { useUserStore } from "@/stores/useUserStore";
 
 // Convert API workout to UI format
 const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
@@ -93,6 +95,7 @@ const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const user = useUserStore();
   // Replace the useState for exercises with this
   const [exercises, setExercises] = useState<WorkoutUIExercise[]>([]);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
@@ -545,12 +548,7 @@ export default function HomePage() {
 
     // If challenge is completed
     if (dailyChallengeProgress + 5 >= 50) {
-      console.log("heyyyyyyyyyyyy");
-      console.log({ 1111: originalWorkout });
-
-      if (originalWorkout?.user_id) {
-        await challengeService.finishChallenge(originalWorkout.user_id);
-      }
+      await challengeService.finishChallenge(user.id);
 
       setIsDailyChallengeDone(true);
       // Add coins and save to localStorage
