@@ -104,7 +104,7 @@ export default function HomePage() {
   const [earnedCoins, setEarnedCoins] = useState(0);
   const [earnedXP, setEarnedXP] = useState(0);
   const [earnedScore, setEarnedScore] = useState(0);
-  const [earnedBadges] = useState<
+  const [earnedBadges, setEarnedBadges] = useState<
     Array<{ id: string; name: string; icon: string }>
   >([]);
   const [restMode, setRestMode] = useState(false);
@@ -352,7 +352,7 @@ export default function HomePage() {
       setIsLoading(true);
 
       // Finish the workout and receive rewards from the backend
-      const { coins, experience_earned, score } =
+      const { coins, experience_earned, score, newBadges } =
         await workoutService.finishWorkout(originalWorkout);
 
       // Save the completed workout to local storage
@@ -399,6 +399,27 @@ export default function HomePage() {
         localStorage.setItem("userLevel", newLevel.toString());
       }
 
+      if (newBadges && Array.isArray(newBadges) && newBadges.length > 0) {
+        // Save new badges to localStorage
+        const userBadges = JSON.parse(localStorage.getItem("userBadges") || "[]");
+        const newUserBadges = [...userBadges];
+  
+        newBadges.forEach((badge: { id: number; name: string; icon: string }) => {
+          if (!userBadges.some((b: { id: number }) => b.id === badge.id)) {
+            newUserBadges.push({
+              ...badge,
+              earnedAt: new Date().toISOString(),
+            });
+          }
+        });
+  
+        localStorage.setItem("userBadges", JSON.stringify(newUserBadges));
+        setEarnedBadges(newBadges.map((badge: { id: number; name: string; icon: string }) => ({
+          ...badge,
+          id: badge.id.toString(),
+        })));
+      }
+
       setEarnedScore(score);
 
       setCurrentWorkout(null);
@@ -411,68 +432,6 @@ export default function HomePage() {
     } finally {
       setIsLoading(false);
     }
-
-    //   // Check for any badges earned
-    //   const checkForEarnedBadges = () => {
-    //     const newBadges = [];
-
-    //     // Example badge conditions - replace with your actual badge logic
-    //     if (totalXP > 300) {
-    //       newBadges.push({
-    //         id: "high-performer",
-    //         name: "High Performer",
-    //         icon: "🏆",
-    //       });
-    //     }
-
-    //     if (exercises.every((ex) => ex.sets.filter((set) => set.completed).length === ex.targetSets)) {
-    //       newBadges.push({
-    //         id: "completionist",
-    //         name: "Completionist",
-    //         icon: "✅",
-    //       });
-    //     }
-
-    //     // First workout badge
-    //     if (workoutHistory.length === 0) {
-    //       newBadges.push({
-    //         id: "first-workout",
-    //         name: "First Steps",
-    //         icon: "🌱",
-    //       });
-    //     }
-
-    //     // Add badges to user's collection if they're new
-    //     if (newBadges.length > 0) {
-    //       const userBadges = JSON.parse(localStorage.getItem("userBadges") || "[]");
-    //       const newUserBadges = [...userBadges];
-
-    //       newBadges.forEach((badge) => {
-    //         if (!userBadges.some((b: { id: string }) => b.id === badge.id)) {
-    //           newUserBadges.push({
-    //             ...badge,
-    //             earnedAt: new Date().toISOString(),
-    //           });
-    //         }
-    //       });
-
-    //       localStorage.setItem("userBadges", JSON.stringify(newUserBadges));
-    //       setEarnedBadges(newBadges);
-    //     }
-    //   };
-
-    //   checkForEarnedBadges();
-
-    //   // Show confetti and coin animation
-    //   setShowConfetti(true);
-    //   setWorkoutStarted(false);
-    //   setCurrentWorkoutId(null);
-    // } catch (err) {
-    //   console.error("Error completing workout:", err);
-    //   setError("Failed to save your completed workout. Please try again.");
-    // } finally {
-    //   setIsLoading(false);
-    // }
   };
 
   const closePopup = () => {
@@ -589,7 +548,7 @@ export default function HomePage() {
                 <BarChart className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                 <p className="text-sm text-purple-600">Workout Score</p>
                 <p className="text-2xl font-bold text-purple-800">
-                  {earnedScore}
+                  {earnedScore} / 100
                 </p>
                 <div className="w-full bg-purple-200 h-2 rounded-full mt-2">
                   <div
@@ -605,8 +564,7 @@ export default function HomePage() {
                 <div className="bg-purple-50 p-4 rounded-lg mb-6">
                   <Trophy className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
                   <p className="text-sm text-purple-600 mb-3">Badges Earned</p>
-
-                  <div className="flex justify-center gap-4">
+                  <div className="grid grid-cols-4 gap-4 justify-center max-h-40 overflow-y-auto" style={{ maxWidth: 450 }}>
                     {earnedBadges.map((badge) => (
                       <motion.div
                         key={badge.id}
