@@ -53,14 +53,6 @@ export const signin = async (
   return await axios.post("/auth/login", { email, password });
 };
 
-// export const logout = async () => {
-//   return await axios.post(
-//     "/auth/logout",
-//     {},
-//     { headers: refreshTokenHeaders() }
-//   );
-// };
-
 export const signup = async (
   username: string,
   email: string,
@@ -73,25 +65,8 @@ export const signup = async (
   });
 };
 
-// export const googleSignIn = async (
-//   credentialResponse: CredentialResponse
-// ): Promise<AxiosResponse<GoogleSignInResponse>> => {
-//   return await axios.get("/auth/google", {
-//     credentialResponse
-//   });
-// };
-
-// export const refresh = async (): Promise<AxiosResponse<RefreshResponse>> => {
-//   return await axios.post(
-//     "/auth/refresh",
-//     {},
-//     {
-//       headers: refreshTokenHeaders()
-//     }
-//   );
-// };
-
-// export const isAuthenticated = () => {
-//   const tokens = getTokens();
-//   return tokens.accessToken !== null;
-// };
+export const googleSignIn = () => {
+  window.location.href = `${
+    import.meta.env.VITE_REACT_APP_API_URL
+  }/api/auth/google`;
+};
