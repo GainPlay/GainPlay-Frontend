@@ -56,15 +56,6 @@ export interface UserAvatar {
   purchased_at: string;
   avatars: FrontendAvatar;
 }
-// Badge related types
-export interface Badge {
-  id: number;
-  name: string | null;
-  icon: string | null;
-  description: string | null; // This was already in your schema
-  created_at: Date | null;
-}
-
 export interface UserBadge {
   id: number;
   user_id: number | null;
@@ -170,14 +161,14 @@ export enum DifficultyLevel {
   BEGINNER = 1,
   INTERMEDIATE,
   ADVANCED,
-  EXPERT
+  EXPERT,
 }
 
 export const difficultyMap: Record<DifficultyLevel, ExerciseDifficulty> = {
   [DifficultyLevel.BEGINNER]: "beginner",
   [DifficultyLevel.INTERMEDIATE]: "intermediate",
   [DifficultyLevel.ADVANCED]: "advanced",
-  [DifficultyLevel.EXPERT]: "expert"
+  [DifficultyLevel.EXPERT]: "expert",
 };
 
 // Add a frontend-specific type for the workout UI
@@ -201,7 +192,7 @@ export interface WorkoutUIExercise {
 }
 
 export interface FrontendBadge {
-  id: string;
+  id: number;
   name: string;
   icon: string;
   description: string;
@@ -221,7 +212,7 @@ export enum FriendshipStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
   BLOCKED = "blocked",
-  NONE = "none"
+  NONE = "none",
 }
 export interface FrontendUserData {
   id: number;
@@ -307,3 +298,15 @@ export interface ApiSurveyValues {
     height: number;
   };
 }
+
+export interface Badge {
+  id: number;
+  name: string;
+  icon: string;
+  description: string;
+  created_at?: string;
+}
+
+// export interface UserBadge extends Badge {
+//   earnedAt: string;
+// }

@@ -22,45 +22,7 @@ import { motion } from "framer-motion";
 import type { FrontendBadge } from "../types";
 import { useUserStore } from "@/stores/useUserStore";
 import { userService } from "@/services/userService";
-
-//TODO: implement the badges options fetch from the backend
-const badgesWithDescriptions: FrontendBadge[] = [
-  {
-    id: "1",
-    name: "Early Bird",
-    icon: "🌅",
-    description: "Completed 5 workouts before 8 AM",
-    earnedOn: "2 weeks ago"
-  },
-  {
-    id: "2",
-    name: "Night Owl",
-    icon: "🦉",
-    description: "Completed 10 workouts after 8 PM",
-    earnedOn: "1 month ago"
-  },
-  {
-    id: "3",
-    name: "Consistency King",
-    icon: "👑",
-    description: "Maintained a 7-day workout streak",
-    earnedOn: "3 days ago"
-  },
-  {
-    id: "4",
-    name: "Muscle Master",
-    icon: "💪",
-    description: "Completed 20 strength training workouts",
-    earnedOn: "2 months ago"
-  },
-  {
-    id: "5",
-    name: "Cardio Crusher",
-    icon: "🏃",
-    description: "Burned over 5000 calories in cardio exercises",
-    earnedOn: "3 weeks ago"
-  }
-];
+import { badgeService } from "@/services/badgeService";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -75,16 +37,33 @@ export default function ProfilePage() {
     null
   );
   const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
-
+  const [allBadges, setAllBadges] = useState<FrontendBadge[]>([]);
+  const [userBadges, setUserBadges] = useState<FrontendBadge[]>([]);
+  
   const user = useUserStore();
 
   useEffect(() => {
+    const loadBadges = async () => {
+      try {
+        const [all, userOwned] = await Promise.all([
+          badgeService.getAllBadges(),
+          badgeService.getUserBadges()
+        ]);
+        setAllBadges(all); // All badges from the backend
+        
+        setUserBadges(userOwned);
+      } catch (err) {
+        console.error("Failed to load badges:", err);
+      }
+    };
+  
     if (user) {
       setEditedName(user.name!);
       setEditedEmail(user.email);
       setEditedHeight(user.height);
       setEditedWeight(user.weight);
       setEditedAge(user.age);
+      loadBadges();
     }
   }, []);
 
@@ -121,17 +100,14 @@ export default function ProfilePage() {
   };
 
   const handleBadgeClick = (badge: FrontendBadge | undefined) => {
-    // Find the badge with description
-    const badgeWithDesc: FrontendBadge = badgesWithDescriptions.find(
-      (b) => b.id === badge?.id
-    ) || {
-      id: badge?.id || "unknown",
+    const badgeWithDesc = allBadges.find((b) => b.id === badge?.id) || {
+      id: typeof badge?.id === "number" ? badge.id : 0,
       name: badge?.name || "Unknown Badge",
       icon: badge?.icon || "❓",
       description: "Achievement unlocked for your fitness journey!",
       earnedOn: "Recently"
     };
-
+  
     setSelectedBadge(badgeWithDesc);
     setBadgeDialogOpen(true);
   };
@@ -257,7 +233,7 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap justify-center">
-            {user.user_badges?.map((badge) => (
+          {userBadges.map((badge) => (
               <motion.div
                 key={badge.id}
                 className="flex flex-col items-center w-24 m-2 cursor-pointer"
