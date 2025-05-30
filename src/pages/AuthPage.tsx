@@ -1,21 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
-  signup,
   saveTokens,
+  setDefaultAxiosConfig,
   signin,
-  setDefaultAxiosConfig
+  signup,
 } from "@/services/authService";
-import { useCallback } from "react";
-import { useUserStore } from "@/stores/useUserStore";
 import { userService } from "@/services/userService";
+import { useUserStore } from "@/stores/useUserStore";
+import { motion } from "framer-motion";
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const user = useUserStore();
+  const setUser = useUserStore((state) => state.setUser);
 
   const handleLogin = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,8 +37,9 @@ export default function AuthPage() {
             ...fetchedUser,
             ...fetchedUser.user_settings,
             ...fetchedUser.user_badges,
-            ...fetchedUser.user_goals
+            ...fetchedUser.user_goals,
           });
+          setUser(fetchedUser);
           navigate("/home");
         } else {
           if (response.status === 400) {
@@ -70,10 +72,12 @@ export default function AuthPage() {
             saveTokens({ accessToken: response.data.access_token });
             setDefaultAxiosConfig();
             user.setUser({
-             email:email,
-             name: username,
-
+              ...fetchedUser,
+              ...fetchedUser.user_settings,
+              ...fetchedUser.user_badges,
+              ...fetchedUser.user_goals,
             });
+            setUser(fetchedUser);
           }
         } else {
           if (response.status === 400) {
@@ -123,12 +127,12 @@ export default function AuthPage() {
         <motion.div
           animate={{
             y: [0, -15, 0],
-            opacity: [0.3, 0.5, 0.3]
+            opacity: [0.3, 0.5, 0.3],
           }}
           transition={{
             duration: 5,
             repeat: Number.POSITIVE_INFINITY,
-            repeatType: "reverse"
+            repeatType: "reverse",
           }}
           className="absolute top-1/3 left-1/4 w-16 h-16 rounded-full bg-purple-400 opacity-30 blur-xl"
         ></motion.div>
@@ -136,12 +140,12 @@ export default function AuthPage() {
         <motion.div
           animate={{
             y: [0, 20, 0],
-            opacity: [0.2, 0.4, 0.2]
+            opacity: [0.2, 0.4, 0.2],
           }}
           transition={{
             duration: 7,
             repeat: Number.POSITIVE_INFINITY,
-            repeatType: "reverse"
+            repeatType: "reverse",
           }}
           className="absolute bottom-1/4 right-1/3 w-20 h-20 rounded-full bg-indigo-400 opacity-20 blur-xl"
         ></motion.div>

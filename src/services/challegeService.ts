@@ -8,11 +8,12 @@ export type Challenge = {
   repetitions: number;
   intervals: number;
 };
+const API_BASE = "/daily-challenge";
 
 export const challengeService = {
   generateChallenge: async (): Promise<Challenge> => {
     try {
-      return (await axios.post("/daily-challenge")).data;
+      return (await axios.get(`${API_BASE}`)).data;
     } catch (error) {
       console.error("Error generating daily challenge:", error);
       throw error;
@@ -21,7 +22,7 @@ export const challengeService = {
 
   finishChallenge: async (userId: number): Promise<{ user: User }> => {
     try {
-      return (await axios.post(`/daily-challenge/complete/${userId}`)).data;
+      return (await axios.post(`${API_BASE}/complete/${userId}`)).data;
     } catch (error) {
       console.error("Error finishing daily challenge:", error);
       throw error;
