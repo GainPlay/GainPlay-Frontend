@@ -18,7 +18,7 @@ import {
   Dumbbell,
   FlameIcon as Fire,
   Trophy,
-  Loader2,
+  Loader2
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,14 +32,13 @@ import {
   type DifficultyLevel,
   type ExerciseDifficulty,
   type Workout,
-  type WorkoutUIExercise,
+  type WorkoutUIExercise
 } from "../types";
 import { workoutService } from "@/services/workoutService";
 import { updateSetUtils, XP_CONST } from "@/utils/workout.utils";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { Challenge, challengeService } from "@/services/challegeService";
 import { motivationalQuotes } from "@/utils/constants/motivationalQuotes";
-import { userService } from "@/services/userService";
 import { useUserStore } from "@/stores/useUserStore";
 
 // Convert API workout to UI format
@@ -60,7 +59,7 @@ const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
     const sets = workoutExercise.exercise_sets.map((set) => ({
       id: set.id, // Include the set ID
       completed: (set.completed_reps || 0) > 0,
-      reps: set.completed_reps || 0,
+      reps: set.completed_reps || 0
     }));
 
     // Find the current set (first incomplete set)
@@ -84,11 +83,11 @@ const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
         "Keep proper form throughout the exercise",
         "Breathe properly during the movement",
         "Focus on muscle contraction",
-        "Maintain a controlled tempo",
+        "Maintain a controlled tempo"
       ],
       exerciseId: exercise?.id || 0,
       workoutExerciseId: workoutExercise.id,
-      templateId: template?.id || 0,
+      templateId: template?.id || 0
     };
   });
 };
@@ -288,14 +287,14 @@ export default function HomePage() {
           newSets[exercise.currentSet] = {
             ...newSets[exercise.currentSet],
             completed: true,
-            reps: exercise.currentReps,
+            reps: exercise.currentReps
           };
 
           newExercises[currentExerciseIndex] = {
             ...exercise,
             sets: newSets,
             currentSet: exercise.currentSet + 1,
-            currentReps: 0,
+            currentReps: 0
           };
 
           return newExercises;
@@ -382,7 +381,7 @@ export default function HomePage() {
         totalReps: exercise.sets.reduce(
           (total, set) => total + (set.reps || 0),
           0
-        ),
+        )
       }));
 
       const workoutHistory = JSON.parse(
@@ -391,7 +390,7 @@ export default function HomePage() {
       workoutHistory.push({
         date: new Date().toISOString(),
         exercises: completedExercises,
-        score, // Save score for UI/stats
+        score // Save score for UI/stats
       });
       localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
 
@@ -421,23 +420,31 @@ export default function HomePage() {
 
       if (newBadges && Array.isArray(newBadges) && newBadges.length > 0) {
         // Save new badges to localStorage
-        const userBadges = JSON.parse(localStorage.getItem("userBadges") || "[]");
+        const userBadges = JSON.parse(
+          localStorage.getItem("userBadges") || "[]"
+        );
         const newUserBadges = [...userBadges];
-  
-        newBadges.forEach((badge: { id: number; name: string; icon: string }) => {
-          if (!userBadges.some((b: { id: number }) => b.id === badge.id)) {
-            newUserBadges.push({
-              ...badge,
-              earnedAt: new Date().toISOString(),
-            });
+
+        newBadges.forEach(
+          (badge: { id: number; name: string; icon: string }) => {
+            if (!userBadges.some((b: { id: number }) => b.id === badge.id)) {
+              newUserBadges.push({
+                ...badge,
+                earnedAt: new Date().toISOString()
+              });
+            }
           }
-        });
-  
+        );
+
         localStorage.setItem("userBadges", JSON.stringify(newUserBadges));
-        setEarnedBadges(newBadges.map((badge: { id: number; name: string; icon: string }) => ({
-          ...badge,
-          id: badge.id.toString(),
-        })));
+        setEarnedBadges(
+          newBadges.map(
+            (badge: { id: number; name: string; icon: string }) => ({
+              ...badge,
+              id: badge.id.toString()
+            })
+          )
+        );
       }
 
       setEarnedScore(score);
@@ -481,16 +488,16 @@ export default function HomePage() {
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 1000 : -1000,
-      opacity: 0,
+      opacity: 0
     }),
     center: {
       x: 0,
-      opacity: 1,
+      opacity: 1
     },
     exit: (direction: number) => ({
       x: direction < 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
+      opacity: 0
+    })
   };
 
   const currentExercise = exercises[currentExerciseIndex];
@@ -576,7 +583,7 @@ export default function HomePage() {
                   <div
                     className="h-full bg-purple-600 rounded-full transition-all duration-500"
                     style={{
-                      width: `${Math.min(Math.round(earnedXP / 2), 100)}%`,
+                      width: `${Math.min(Math.round(earnedXP / 2), 100)}%`
                     }}
                   />
                 </div>
@@ -586,7 +593,10 @@ export default function HomePage() {
                 <div className="bg-purple-50 p-4 rounded-lg mb-6">
                   <Trophy className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
                   <p className="text-sm text-purple-600 mb-3">Badges Earned</p>
-                  <div className="grid grid-cols-4 gap-4 justify-center max-h-40 overflow-y-auto" style={{ maxWidth: 450 }}>
+                  <div
+                    className="grid grid-cols-4 gap-4 justify-center max-h-40 overflow-y-auto"
+                    style={{ maxWidth: 450 }}
+                  >
                     {earnedBadges.map((badge) => (
                       <motion.div
                         key={badge.id}
@@ -595,7 +605,7 @@ export default function HomePage() {
                         transition={{
                           type: "spring",
                           delay: 0.3,
-                          duration: 0.5,
+                          duration: 0.5
                         }}
                         className="flex flex-col items-center"
                       >
@@ -968,7 +978,7 @@ export default function HomePage() {
                       (restTimeRemaining /
                         exercises[currentExerciseIndex].restTime) *
                       100
-                    }%`,
+                    }%`
                   }}
                 />
               </div>
@@ -1001,7 +1011,7 @@ export default function HomePage() {
               <div
                 className="bg-purple-600 h-full rounded-full"
                 style={{
-                  width: `${(currentExerciseIndex / exercises.length) * 100}%`,
+                  width: `${(currentExerciseIndex / exercises.length) * 100}%`
                 }}
               />
             </div>
