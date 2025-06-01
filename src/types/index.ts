@@ -222,7 +222,9 @@ export interface FrontendUserData {
   coins?: number;
   height?: number;
   weight?: number;
+  streak?: number;
   age?: number;
+  experience?: number;
   level?: number;
   status?: FriendshipStatus;
   user_settings?: UserSettings;

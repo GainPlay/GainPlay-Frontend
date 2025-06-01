@@ -168,39 +168,25 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const storedAvatar = localStorage.getItem("currentAvatar");
-    const storedCoins = localStorage.getItem("userCoins");
-    const storedLevel = localStorage.getItem("userLevel");
-    const storedStreak = localStorage.getItem("userStreak");
+    
+    const userAvatar = user.avatar;
+    const userCoins = user.coins;
+    const userLevel = user.level;
+    const userStreak = user.streak;
 
-    if (storedAvatar) setUserAvatar(storedAvatar);
-    if (storedCoins) setCoins(Number.parseInt(storedCoins));
-    if (storedLevel) setLevel(Number.parseInt(storedLevel));
-    if (storedStreak) setStreak(Number.parseInt(storedStreak));
+    if (userAvatar) setUserAvatar(userAvatar);
+    if (userCoins) setCoins(userCoins);
+    if (userLevel) setLevel(userLevel);
+    if (userStreak) setStreak(userStreak);
 
-    // Check if we need a new daily quote
-    const today = new Date().toDateString();
-    const lastQuoteDate = localStorage.getItem("lastQuoteDate");
-    const storedQuote = localStorage.getItem("dailyQuote");
-
-    if (lastQuoteDate !== today || !storedQuote) {
-      // Need a new quote for today
-      getNewQuote();
-    } else {
-      // Use the stored quote
-      setQuote(storedQuote);
-    }
+    getNewQuote();
+  
   }, []);
 
   const getNewQuote = () => {
     const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
     const newQuote = motivationalQuotes[randomIndex];
     setQuote(newQuote);
-
-    // Store the new quote and date
-    const today = new Date().toDateString();
-    localStorage.setItem("dailyQuote", newQuote);
-    localStorage.setItem("lastQuoteDate", today);
   };
 
   useEffect(() => {
@@ -384,6 +370,7 @@ export default function HomePage() {
         )
       }));
 
+      //TODO: implement workout history
       const workoutHistory = JSON.parse(
         localStorage.getItem("workoutHistory") || "[]"
       );
@@ -397,32 +384,27 @@ export default function HomePage() {
       // Update streak
       const newStreak = streak + 1;
       setStreak(newStreak);
-      localStorage.setItem("userStreak", newStreak.toString());
+      user.setUser({streak: newStreak});
 
       // Update coins
       const newCoins =
-        coins + parseInt(localStorage.getItem("userCoins") || "0");
+        coins + (user.coins ?? 0);
       setCoins(newCoins);
       setEarnedCoins(coins);
-      localStorage.setItem("userCoins", newCoins.toString());
-
+      
       // Update experience and level
-      const currentXP = parseInt(localStorage.getItem("userXP") || "0");
+      const currentXP = (user.experience || 0);
       const newTotalXP = currentXP + experience_earned;
       setEarnedXP(experience_earned);
-      localStorage.setItem("userXP", newTotalXP.toString());
-
+      user.setUser({experience: newTotalXP});
       const newLevel = Math.floor(newTotalXP / 100) + 1;
       if (newLevel > level) {
         setLevel(newLevel);
-        localStorage.setItem("userLevel", newLevel.toString());
+      user.setUser({level: newLevel});
       }
 
       if (newBadges && Array.isArray(newBadges) && newBadges.length > 0) {
-        // Save new badges to localStorage
-        const userBadges = JSON.parse(
-          localStorage.getItem("userBadges") || "[]"
-        );
+        const userBadges = user.user_badges || [];
         const newUserBadges = [...userBadges];
 
         newBadges.forEach(
@@ -430,13 +412,14 @@ export default function HomePage() {
             if (!userBadges.some((b: { id: number }) => b.id === badge.id)) {
               newUserBadges.push({
                 ...badge,
-                earnedAt: new Date().toISOString()
+                description: "Badge earned",
+                earnedOn: new Date().toISOString()
               });
             }
           }
         );
 
-        localStorage.setItem("userBadges", JSON.stringify(newUserBadges));
+        user.setUser({ user_badges: newUserBadges });
         setEarnedBadges(
           newBadges.map(
             (badge: { id: number; name: string; icon: string }) => ({
@@ -517,10 +500,9 @@ export default function HomePage() {
       await challengeService.finishChallenge(user.id);
 
       setIsDailyChallengeDone(true);
-      // Add coins and save to localStorage
       const newCoins = coins + 50;
       setCoins(newCoins);
-      localStorage.setItem("userCoins", newCoins.toString());
+      user.setUser({ coins: newCoins });
 
       // Show celebration popup
       setShowChallengeComplete(true);
