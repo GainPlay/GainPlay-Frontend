@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { avatarService } from "@/services/avatarService";
 import { FrontendAvatar } from "@/types";
+import { useUserStore } from "@/stores/useUserStore";
 
 const rarityColors = {
   common: "bg-gray-200 text-gray-700",
@@ -41,6 +42,7 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const shopRef = useRef<HTMLDivElement>(null);
+  const user = useUserStore();
 
   // Load initial data
   useEffect(() => {
@@ -63,10 +65,9 @@ export default function CartPage() {
         setOwnedAvatars(ownedIds);
         setCurrentAvatar(current);
 
-        // Get user coins from localStorage or API
-        const storedCoins = localStorage.getItem("userCoins");
-        if (storedCoins) {
-          setCoins(Number.parseInt(storedCoins));
+        const userCoins = user.coins;
+        if (userCoins) {
+          setCoins(userCoins);
         }
         
       } catch (error) {
@@ -145,10 +146,8 @@ export default function CartPage() {
         setOwnedAvatars(newOwnedAvatars);
         setCurrentAvatar(avatar.id);
 
-        // Update localStorage
-        localStorage.setItem("userCoins", newCoins.toString());
+        user.setUser({coins: newCoins, avatar: avatar.image_url || ""});
 
-        // Show purchase animation
         setPurchasedAvatar(avatar);
         setShowPurchaseAnimation(true);
         setTimeout(() => {
