@@ -93,8 +93,6 @@ export default function ProfilePage() {
   };
 
   const handleRegenerateWorkout = () => {
-    // Clear current workout data
-    localStorage.removeItem("currentWorkout");
     // Redirect to onboarding survey
     navigate("/onboarding");
   };
