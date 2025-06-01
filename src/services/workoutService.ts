@@ -1,7 +1,11 @@
-import { Workout } from "@/types";
+import { FrontendBadge, Workout, WorkoutHistoryItem } from "@/types";
 import axios from "axios";
 
 export const workoutService = {
+  getWorkoutHistory: async (): Promise<WorkoutHistoryItem[]> => {
+    return (await axios.get(`/workout`)).data;
+  },
+
   generateWorkout: async (): Promise<Workout> => {
     try {
       return (await axios.post("/workout/generate")).data;
@@ -20,7 +24,14 @@ export const workoutService = {
     }
   },
 
-  finishWorkout: async (finishedWorkout: any): Promise<{ coins: number; experience_earned: number; score: number }> => {
+  finishWorkout: async (
+    finishedWorkout: unknown
+  ): Promise<{
+    coins: number;
+    experience_earned: number;
+    score: number;
+    newBadges: FrontendBadge[];
+  }> => {
     try {
       return (await axios.put(`/workout/finishWorkout`, finishedWorkout)).data;
     } catch (error) {

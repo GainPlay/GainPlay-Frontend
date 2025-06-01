@@ -36,23 +36,26 @@ export interface Avatar {
   rarity?: "common" | "rare" | "epic" | "legendary"; // Added to match frontend
 }
 
+// types.ts - Add this to your types file
+
+export interface FrontendAvatar {
+  id: number;
+  name: string;
+  image_url: string;
+  price: number;
+  rarity: "common" | "rare" | "epic" | "legendary";
+  created_at: string;
+}
+
+// Type for the user avatars response from the API
 export interface UserAvatar {
   id: number;
-  user_id: number | null;
-  avatar_id: number | null;
-  is_current: boolean | null;
-  purchased_at: Date | null;
+  user_id: number;
+  avatar_id: number;
+  is_current: boolean;
+  purchased_at: string;
+  avatars: FrontendAvatar;
 }
-
-// Badge related types
-export interface Badge {
-  id: number;
-  name: string | null;
-  icon: string | null;
-  description: string | null; // This was already in your schema
-  created_at: Date | null;
-}
-
 export interface UserBadge {
   id: number;
   user_id: number | null;
@@ -148,6 +151,26 @@ export interface WorkoutHistoryItem {
   }[];
 }
 
+export type ExerciseDifficulty =
+  | "beginner"
+  | "intermediate"
+  | "advanced"
+  | "expert";
+
+export enum DifficultyLevel {
+  BEGINNER = 1,
+  INTERMEDIATE,
+  ADVANCED,
+  EXPERT,
+}
+
+export const difficultyMap: Record<DifficultyLevel, ExerciseDifficulty> = {
+  [DifficultyLevel.BEGINNER]: "beginner",
+  [DifficultyLevel.INTERMEDIATE]: "intermediate",
+  [DifficultyLevel.ADVANCED]: "advanced",
+  [DifficultyLevel.EXPERT]: "expert",
+};
+
 // Add a frontend-specific type for the workout UI
 export interface WorkoutUIExercise {
   id: number;
@@ -156,7 +179,7 @@ export interface WorkoutUIExercise {
   targetReps: number;
   restTime: number;
   instruction: string;
-  difficulty: "beginner" | "intermediate" | "advanced";
+  difficulty: ExerciseDifficulty;
   muscleGroup: string;
   xpReward: number;
   sets: Array<{ id?: number; completed: boolean; reps: number }>;
@@ -169,7 +192,7 @@ export interface WorkoutUIExercise {
 }
 
 export interface FrontendBadge {
-  id: string;
+  id: number;
   name: string;
   icon: string;
   description: string;
@@ -177,7 +200,7 @@ export interface FrontendBadge {
 }
 
 export interface FrontendAvatar {
-  id: string;
+  id: number;
   name: string;
   image: string;
   price: number;
@@ -197,9 +220,9 @@ export interface FrontendUserData {
   name?: string;
   avatar?: string;
   coins?: number;
-  height?: string;
-  weight?: string;
-  age?: string;
+  height?: number;
+  weight?: number;
+  age?: number;
   level?: number;
   status?: FriendshipStatus;
   user_settings?: UserSettings;
@@ -275,3 +298,15 @@ export interface ApiSurveyValues {
     height: number;
   };
 }
+
+export interface Badge {
+  id: number;
+  name: string;
+  icon: string;
+  description: string;
+  created_at?: string;
+}
+
+// export interface UserBadge extends Badge {
+//   earnedAt: string;
+// }

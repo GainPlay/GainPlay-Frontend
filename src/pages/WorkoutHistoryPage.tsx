@@ -48,6 +48,7 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover";
+import { workoutService } from "@/services/workoutService";
 
 type WorkoutHistoryItem = {
   date: string;
@@ -85,20 +86,15 @@ export default function WorkoutHistoryPage() {
   );
 
   useEffect(() => {
-    const storedHistory = JSON.parse(
-      localStorage.getItem("workoutHistory") || "[]"
-    );
+    const fetchAndSetHistory = async () => {
+      const workoutHistory = await fetchWorkoutHistory();
+      if (workoutHistory.length) {
+        setWorkoutHistory(workoutHistory);
+        setFilteredHistory(workoutHistory);
+      }
+    };
 
-    // If no history exists, create some mock data for demonstration
-    if (storedHistory.length === 0) {
-      const mockHistory = generateMockWorkoutHistory(30);
-      localStorage.setItem("workoutHistory", JSON.stringify(mockHistory));
-      setWorkoutHistory(mockHistory);
-      setFilteredHistory(mockHistory);
-    } else {
-      setWorkoutHistory(storedHistory);
-      setFilteredHistory(storedHistory);
-    }
+    fetchAndSetHistory();
   }, []);
 
   useEffect(() => {
@@ -261,59 +257,9 @@ export default function WorkoutHistoryPage() {
   const topExercises = getTopExercises();
 
   // Generate mock workout history data
-  function generateMockWorkoutHistory(days: number): WorkoutHistoryItem[] {
-    const history: WorkoutHistoryItem[] = [];
-    const exercises = [
-      "Push-ups",
-      "Squats",
-      "Lunges",
-      "Plank",
-      "Mountain Climbers",
-      "Burpees",
-      "Jumping Jacks",
-      "Crunches",
-      "Bicycle Crunches",
-      "Tricep Dips"
-    ];
-
-    const today = new Date();
-
-    for (let i = 0; i < days; i++) {
-      // Skip some days randomly to simulate non-consecutive workouts
-      if (Math.random() > 0.7 && i > 0) continue;
-
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-
-      // Randomly select 3-5 exercises for this workout
-      const workoutExercises = [];
-      const exerciseCount = Math.floor(Math.random() * 3) + 3;
-      const shuffled = [...exercises].sort(() => 0.5 - Math.random());
-      const selectedExercises = shuffled.slice(0, exerciseCount);
-
-      for (const exercise of selectedExercises) {
-        const sets = [];
-        const setCount = Math.floor(Math.random() * 2) + 2; // 2-3 sets
-        let totalReps = 0;
-
-        for (let j = 0; j < setCount; j++) {
-          const reps = Math.floor(Math.random() * 10) + 5; // 5-15 reps
-          sets.push({ completed: true, reps });
-          totalReps += reps;
-        }
-
-        workoutExercises.push({
-          name: exercise,
-          sets,
-          totalReps
-        });
-      }
-
-      history.push({
-        date: date.toISOString(),
-        exercises: workoutExercises
-      });
-    }
+  async function fetchWorkoutHistory(): Promise<WorkoutHistoryItem[]> {
+    const history: WorkoutHistoryItem[] =
+      await workoutService.getWorkoutHistory();
 
     return history;
   }
@@ -416,9 +362,7 @@ export default function WorkoutHistoryPage() {
                     </p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg text-center">
-                    <p className="text-sm text-purple-600 mb-1">
-                      Avg Reps/Workout
-                    </p>
+                    <p className="text-sm text-purple-600 mb-1">Avg Reps</p>
                     <p className="text-3xl font-bold text-purple-800">
                       {metrics.avgRepsPerWorkout}
                     </p>

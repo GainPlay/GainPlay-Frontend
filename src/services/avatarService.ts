@@ -1,48 +1,32 @@
+import { FrontendAvatar, UserAvatar } from "@/types";
+import axios from "axios";
+
+const API_BASE = "/avatars";
+
 export const avatarService = {
-  // getAvatars: async (): Promise<FrontendAvatar[]> => {
-  //   return new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       resolve(avatars);
-  //     }, 100);
-  //   });
-  // },
-  // getOwnedAvatars: async (): Promise<string[]> => {
-  //   return new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       const ownedAvatars = localStorage.getItem("ownedAvatars");
-  //       resolve(ownedAvatars ? JSON.parse(ownedAvatars) : []);
-  //     }, 100);
-  //   });
-  // },
-  // buyAvatar: async (avatarId: string): Promise<void> => {
-  //   return new Promise((resolve, reject) => {
-  //     setTimeout(() => {
-  //       const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-  //       const avatar = avatars.find((a) => a.id === avatarId);
-  //       if (avatar && userData.coins >= avatar.price) {
-  //         userData.coins -= avatar.price;
-  //         const ownedAvatars = JSON.parse(
-  //           localStorage.getItem("ownedAvatars") || "[]"
-  //         );
-  //         ownedAvatars.push(avatarId);
-  //         localStorage.setItem("ownedAvatars", JSON.stringify(ownedAvatars));
-  //         localStorage.setItem("userData", JSON.stringify(userData));
-  //         resolve();
-  //       } else {
-  //         reject(new Error("Not enough coins or avatar not found"));
-  //       }
-  //     }, 100);
-  //   });
-  // },
-  // setCurrentAvatar: async (avatarImage: string): Promise<void> => {
-  //   return new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       localStorage.setItem("currentAvatar", avatarImage);
-  //       const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-  //       userData.avatar = avatarImage;
-  //       localStorage.setItem("userData", JSON.stringify(userData));
-  //       resolve();
-  //     }, 100);
-  //   });
-  // }
+  getAvatars: async (): Promise<FrontendAvatar[]> => {
+    const res = await axios.get(API_BASE);
+    return res.data;
+  },
+
+  getOwnedAvatars: async (): Promise<UserAvatar[]> => {
+    const res = await axios.get(`${API_BASE}/user`);
+    return res.data;
+  },
+
+  purchaseAvatar: async (
+    avatarId: number
+  ): Promise<{
+    success: boolean;
+    userAvatar: UserAvatar;
+    remainingCoins: number;
+  }> => {
+    const res = await axios.post(`${API_BASE}/purchase/${avatarId}`, {});
+    return res.data;
+  },
+
+  setCurrentAvatar: async (avatarId: number): Promise<{ success: boolean }> => {
+    const res = await axios.post(`${API_BASE}/set-current/${avatarId}`, {});
+    return res.data;
+  },
 };

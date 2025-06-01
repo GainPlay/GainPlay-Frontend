@@ -11,19 +11,27 @@ import OnboardingPage from "./pages/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import WorkoutHistoryPage from "./pages/WorkoutHistoryPage";
-import { getValidAccessToken } from "./services/authService";
+import {
+  getValidAccessToken,
+  setDefaultAxiosConfig
+} from "./services/authService";
+import AuthCallback from "@/pages/AuthCallback";
 
 function App() {
   const navigate = useNavigate();
   const access_token = getValidAccessToken();
 
-  // Redirect if trying to navigate from AuthPage to other routes
   useEffect(() => {
-    if (location.pathname !== "/" && !access_token) {
-      // If user is not authenticated, redirect them to the / route
+    if (!access_token) {
       navigate("/");
     }
+
+    if (access_token && location.pathname === "/") {
+      navigate("/home");
+    }
   }, [location, access_token]);
+
+  setDefaultAxiosConfig();
 
   return (
     <>
@@ -31,6 +39,7 @@ function App() {
         <Routes>
           <Route path="/" element={<AuthPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<ProfilePage />} />
@@ -40,7 +49,9 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         {/* Conditionally render Navigation based on the current route */}
-        {location.pathname !== "/" && location.pathname !== "/onboarding" && <Navigation />}
+        {location.pathname !== "/" && location.pathname !== "/onboarding" && (
+          <Navigation />
+        )}
         <Toaster />
       </div>
     </>

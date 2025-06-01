@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
+  CardDescription
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -16,13 +16,13 @@ import { Slider } from "@/components/ui/slider";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, ArrowRight, ArrowLeft, Dumbbell } from "lucide-react";
 import { mapSurveyValuesToApi } from "@/utils/surveyMap";
-import slimBuilder from "../assets/slim builder.png";
 import { onboardingService } from "@/services/onboardingService";
-import athleticBuilder from "../assets/Athletic Builder.png";
-import solidBuilder from "../assets/solid builder.png";
 import { toast } from "@/hooks/use-toast";
 import { workoutService } from "@/services/workoutService";
 import { useWorkoutStore } from "@/stores/useWorkoutStore";
+import { useUserStore } from "@/stores/useUserStore";
+import { userService } from "@/services/userService";
+import { cn } from "@/lib/utils";
 
 // Type definitions
 type Option = {
@@ -62,8 +62,10 @@ interface MultiGoalQuestion extends BaseQuestion {
 }
 
 interface BodyTypeQuestion extends BaseQuestion {
+  question: string;
+  description: string;
   type: "bodyType";
-  options: Option[];
+  icon: string;
 }
 
 interface TechnicalDataQuestion extends BaseQuestion {
@@ -92,6 +94,60 @@ type Answers = {
   technicalData: TechnicalData;
 };
 
+const bodyTypeOptions = [
+  {
+    value: "slim",
+    title: "Ectomorph",
+    subtitle: "Naturally Lean Build",
+    description:
+      "You tend to be naturally thin with a fast metabolism. You may find it challenging to gain weight or build muscle mass, even when eating more.",
+    characteristics: [
+      "Fast metabolism",
+      "Hard to gain weight",
+      "Lean build",
+      "Small frame"
+    ],
+    bgColor: "from-blue-50 to-cyan-50",
+    borderColor: "border-blue-200",
+    selectedBg: "from-blue-100 to-cyan-100",
+    selectedBorder: "border-blue-400"
+  },
+  {
+    value: "athletic",
+    title: "Mesomorph",
+    subtitle: "Naturally Athletic Build",
+    description:
+      "You have a naturally muscular and well-proportioned body. You respond well to exercise and can gain or lose weight relatively easily.",
+    characteristics: [
+      "Builds muscle easily",
+      "Athletic look",
+      "Balanced metabolism",
+      "Defined muscles"
+    ],
+    bgColor: "from-green-50 to-emerald-50",
+    borderColor: "border-green-200",
+    selectedBg: "from-green-100 to-emerald-100",
+    selectedBorder: "border-green-400"
+  },
+  {
+    value: "solid",
+    title: "Endomorph",
+    subtitle: "Naturally Solid Build",
+    description:
+      "You tend to have a larger frame and may gain weight more easily. You can build muscle effectively but may need to work harder to lose fat.",
+    characteristics: [
+      "Gains muscle easily",
+      "Slower metabolism",
+      "Larger frame",
+      "Stores fat easily"
+    ],
+    bgColor: "from-orange-50 to-amber-50",
+    borderColor: "border-orange-200",
+    selectedBg: "from-orange-100 to-amber-100",
+    selectedBorder: "border-orange-400"
+  }
+];
+
 const questions: Question[] = [
   {
     id: "fitnessLevel",
@@ -102,25 +158,25 @@ const questions: Question[] = [
       {
         value: "beginner",
         label: "Beginner",
-        description: "New to fitness or returning after a long break",
+        description: "New to fitness or returning after a long break"
       },
       {
         value: "intermediate",
         label: "Intermediate",
-        description: "Exercise regularly with some experience",
+        description: "Exercise regularly with some experience"
       },
       {
         value: "advanced",
         label: "Advanced",
-        description: "Consistent training with good knowledge",
+        description: "Consistent training with good knowledge"
       },
       {
         value: "expert",
         label: "Expert",
-        description: "Highly trained with extensive experience",
-      },
+        description: "Highly trained with extensive experience"
+      }
     ],
-    icon: "📊",
+    icon: "📊"
   },
   {
     id: "fitnessGoals",
@@ -133,9 +189,9 @@ const questions: Question[] = [
       { id: "improveEndurance", label: "Improve Endurance" },
       { id: "increaseStrength", label: "Increase Strength" },
       { id: "improveFlexibility", label: "Improve Flexibility" },
-      { id: "maintainHealth", label: "Maintain Health" },
+      { id: "maintainHealth", label: "Maintain Health" }
     ],
-    icon: "🎯",
+    icon: "🎯"
   },
   {
     id: "workoutFrequency",
@@ -146,21 +202,21 @@ const questions: Question[] = [
       {
         value: "1-2",
         label: "1-2 times per week",
-        description: "Getting started",
+        description: "Getting started"
       },
       {
         value: "3-4",
         label: "3-4 times per week",
-        description: "Consistent routine",
+        description: "Consistent routine"
       },
       {
         value: "5-6",
         label: "5-6 times per week",
-        description: "Dedicated schedule",
+        description: "Dedicated schedule"
       },
-      { value: "daily", label: "Daily", description: "Full commitment" },
+      { value: "daily", label: "Daily", description: "Full commitment" }
     ],
-    icon: "📅",
+    icon: "📅"
   },
   {
     id: "workoutDuration",
@@ -175,40 +231,17 @@ const questions: Question[] = [
       {
         value: "90min",
         label: "90+ minutes",
-        description: "Extended training",
-      },
+        description: "Extended training"
+      }
     ],
-    icon: "⏱️",
+    icon: "⏱️"
   },
   {
     id: "bodyStructure",
     question: "Which body type best represents you?",
     description: "Select the body structure that most closely matches yours",
     type: "bodyType",
-    options: [
-      {
-        value: "slim",
-        label: "Slim Builder",
-        description:
-          "Naturally lean, finds it harder to gain weight or muscle. Fast metabolism, narrow frame.",
-        image: slimBuilder,
-      },
-      {
-        value: "athletic",
-        label: "Athletic Builder",
-        description:
-          "Naturally muscular and athletic. Gains muscle easily and maintains a balanced physique.",
-        image: athleticBuilder,
-      },
-      {
-        value: "solid",
-        label: "Solid Builder",
-        description:
-          "Naturally broader and rounder. Tends to store fat easily and may struggle with weight loss.",
-        image: solidBuilder,
-      },
-    ],
-    icon: "👤",
+    icon: "👤"
   },
   {
     id: "technicalData",
@@ -220,26 +253,28 @@ const questions: Question[] = [
         id: "age",
         label: "Age",
         type: "number",
-        placeholder: "Enter your age",
+        placeholder: "Enter your age"
       },
       {
         id: "weight",
         label: "Weight (kg)",
         type: "number",
-        placeholder: "Enter your weight in kg",
+        placeholder: "Enter your weight in kg"
       },
       {
         id: "height",
         label: "Height (cm)",
         type: "number",
-        placeholder: "Enter your height in cm",
-      },
+        placeholder: "Enter your height in cm"
+      }
     ],
-    icon: "📋",
-  },
+    icon: "📋"
+  }
 ];
 
 export default function OnboardingPage() {
+  const user = useUserStore();
+
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<Answers>({
@@ -251,8 +286,8 @@ export default function OnboardingPage() {
     technicalData: {
       age: "",
       weight: "",
-      height: "",
-    },
+      height: ""
+    }
   });
   const [direction, setDirection] = useState<number>(0);
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
@@ -269,14 +304,21 @@ export default function OnboardingPage() {
       try {
         setIsGeneratingWorkout(true);
         await onboardingService.saveOnboardingData(apiAnswers);
+        const fetchedUser = await userService.getUserDataByMail(user.email);
+        user.setUser({
+          ...fetchedUser,
+          ...fetchedUser.user_settings,
+          ...fetchedUser.user_badges,
+          ...fetchedUser.user_goals
+        });
         const generatedWorkout = await workoutService.generateWorkout();
         setCurrentWorkout(generatedWorkout);
         navigate("/home");
-      } catch (error) {
+      } catch {
         toast({
           title: "Error saving onboarding data",
           description: `please try again`,
-          variant: "destructive",
+          variant: "destructive"
         });
         setIsGeneratingWorkout(false);
       }
@@ -294,7 +336,7 @@ export default function OnboardingPage() {
     const currentQuestionId = questions[currentQuestion].id;
     setAnswers({
       ...answers,
-      [currentQuestionId]: value,
+      [currentQuestionId]: value
     });
   };
 
@@ -312,9 +354,17 @@ export default function OnboardingPage() {
 
       setAnswers({
         ...answers,
-        fitnessGoals: updatedGoals,
+        fitnessGoals: updatedGoals
       });
     }
+
+    setAnswers({
+      ...answers,
+      fitnessGoals: {
+        ...answers.fitnessGoals,
+        [goalId]: 5
+      }
+    });
   };
 
   const handleGoalImportanceChange = (goalId: string, importance: number) => {
@@ -322,8 +372,8 @@ export default function OnboardingPage() {
       ...answers,
       fitnessGoals: {
         ...answers.fitnessGoals,
-        [goalId]: importance,
-      },
+        [goalId]: importance
+      }
     });
   };
 
@@ -335,8 +385,8 @@ export default function OnboardingPage() {
       ...answers,
       technicalData: {
         ...answers.technicalData,
-        [field]: value,
-      },
+        [field]: value
+      }
     });
   };
 
@@ -344,18 +394,18 @@ export default function OnboardingPage() {
     enter: (direction: number) => ({
       x: direction > 0 ? 300 : -300,
       opacity: 0,
-      scale: 0.9,
+      scale: 0.9
     }),
     center: {
       x: 0,
       opacity: 1,
-      scale: 1,
+      scale: 1
     },
     exit: (direction: number) => ({
       x: direction < 0 ? 300 : -300,
       opacity: 0,
-      scale: 0.9,
-    }),
+      scale: 0.9
+    })
   };
 
   const renderQuestionInput = () => {
@@ -454,47 +504,126 @@ export default function OnboardingPage() {
       }
 
       case "bodyType": {
-        const bodyTypeQuestion = question as BodyTypeQuestion;
         return (
-          <RadioGroup
-            value={answers[bodyTypeQuestion.id] as string}
-            onValueChange={handleAnswerChange}
-            className="space-y-4 mt-4"
-          >
-            {bodyTypeQuestion.options.map((option) => (
-              <Label
-                key={option.value}
-                htmlFor={option.value}
-                className="flex flex-col border border-purple-100 p-4 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer"
-                onClick={() => handleAnswerChange(option.value)}
-              >
-                <div className="flex items-center">
+          <div className="space-y-4 mt-6">
+            <RadioGroup
+              value={answers[question.id] as string}
+              onValueChange={handleAnswerChange}
+              className="space-y-4"
+            >
+              {bodyTypeOptions.map((option) => (
+                <Label
+                  key={option.value}
+                  htmlFor={option.value}
+                  className={cn(
+                    "relative flex flex-col p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-lg",
+                    `bg-gradient-to-br ${option.bgColor}`,
+                    answers[question.id] === option.value
+                      ? `${option.selectedBorder} ${option.selectedBg} shadow-md`
+                      : `${option.borderColor} hover:${option.selectedBorder}`
+                  )}
+                  onClick={() => handleAnswerChange(option.value)}
+                >
                   <RadioGroupItem
                     value={option.value}
                     id={option.value}
-                    className="mr-3"
+                    className="absolute top-4 right-4"
                   />
-                  <div className="grid gap-1 flex-1">
-                    <div className="font-medium text-purple-900">
-                      {option.label}
+
+                  <div className="pr-8">
+                    <div className="mb-3">
+                      <h3
+                        className={cn(
+                          "text-xl font-bold mb-1 transition-colors",
+                          answers[question.id] === option.value
+                            ? "text-gray-800"
+                            : "text-gray-700"
+                        )}
+                      >
+                        {option.title}
+                      </h3>
+                      <p
+                        className={cn(
+                          "text-sm font-medium transition-colors",
+                          answers[question.id] === option.value
+                            ? "text-gray-600"
+                            : "text-gray-500"
+                        )}
+                      >
+                        {option.subtitle}
+                      </p>
                     </div>
-                    <p className="text-sm text-purple-600">
+
+                    <p
+                      className={cn(
+                        "text-sm leading-relaxed mb-4 transition-colors",
+                        answers[question.id] === option.value
+                          ? "text-gray-700"
+                          : "text-gray-600"
+                      )}
+                    >
                       {option.description}
                     </p>
+
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        Key Characteristics:
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {option.characteristics.map((char, index) => (
+                          <div
+                            key={index}
+                            className={cn(
+                              "flex items-center text-xs px-2 py-1.5 rounded-full transition-colors h-6 min-h-[24px]",
+                              answers[question.id] === option.value
+                                ? "bg-white/60 text-gray-700"
+                                : "bg-white/40 text-gray-600"
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0",
+                                option.value === "slim"
+                                  ? "bg-blue-400"
+                                  : option.value === "athletic"
+                                  ? "bg-green-400"
+                                  : "bg-orange-400"
+                              )}
+                            />
+                            <span className="truncate">{char}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="mt-3 flex justify-center">
-                  <img
-                    src={option.image || "/placeholder.svg"}
-                    alt={option.label}
-                    width={100}
-                    height={50}
-                    className="rounded-lg"
-                  />
-                </div>
-              </Label>
-            ))}
-          </RadioGroup>
+
+                  {/* Selection indicator */}
+                  {answers[question.id] === option.value && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center shadow-lg"
+                    >
+                      <svg
+                        className="w-4 h-4 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </motion.div>
+                  )}
+
+                  {/* Hover effect overlay */}
+                  <div className="absolute inset-0 rounded-xl transition-opacity duration-200 pointer-events-none bg-white/0 hover:bg-white/10" />
+                </Label>
+              ))}
+            </RadioGroup>
+          </div>
         );
       }
 
@@ -593,7 +722,7 @@ export default function OnboardingPage() {
             <div
               className="h-full bg-purple-600 transition-all duration-300"
               style={{
-                width: `${(currentQuestion / (questions.length - 1)) * 100}%`,
+                width: `${(currentQuestion / (questions.length - 1)) * 100}%`
               }}
             />
           </div>
@@ -625,7 +754,7 @@ export default function OnboardingPage() {
                 type: "spring",
                 stiffness: 400,
                 damping: 35,
-                mass: 1.5,
+                mass: 1.5
               }}
               className="w-full"
             >
@@ -677,13 +806,13 @@ export default function OnboardingPage() {
                     boxShadow: [
                       "0 0 0 0 rgba(147, 51, 234, 0.2)",
                       "0 0 0 10px rgba(147, 51, 234, 0)",
-                      "0 0 0 0 rgba(147, 51, 234, 0)",
-                    ],
+                      "0 0 0 0 rgba(147, 51, 234, 0)"
+                    ]
                   }}
                   transition={{
                     duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut",
+                    ease: "easeInOut"
                   }}
                 />
                 <motion.div
@@ -692,7 +821,7 @@ export default function OnboardingPage() {
                   transition={{
                     duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "linear",
+                    ease: "linear"
                   }}
                 >
                   <div className="w-20 h-20 rounded-full border-4 border-transparent border-t-purple-600" />
@@ -700,12 +829,12 @@ export default function OnboardingPage() {
                 <motion.div
                   className="absolute inset-0 flex items-center justify-center"
                   animate={{
-                    scale: [1, 1.1, 1],
+                    scale: [1, 1.1, 1]
                   }}
                   transition={{
                     duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut",
+                    ease: "easeInOut"
                   }}
                 >
                   <Dumbbell className="h-8 w-8 text-purple-600" />
@@ -728,7 +857,7 @@ export default function OnboardingPage() {
                   animate={{ width: "100%" }}
                   transition={{
                     duration: 4.5,
-                    ease: "easeInOut",
+                    ease: "easeInOut"
                   }}
                 />
               </motion.div>
