@@ -10,19 +10,20 @@ import {
   Check,
   Coins,
   History,
-  Dumbbell
+  Dumbbell,
 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import type { FrontendBadge } from "../types";
 import { useUserStore } from "@/stores/useUserStore";
 import { userService } from "@/services/userService";
 import { badgeService } from "@/services/badgeService";
+import { useAvatarStore } from "@/stores/useAvatarStore";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -39,24 +40,33 @@ export default function ProfilePage() {
   const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
   const [allBadges, setAllBadges] = useState<FrontendBadge[]>([]);
   const [userBadges, setUserBadges] = useState<FrontendBadge[]>([]);
-  
+
   const user = useUserStore();
+
+  const { allAvatars, initializeAvatars } = useAvatarStore();
+
+  useEffect(() => {
+    initializeAvatars();
+  }, []);
+
+  // if (loading) return <p>Loading avatars...</p>;
+  // if (error) return <p>Error: {error}</p>;
 
   useEffect(() => {
     const loadBadges = async () => {
       try {
         const [all, userOwned] = await Promise.all([
           badgeService.getAllBadges(),
-          badgeService.getUserBadges()
+          badgeService.getUserBadges(),
         ]);
         setAllBadges(all); // All badges from the backend
-        
+
         setUserBadges(userOwned);
       } catch (err) {
         console.error("Failed to load badges:", err);
       }
     };
-  
+
     if (user) {
       setEditedName(user.name!);
       setEditedEmail(user.email);
@@ -74,7 +84,7 @@ export default function ProfilePage() {
         email: editedEmail,
         height: editedHeight,
         weight: editedWeight,
-        age: editedAge
+        age: editedAge,
       };
       await userService.updateUser(user.id, updatedUserData);
       user.setUser(updatedUserData);
@@ -85,7 +95,7 @@ export default function ProfilePage() {
   const changeAvatar = async (newAvatar: string) => {
     if (user) {
       const updatedUserData = {
-        avatar: newAvatar
+        avatar: newAvatar,
       };
       //TODO SAVE USER AVATAR HERE
       user.setUser(updatedUserData);
@@ -103,9 +113,9 @@ export default function ProfilePage() {
       name: badge?.name || "Unknown Badge",
       icon: badge?.icon || "❓",
       description: "Achievement unlocked for your fitness journey!",
-      earnedOn: "Recently"
+      earnedOn: "Recently",
     };
-  
+
     setSelectedBadge(badgeWithDesc);
     setBadgeDialogOpen(true);
   };
@@ -231,7 +241,7 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap justify-center">
-          {userBadges.map((badge) => (
+            {userBadges.map((badge) => (
               <motion.div
                 key={badge.id}
                 className="flex flex-col items-center w-24 m-2 cursor-pointer"
@@ -274,15 +284,17 @@ export default function ProfilePage() {
                   key={avatarId}
                   variant="outline"
                   className={`p-0 h-14 w-14 rounded-full overflow-hidden ${
-                    user?.avatar === avatar.image
+                    user?.avatar === avatar.image_url
                       ? "ring-2 ring-purple-600"
                       : ""
                   }`}
-                  onClick={() => changeAvatar(avatar.image)}
+                  onClick={() =>
+                    avatar.image_url && changeAvatar(avatar.image_url)
+                  }
                 >
                   <img
-                    src={avatar.image || "/placeholder.svg"}
-                    alt={avatar.name}
+                    src={avatar.image_url || "/placeholder.svg"}
+                    alt={avatar.name ?? undefined}
                     width={56}
                     height={56}
                     className="h-full w-full object-cover"
