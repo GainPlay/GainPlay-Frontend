@@ -25,7 +25,7 @@ export const avatarService = {
     return res.data;
   },
 
-  setCurrentAvatar: async (avatarId: number): Promise<{ success: boolean }> => {
+  setCurrentAvatar: async (avatarId: number): Promise<{ success: boolean, avatarUrl: string }> => {
     const res = await axios.post(`${API_BASE}/set-current/${avatarId}`, {});
     return res.data;
   },
