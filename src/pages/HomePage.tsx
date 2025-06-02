@@ -1026,7 +1026,7 @@ export default function HomePage() {
                 className="bg-purple-600 h-full rounded-full"
                 style={{
                   width: `${
-                    (currentExerciseIndex + 1 / exercises.length) * 100
+                    ((currentExerciseIndex + 1) / exercises.length) * 100
                   }%`
                 }}
               />
