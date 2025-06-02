@@ -72,13 +72,6 @@ export default function AuthPage() {
           if (response.data?.access_token) {
             saveTokens({ accessToken: response.data.access_token });
             setDefaultAxiosConfig();
-            // user.setUser({
-            //   ...fetchedUser,
-            //   ...fetchedUser.user_settings,
-            //   ...fetchedUser.user_badges,
-            //   ...fetchedUser.user_goals,
-            // });
-            // setUser(fetchedUser);
           }
         } else {
           if (response.status === 400) {

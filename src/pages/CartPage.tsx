@@ -109,8 +109,8 @@ export default function CartPage() {
       // User already owns this avatar, just set it as current
       try {
         setPurchasing(true);
-        await avatarService.setCurrentAvatar(avatar.id);
-        
+        const newAvatarData = await avatarService.setCurrentAvatar(avatar.id); 
+        user.setUser({avatar_url:newAvatarData.avatarUrl});
         setCurrentAvatar(avatar.id);
         
         toast({
@@ -146,7 +146,8 @@ export default function CartPage() {
         setOwnedAvatars(newOwnedAvatars);
         setCurrentAvatar(avatar.id);
 
-        user.setUser({coins: newCoins, avatar: avatar.image_url || ""});
+        await avatarService.setCurrentAvatar(avatar.id); 
+        user.setUser({coins: newCoins, avatar_url: avatar.image_url || ""});
 
         setPurchasedAvatar(avatar);
         setShowPurchaseAnimation(true);
