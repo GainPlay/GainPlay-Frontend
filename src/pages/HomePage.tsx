@@ -18,7 +18,9 @@ import {
   Dumbbell,
   FlameIcon as Fire,
   Trophy,
-  Loader2
+  Loader2,
+  X,
+  AlertTriangle,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,6 +42,7 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { Challenge, challengeService } from "@/services/challegeService";
 import { motivationalQuotes } from "@/utils/constants/motivationalQuotes";
 import { useUserStore } from "@/stores/useUserStore";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 // Convert API workout to UI format
 const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
@@ -116,6 +119,7 @@ export default function HomePage() {
   const [showExerciseComplete, setShowExerciseComplete] = useState(false);
   const [showTips, setShowTips] = useState(false);
   const [quote, setQuote] = useState("");
+  const [showQuitDialog, setShowQuitDialog] = useState(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isDailyChallengeDone, setIsDailyChallengeDone] = useState(false);
@@ -349,6 +353,16 @@ export default function HomePage() {
     }
   };
 
+  const quitWorkout = () => {
+    // Clear workout data and return to home
+    localStorage.removeItem("currentWorkout")
+    setExercises([])
+    setWorkoutStarted(false)
+    setCurrentExerciseIndex(0)
+    setRestMode(false)
+    setShowQuitDialog(false)
+  }
+  
   // Update the finishWorkout function to use the API with the current workout
   const finishWorkout = async () => {
     if (!currentWorkoutId || !originalWorkout) return;
@@ -988,6 +1002,15 @@ export default function HomePage() {
               <span className="text-sm font-medium text-purple-600">
                 {currentExerciseIndex + 1} of {exercises.length} exercises
               </span>
+              <Button
+                  onClick={() => setShowQuitDialog(true)}
+                  variant="outline"
+                  size="sm"
+                  className="h-9 w-9 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full border-red-200 hover:border-red-300"
+                  title="Exit workout"
+                >
+                  <X className="w-5 h-5 stroke-[2.5]" />
+                </Button>
             </div>
             <div className="w-full bg-purple-200 h-2 rounded-full">
               <div
@@ -1221,6 +1244,29 @@ export default function HomePage() {
           </div>
         </>
       )}
+      <Dialog open={showQuitDialog} onOpenChange={setShowQuitDialog}>
+        <DialogContent className="max-w-[280px] mx-auto rounded-2xl border-none shadow-2xl">
+          <DialogHeader className="text-center pb-2">
+            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <AlertTriangle className="h-8 w-8 text-red-500" />
+            </div>
+            <DialogTitle className="text-xl font-bold text-gray-800 mb-2">Exit Workout?</DialogTitle>
+            <DialogDescription className="text-gray-600 text-sm">Progress won't be saved</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-row gap-3 pt-4 justify-center">
+            <Button
+              variant="outline"
+              onClick={() => setShowQuitDialog(false)}
+              className="border-gray-300 hover:bg-gray-50 px-6"
+            >
+              Stay
+            </Button>
+            <Button onClick={quitWorkout} className="bg-red-500 hover:bg-red-600 text-white px-6">
+              Exit
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       {workoutStarted && !restMode && currentExercise && (
         <ExerciseAssistant exerciseName={currentExercise.name} />
       )}
