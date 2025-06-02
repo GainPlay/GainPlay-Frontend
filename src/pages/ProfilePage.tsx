@@ -24,6 +24,7 @@ import { useUserStore } from "@/stores/useUserStore";
 import { userService } from "@/services/userService";
 import { badgeService } from "@/services/badgeService";
 import { useAvatarStore } from "@/stores/useAvatarStore";
+import { avatarService } from "@/services/avatarService";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -92,13 +93,11 @@ export default function ProfilePage() {
     }
   };
 
-  const changeAvatar = async (newAvatar: string) => {
+  const changeAvatar = async (newAvatar: number) => {
     if (user) {
-      const updatedUserData = {
-        avatar: newAvatar,
-      };
-      //TODO SAVE USER AVATAR HERE
-      user.setUser(updatedUserData);
+     const newAvatarData = await avatarService.setCurrentAvatar(newAvatar);
+     if(newAvatarData.success)
+      user.setUser({avatar_url:newAvatarData.avatarUrl});
     }
   };
 
@@ -131,7 +130,7 @@ export default function ProfilePage() {
       <Card className="mb-6">
         <CardContent className="flex items-center space-x-4 pt-6">
           <img
-            src={user.avatar || "/placeholder.svg"}
+            src={user.avatar_url || "/placeholder.svg"}
             alt="User Avatar"
             width={80}
             height={80}
@@ -284,7 +283,7 @@ export default function ProfilePage() {
                   key={avatarId}
                   variant="outline"
                   className={`p-0 h-14 w-14 rounded-full overflow-hidden ${
-                    user?.avatar === avatar.image_url
+                    user?.avatar_url === avatar.image_url
                       ? "ring-2 ring-purple-600"
                       : ""
                   }`}

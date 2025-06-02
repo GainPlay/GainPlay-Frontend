@@ -218,7 +218,7 @@ export interface FrontendUserData {
   id: number;
   email: string;
   name?: string;
-  avatar?: string;
+  avatar_url?: string;
   coins?: number;
   height?: number;
   weight?: number;
