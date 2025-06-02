@@ -41,7 +41,6 @@ function App() {
       if (token) {
         const decodedToken = token ? jwtDecode<{ email: string }>(token) : null;
         const fetchedUser = await userService.getUserDataByMail(decodedToken?.email || "");
-        console.log(fetchedUser)
         user.setUser({
           ...fetchedUser,
           ...fetchedUser.user_settings,

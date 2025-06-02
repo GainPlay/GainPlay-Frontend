@@ -69,9 +69,6 @@ export default function ProfilePage() {
     };
 
     if (user) {
-      console.log('test')
-      console.log(user)
-      console.log('test')
       setEditedName(user.name!);
       setEditedEmail(user.email);
       setEditedHeight(user.height);
