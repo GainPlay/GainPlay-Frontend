@@ -44,7 +44,7 @@ export default function ProfilePage() {
 
   const user = useUserStore();
 
-  const { allAvatars, initializeAvatars } = useAvatarStore();
+  const { initializeAvatars } = useAvatarStore();
 
   useEffect(() => {
     initializeAvatars();
