@@ -169,7 +169,7 @@ export default function HomePage() {
 
   useEffect(() => {
     
-    const userAvatar = user.avatar;
+    const userAvatar = user.avatar_url;
     const userCoins = user.coins;
     const userLevel = user.level;
     const userStreak = user.streak;
