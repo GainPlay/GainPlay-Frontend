@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   Clock,
   Zap,
-  Star,
   BarChart,
   Calendar,
   Dumbbell,
@@ -20,7 +19,7 @@ import {
   Trophy,
   Loader2,
   X,
-  AlertTriangle,
+  AlertTriangle
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion, AnimatePresence } from "framer-motion";
@@ -42,7 +41,13 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { Challenge, challengeService } from "@/services/challegeService";
 import { motivationalQuotes } from "@/utils/constants/motivationalQuotes";
 import { useUserStore } from "@/stores/useUserStore";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
 
 // Convert API workout to UI format
 const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
@@ -119,7 +124,7 @@ export default function HomePage() {
   const [showExerciseComplete, setShowExerciseComplete] = useState(false);
   const [showTips, setShowTips] = useState(false);
   const [quote, setQuote] = useState("");
-  const [showQuitDialog, setShowQuitDialog] = useState(false)
+  const [showQuitDialog, setShowQuitDialog] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isDailyChallengeDone, setIsDailyChallengeDone] = useState(false);
@@ -172,7 +177,6 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    
     const userAvatar = user.avatar_url;
     const userCoins = user.coins;
     const userLevel = user.level;
@@ -184,7 +188,6 @@ export default function HomePage() {
     if (userStreak) setStreak(userStreak);
 
     getNewQuote();
-  
   }, []);
 
   const getNewQuote = () => {
@@ -212,13 +215,20 @@ export default function HomePage() {
   const handleRepsChange = (increment: boolean) => {
     if (currentExerciseIndex >= exercises.length) return;
 
+    console.log("Current Exercise Index:", currentExerciseIndex);
+
+    const updatedExercise = exercises[currentExerciseIndex];
+    updatedExercise.currentReps = Math.max(
+      0,
+      increment
+        ? updatedExercise.currentReps + 1
+        : updatedExercise.currentReps - 1
+    );
+
     setExercises((prevExercises) => {
       const newExercises = [...prevExercises];
-      const exercise = newExercises[currentExerciseIndex];
-      exercise.currentReps = Math.max(
-        0,
-        increment ? exercise.currentReps + 1 : exercise.currentReps - 1
-      );
+      newExercises[currentExerciseIndex] = updatedExercise;
+
       return newExercises;
     });
   };
@@ -355,13 +365,13 @@ export default function HomePage() {
 
   const quitWorkout = () => {
     // Clear workout data and return to home
-    localStorage.removeItem("currentWorkout")
-    setExercises([])
-    setWorkoutStarted(false)
-    setCurrentExerciseIndex(0)
-    setRestMode(false)
-    setShowQuitDialog(false)
-  }
+    localStorage.removeItem("currentWorkout");
+    setExercises([]);
+    setWorkoutStarted(false);
+    setCurrentExerciseIndex(0);
+    setRestMode(false);
+    setShowQuitDialog(false);
+  };
 
   // Update the finishWorkout function to use the API with the current workout
   const finishWorkout = async () => {
@@ -398,23 +408,22 @@ export default function HomePage() {
       // Update streak
       const newStreak = streak + 1;
       setStreak(newStreak);
-      user.setUser({streak: newStreak});
+      user.setUser({ streak: newStreak });
 
       // Update coins
-      const newCoins =
-        coins + (user.coins ?? 0);
+      const newCoins = coins + (user.coins ?? 0);
       setCoins(newCoins);
       setEarnedCoins(coins);
-      
+
       // Update experience and level
-      const currentXP = (user.experience || 0);
+      const currentXP = user.experience || 0;
       const newTotalXP = currentXP + experience_earned;
       setEarnedXP(experience_earned);
-      user.setUser({experience: newTotalXP});
+      user.setUser({ experience: newTotalXP });
       const newLevel = Math.floor(newTotalXP / 100) + 1;
       if (newLevel > level) {
         setLevel(newLevel);
-      user.setUser({level: newLevel});
+        user.setUser({ level: newLevel });
       }
 
       if (newBadges && Array.isArray(newBadges) && newBadges.length > 0) {
@@ -1003,20 +1012,22 @@ export default function HomePage() {
                 {currentExerciseIndex + 1} of {exercises.length} exercises
               </span>
               <Button
-                  onClick={() => setShowQuitDialog(true)}
-                  variant="outline"
-                  size="sm"
-                  className="h-9 w-9 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full border-red-200 hover:border-red-300"
-                  title="Exit workout"
-                >
-                  <X className="w-5 h-5 stroke-[2.5]" />
-                </Button>
+                onClick={() => setShowQuitDialog(true)}
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full border-red-200 hover:border-red-300"
+                title="Exit workout"
+              >
+                <X className="w-5 h-5 stroke-[2.5]" />
+              </Button>
             </div>
             <div className="w-full bg-purple-200 h-2 rounded-full">
               <div
                 className="bg-purple-600 h-full rounded-full"
                 style={{
-                  width: `${(currentExerciseIndex / exercises.length) * 100}%`
+                  width: `${
+                    ((currentExerciseIndex + 1) / exercises.length) * 100
+                  }%`
                 }}
               />
             </div>
@@ -1244,8 +1255,12 @@ export default function HomePage() {
             <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
-            <DialogTitle className="text-xl font-bold text-gray-800 mb-2">Exit Workout?</DialogTitle>
-            <DialogDescription className="text-gray-600 text-sm">Progress won't be saved</DialogDescription>
+            <DialogTitle className="text-xl font-bold text-gray-800 mb-2">
+              Exit Workout?
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 text-sm">
+              Progress won't be saved
+            </DialogDescription>
           </DialogHeader>
           <div className="flex flex-row gap-3 pt-4 justify-center">
             <Button
@@ -1255,7 +1270,10 @@ export default function HomePage() {
             >
               Resume
             </Button>
-            <Button onClick={quitWorkout} className="bg-red-500 hover:bg-red-600 text-white px-6">
+            <Button
+              onClick={quitWorkout}
+              className="bg-red-500 hover:bg-red-600 text-white px-6"
+            >
               Exit
             </Button>
           </div>

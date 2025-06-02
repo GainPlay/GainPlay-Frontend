@@ -163,14 +163,14 @@ export enum DifficultyLevel {
   BEGINNER = 1,
   INTERMEDIATE,
   ADVANCED,
-  EXPERT,
+  EXPERT
 }
 
 export const difficultyMap: Record<DifficultyLevel, ExerciseDifficulty> = {
   [DifficultyLevel.BEGINNER]: "beginner",
   [DifficultyLevel.INTERMEDIATE]: "intermediate",
   [DifficultyLevel.ADVANCED]: "advanced",
-  [DifficultyLevel.EXPERT]: "expert",
+  [DifficultyLevel.EXPERT]: "expert"
 };
 
 // Add a frontend-specific type for the workout UI
@@ -213,7 +213,7 @@ export enum FriendshipStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
   BLOCKED = "blocked",
-  NONE = "none",
+  NONE = "none"
 }
 export interface FrontendUserData {
   id: number;
@@ -226,6 +226,7 @@ export interface FrontendUserData {
   streak?: number;
   age?: number;
   experience?: number;
+  finished_onboarding: boolean;
   level?: number;
   status?: FriendshipStatus;
   user_settings?: UserSettings;

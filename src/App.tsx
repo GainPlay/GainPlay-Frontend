@@ -40,7 +40,9 @@ function App() {
 
       if (token) {
         const decodedToken = token ? jwtDecode<{ email: string }>(token) : null;
-        const fetchedUser = await userService.getUserDataByMail(decodedToken?.email || "");
+        const fetchedUser = await userService.getUserDataByMail(
+          decodedToken?.email || ""
+        );
         user.setUser({
           ...fetchedUser,
           ...fetchedUser.user_settings,
@@ -51,6 +53,10 @@ function App() {
         console.log("User data fetched and stored in Zustand:");
         console.log(user);
         console.log("User data fetched and stored in Zustand:");
+
+        if (!fetchedUser.finished_onboarding) {
+          navigate("/onboarding");
+        }
       }
     };
 
