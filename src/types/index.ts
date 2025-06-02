@@ -145,11 +145,13 @@ export interface WorkoutHistoryItem {
   date: string;
   exercises: {
     name: string;
-    sets: { completed: boolean; reps: number }[];
+    sets: { completed: boolean; completedReps:number; reps: number }[];
     totalReps: number;
     xpEarned?: number;
   }[];
 }
+
+
 
 export type ExerciseDifficulty =
   | "beginner"

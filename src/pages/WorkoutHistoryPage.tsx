@@ -49,15 +49,9 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover";
 import { workoutService } from "@/services/workoutService";
+import { WorkoutHistoryItem } from "@/types";
 
-type WorkoutHistoryItem = {
-  date: string;
-  exercises: {
-    name: string;
-    sets: { completed: boolean; reps: number }[];
-    totalReps: number;
-  }[];
-};
+
 
 export default function WorkoutHistoryPage() {
   const navigate = useNavigate();
@@ -845,7 +839,7 @@ export default function WorkoutHistoryPage() {
                                   Set {setIndex + 1}
                                 </div>
                                 <div className="text-sm font-semibold">
-                                  {set.reps}
+                                  {set.completedReps}
                                 </div>
                               </div>
                             ))}
