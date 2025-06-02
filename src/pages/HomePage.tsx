@@ -362,7 +362,7 @@ export default function HomePage() {
     setRestMode(false)
     setShowQuitDialog(false)
   }
-  
+
   // Update the finishWorkout function to use the API with the current workout
   const finishWorkout = async () => {
     if (!currentWorkoutId || !originalWorkout) return;
@@ -1259,7 +1259,7 @@ export default function HomePage() {
               onClick={() => setShowQuitDialog(false)}
               className="border-gray-300 hover:bg-gray-50 px-6"
             >
-              Stay
+              Resume
             </Button>
             <Button onClick={quitWorkout} className="bg-red-500 hover:bg-red-600 text-white px-6">
               Exit
