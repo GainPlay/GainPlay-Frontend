@@ -14,6 +14,7 @@ export const useUserStore = create<UserData>((set) => ({
   name: "",
   email: "",
   isLoggedIn: false,
+  finished_onboarding: false,
   setUser: (user: Partial<FrontendUserData>) => set(() => ({ ...user })),
   logout: () =>
     set(() => ({
@@ -25,6 +26,7 @@ export const useUserStore = create<UserData>((set) => ({
       coins: 0,
       level: 0,
       experience: 0,
-      created_at: null
+      created_at: null,
+      finished_onboarding: false
     }))
 }));
