@@ -181,7 +181,6 @@ export interface WorkoutUIExercise {
   instruction: string;
   difficulty: ExerciseDifficulty;
   muscleGroup: string;
-  xpReward: number;
   sets: Array<{ id?: number; completed: boolean; reps: number }>;
   currentSet: number;
   currentReps: number;
