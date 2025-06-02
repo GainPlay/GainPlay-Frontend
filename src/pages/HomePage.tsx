@@ -1056,12 +1056,6 @@ export default function HomePage() {
                     <CardTitle className="text-xl font-bold text-purple-800">
                       {currentExercise.name}
                     </CardTitle>
-                    <div className="flex items-center bg-purple-100 px-2 py-1 rounded-full">
-                      <Star className="w-4 h-4 mr-1 text-yellow-500" />
-                      <span className="text-sm font-medium text-purple-700">
-                        {currentExercise.xpReward} XP
-                      </span>
-                    </div>
                   </div>
                   <p className="text-sm text-purple-600">
                     {currentExercise.muscleGroup}
