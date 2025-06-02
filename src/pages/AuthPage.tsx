@@ -72,6 +72,10 @@ export default function AuthPage() {
           if (response.data?.access_token) {
             saveTokens({ accessToken: response.data.access_token });
             setDefaultAxiosConfig();
+            user.setUser({
+              email,
+              name: username,
+            });
           }
         } else {
           if (response.status === 400) {
