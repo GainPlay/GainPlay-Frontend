@@ -44,7 +44,7 @@ export default function ProfilePage() {
 
   const user = useUserStore();
 
-  const { allAvatars, initializeAvatars } = useAvatarStore();
+  const { initializeAvatars } = useAvatarStore();
 
   useEffect(() => {
     initializeAvatars();
@@ -69,6 +69,9 @@ export default function ProfilePage() {
     };
 
     if (user) {
+      console.log('test')
+      console.log(user)
+      console.log('test')
       setEditedName(user.name!);
       setEditedEmail(user.email);
       setEditedHeight(user.height);

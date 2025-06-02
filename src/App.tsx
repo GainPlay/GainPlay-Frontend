@@ -16,19 +16,46 @@ import {
   setDefaultAxiosConfig
 } from "./services/authService";
 import AuthCallback from "@/pages/AuthCallback";
+import { jwtDecode } from "jwt-decode";
+import { ACCESS_TOKEN_KEY } from "./utils/constants";
+import { useUserStore } from "./stores/useUserStore";
+import { userService } from "./services/userService";
 
 function App() {
   const navigate = useNavigate();
   const access_token = getValidAccessToken();
+  const user = useUserStore();
 
   useEffect(() => {
-    if (!access_token) {
-      navigate("/");
-    }
+    const fetchUserData = async () => {
+      if (!access_token) {
+        navigate("/");
+      }
 
-    if (access_token && location.pathname === "/") {
-      navigate("/home");
-    }
+      if (access_token && location.pathname === "/") {
+        navigate("/home");
+      }
+
+      const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+
+      if (token) {
+        const decodedToken = token ? jwtDecode<{ email: string }>(token) : null;
+        const fetchedUser = await userService.getUserDataByMail(decodedToken?.email || "");
+        console.log(fetchedUser)
+        user.setUser({
+          ...fetchedUser,
+          ...fetchedUser.user_settings,
+          ...fetchedUser.user_badges,
+          ...fetchedUser.user_goals
+        });
+
+        console.log("User data fetched and stored in Zustand:");
+        console.log(user);
+        console.log("User data fetched and stored in Zustand:");
+      }
+    };
+
+    fetchUserData();
   }, [location, access_token]);
 
   setDefaultAxiosConfig();
