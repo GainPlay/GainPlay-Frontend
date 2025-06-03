@@ -6,18 +6,20 @@ import {
   saveTokens,
   setDefaultAxiosConfig,
   signin,
-  signup
+  signup,
 } from "@/services/authService";
 import { userService } from "@/services/userService";
 import { useUserStore } from "@/stores/useUserStore";
 import { motion } from "framer-motion";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const user = useUserStore();
   const setUser = useUserStore((state) => state.setUser);
+  const [signinError, setSigninError] = useState<string | null>(null);
+  const [signupError, setSignupError] = useState<string | null>(null);
 
   const handleLogin = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,7 +40,7 @@ export default function AuthPage() {
             ...fetchedUser,
             ...fetchedUser.user_settings,
             ...fetchedUser.user_badges,
-            ...fetchedUser.user_goals
+            ...fetchedUser.user_goals,
           });
           setUser(fetchedUser);
           navigate("/home");
@@ -46,10 +48,18 @@ export default function AuthPage() {
           if (response.status === 400) {
             console.log(response.data.error);
           }
+          setSigninError(
+            response.data.error ||
+              "Invalid email or password. Please try again."
+          );
+
           throw new Error(response.data.error || "Signin failed");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Signin error:", error);
+        setSigninError(
+          "Failed to sign in. Please check your credentials or try again later."
+        );
       }
     },
     [navigate]
@@ -74,7 +84,7 @@ export default function AuthPage() {
             setDefaultAxiosConfig();
             user.setUser({
               email,
-              name: username
+              name: username,
             });
           }
         } else {
@@ -83,11 +93,17 @@ export default function AuthPage() {
           }
 
           console.log(response.data.error);
+          setSignupError(
+            response.data.error ||
+              "Signup failed. Please check your input and try again."
+          );
+
           throw new Error(response.data.error || "Signup failed");
         }
         navigate("/onboarding");
-      } catch (error) {
+      } catch (error: any) {
         console.error("Signup error:", error);
+        setSignupError("Signup failed. Please try again later.");
       }
     },
     [navigate]
@@ -105,12 +121,12 @@ export default function AuthPage() {
         <motion.div
           animate={{
             y: [0, -15, 0],
-            opacity: [0.3, 0.5, 0.3]
+            opacity: [0.3, 0.5, 0.3],
           }}
           transition={{
             duration: 5,
             repeat: Number.POSITIVE_INFINITY,
-            repeatType: "reverse"
+            repeatType: "reverse",
           }}
           className="absolute top-1/3 left-1/4 w-16 h-16 rounded-full bg-purple-400 opacity-30 blur-xl"
         ></motion.div>
@@ -118,12 +134,12 @@ export default function AuthPage() {
         <motion.div
           animate={{
             y: [0, 20, 0],
-            opacity: [0.2, 0.4, 0.2]
+            opacity: [0.2, 0.4, 0.2],
           }}
           transition={{
             duration: 7,
             repeat: Number.POSITIVE_INFINITY,
-            repeatType: "reverse"
+            repeatType: "reverse",
           }}
           className="absolute bottom-1/4 right-1/3 w-20 h-20 rounded-full bg-indigo-400 opacity-20 blur-xl"
         ></motion.div>
@@ -180,6 +196,11 @@ export default function AuthPage() {
             </TabsTrigger>
           </TabsList>
 
+          {signupError && (
+            <div className="text-red-600 bg-red-100 rounded p-2 text-sm">
+              {signupError}
+            </div>
+          )}
           <TabsContent
             value="signin"
             className="p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg"
@@ -242,7 +263,11 @@ export default function AuthPage() {
                   Sign In
                 </Button>
               </div>
-
+              {signinError && (
+                <div className="text-red-600 bg-red-100 rounded p-2 text-sm">
+                  {signinError}
+                </div>
+              )}
               <div className="relative flex items-center justify-center mt-4">
                 <div className="border-t border-gray-300 absolute w-full"></div>
                 <div className="bg-white px-4 relative text-sm text-gray-500">
@@ -352,7 +377,6 @@ export default function AuthPage() {
                 </div>
               </div>
             </form>
-
             <div className="mt-4">
               <GoogleSignInButton buttonText={"Sign up with Google"} />
             </div>
