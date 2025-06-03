@@ -7,7 +7,7 @@ export const headers = () => {
   const tokens = getTokens();
   if (tokens.accessToken) {
     return {
-      Authorization: `Bearer ${tokens.accessToken}`
+      Authorization: `Bearer ${tokens.accessToken}`,
     };
   }
   return {};
@@ -15,7 +15,7 @@ export const headers = () => {
 
 export const getTokens = () => {
   return {
-    accessToken: localStorage.getItem(ACCESS_TOKEN_KEY)
+    accessToken: localStorage.getItem(ACCESS_TOKEN_KEY),
   };
 };
 
@@ -58,11 +58,13 @@ export const signup = async (
   email: string,
   password: string
 ): Promise<AxiosResponse<SignupResponse>> => {
+  // try {
   return await axios.post("/auth/register", {
     name: username,
     email,
-    password
+    password,
   });
+  // } catch (error) {}
 };
 
 export const googleSignIn = () => {
