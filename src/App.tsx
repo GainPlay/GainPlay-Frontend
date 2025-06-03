@@ -3,7 +3,6 @@ import AuthCallback from "@/pages/AuthCallback";
 import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
-import Navigation from "./components/Navigation";
 import { Toaster } from "./components/ui/toaster";
 import AuthPage from "./pages/AuthPage";
 import CartPage from "./pages/CartPage";
@@ -80,10 +79,6 @@ function App() {
           <Route path="/user-profile/:id" element={<UserProfilePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        {/* Conditionally render Navigation based on the current route */}
-        {/* {location.pathname !== "/" && location.pathname !== "/onboarding" && (
-          <Navigation />
-        )} */}
         <Toaster />
       </div>
     </>
