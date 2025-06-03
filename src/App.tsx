@@ -1,4 +1,6 @@
 // import { useEffect, useState } from "react";
+import AuthCallback from "@/pages/AuthCallback";
+import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import Navigation from "./components/Navigation";
@@ -13,13 +15,11 @@ import UserProfilePage from "./pages/UserProfilePage";
 import WorkoutHistoryPage from "./pages/WorkoutHistoryPage";
 import {
   getValidAccessToken,
-  setDefaultAxiosConfig
+  setDefaultAxiosConfig,
 } from "./services/authService";
-import AuthCallback from "@/pages/AuthCallback";
-import { jwtDecode } from "jwt-decode";
-import { ACCESS_TOKEN_KEY } from "./utils/constants";
-import { useUserStore } from "./stores/useUserStore";
 import { userService } from "./services/userService";
+import { useUserStore } from "./stores/useUserStore";
+import { ACCESS_TOKEN_KEY } from "./utils/constants";
 
 function App() {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ function App() {
           ...fetchedUser,
           ...fetchedUser.user_settings,
           ...fetchedUser.user_badges,
-          ...fetchedUser.user_goals
+          ...fetchedUser.user_goals,
         });
 
         console.log("User data fetched and stored in Zustand:");
@@ -81,9 +81,9 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         {/* Conditionally render Navigation based on the current route */}
-        {location.pathname !== "/" && location.pathname !== "/onboarding" && (
+        {/* {location.pathname !== "/" && location.pathname !== "/onboarding" && (
           <Navigation />
-        )}
+        )} */}
         <Toaster />
       </div>
     </>

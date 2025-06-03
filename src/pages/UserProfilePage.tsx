@@ -1,3 +1,4 @@
+import Navigation from "@/components/Navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -130,161 +131,166 @@ export default function UserProfilePage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
-      <header className="flex items-center mb-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/friends")}
-          className="mr-2 p-2"
+    <>
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
+        <header className="flex items-center mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/friends")}
+            className="mr-2 p-2"
+          >
+            <ArrowLeft className="w-6 h-6 text-purple-600" />
+          </Button>
+          <h1 className="text-2xl font-bold text-purple-800">User Profile</h1>
+        </header>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
         >
-          <ArrowLeft className="w-6 h-6 text-purple-600" />
-        </Button>
-        <h1 className="text-2xl font-bold text-purple-800">User Profile</h1>
-      </header>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Card className="mb-6 overflow-hidden">
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 flex flex-col items-center">
-            <div className="relative mb-4">
-              <Avatar className="h-24 w-24 border-4 border-white">
-                <AvatarImage
-                  src={user.avatar || "/placeholder.svg"}
-                  alt={user.name}
-                />
-                <AvatarFallback className="bg-purple-200 text-purple-700 text-2xl">
-                  {user.name?.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="absolute -bottom-2 -right-2 bg-white text-purple-600 text-sm font-bold rounded-full h-8 w-8 flex items-center justify-center border-2 border-purple-600">
-                {user.level}
+          <Card className="mb-6 overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 flex flex-col items-center">
+              <div className="relative mb-4">
+                <Avatar className="h-24 w-24 border-4 border-white">
+                  <AvatarImage
+                    src={user.avatar || "/placeholder.svg"}
+                    alt={user.name}
+                  />
+                  <AvatarFallback className="bg-purple-200 text-purple-700 text-2xl">
+                    {user.name?.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="absolute -bottom-2 -right-2 bg-white text-purple-600 text-sm font-bold rounded-full h-8 w-8 flex items-center justify-center border-2 border-purple-600">
+                  {user.level}
+                </div>
               </div>
+              <h2 className="text-2xl font-bold text-white mb-1">
+                {user.name}
+              </h2>
+              <p className="text-purple-200">{user.email}</p>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-1">{user.name}</h2>
-            <p className="text-purple-200">{user.email}</p>
-          </div>
 
-          <CardContent className="p-6">
-            <div className="flex justify-center space-x-2 mb-6">
-              {!friendship && (
-                <Button
-                  onClick={() => handleFriendAction("add")}
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Add Friend
-                </Button>
-              )}
-
-              {friendship?.status === FriendshipStatus.PENDING &&
-                (friendship.user_id === 1 ? ( // Replace with actual user ID from context or state
+            <CardContent className="p-6">
+              <div className="flex justify-center space-x-2 mb-6">
+                {!friendship && (
                   <Button
-                    variant="outline"
-                    className="border-purple-200 text-purple-700"
-                    disabled
+                    onClick={() => handleFriendAction("add")}
+                    className="bg-purple-600 hover:bg-purple-700"
                   >
-                    <Check className="w-4 h-4 mr-2" />
-                    Request Sent
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Add Friend
                   </Button>
-                ) : (
-                  <div className="flex space-x-2">
+                )}
+
+                {friendship?.status === FriendshipStatus.PENDING &&
+                  (friendship.user_id === 1 ? ( // Replace with actual user ID from context or state
                     <Button
-                      onClick={() => handleFriendAction("reject")}
                       variant="outline"
-                      className="border-red-200 text-red-600 hover:bg-red-50"
-                    >
-                      <X className="w-4 h-4 mr-2" />
-                      Reject
-                    </Button>
-                    <Button
-                      onClick={() => handleFriendAction("accept")}
-                      className="bg-green-600 hover:bg-green-700"
+                      className="border-purple-200 text-purple-700"
+                      disabled
                     >
                       <Check className="w-4 h-4 mr-2" />
-                      Accept
+                      Request Sent
                     </Button>
-                  </div>
-                ))}
-
-              {friendship?.status === FriendshipStatus.ACCEPTED && (
-                <Button
-                  onClick={() => handleFriendAction("remove")}
-                  variant="outline"
-                  className="border-red-200 text-red-600 hover:bg-red-50"
-                >
-                  <UserX className="w-4 h-4 mr-2" />
-                  Remove Friend
-                </Button>
-              )}
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-purple-800 mb-3 flex items-center">
-                  <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
-                  Fitness Goals
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {user.user_goals?.map((goal: UserGoal, index: number) => (
-                    <Badge
-                      key={index}
-                      className="bg-purple-100 text-purple-700 px-3 py-1.5"
-                    >
-                      {goal.goals.name}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-purple-800 mb-3">
-                  Achievements
-                </h3>
-                <div className="grid grid-cols-3 gap-4">
-                  {allBadges?.slice(0, 3).map((badge) => (
-                    <div
-                      key={badge.id}
-                      className="flex flex-col items-center text-center"
-                    >
-                      <div className="text-4xl mb-1">{badge.icon}</div>
-                      <div className="text-sm">{badge.name}</div>
+                  ) : (
+                    <div className="flex space-x-2">
+                      <Button
+                        onClick={() => handleFriendAction("reject")}
+                        variant="outline"
+                        className="border-red-200 text-red-600 hover:bg-red-50"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Reject
+                      </Button>
+                      <Button
+                        onClick={() => handleFriendAction("accept")}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <Check className="w-4 h-4 mr-2" />
+                        Accept
+                      </Button>
                     </div>
                   ))}
-                </div>
+
+                {friendship?.status === FriendshipStatus.ACCEPTED && (
+                  <Button
+                    onClick={() => handleFriendAction("remove")}
+                    variant="outline"
+                    className="border-red-200 text-red-600 hover:bg-red-50"
+                  >
+                    <UserX className="w-4 h-4 mr-2" />
+                    Remove Friend
+                  </Button>
+                )}
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-purple-800 mb-3">
-                  Stats
-                </h3>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="bg-purple-50 p-3 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-700">
-                      {Math.floor(Math.random() * 30) + 1}
-                    </div>
-                    <div className="text-xs text-purple-600">Workouts</div>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-3 flex items-center">
+                    <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
+                    Fitness Goals
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {user.user_goals?.map((goal: UserGoal, index: number) => (
+                      <Badge
+                        key={index}
+                        className="bg-purple-100 text-purple-700 px-3 py-1.5"
+                      >
+                        {goal.goals.name}
+                      </Badge>
+                    ))}
                   </div>
-                  <div className="bg-purple-50 p-3 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-700">
-                      {Math.floor(Math.random() * 20) + 1}
-                    </div>
-                    <div className="text-xs text-purple-600">Day Streak</div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                    Achievements
+                  </h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    {allBadges?.slice(0, 3).map((badge) => (
+                      <div
+                        key={badge.id}
+                        className="flex flex-col items-center text-center"
+                      >
+                        <div className="text-4xl mb-1">{badge.icon}</div>
+                        <div className="text-sm">{badge.name}</div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="bg-purple-50 p-3 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-700">
-                      {user.level}
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                    Stats
+                  </h3>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="bg-purple-50 p-3 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-700">
+                        {Math.floor(Math.random() * 30) + 1}
+                      </div>
+                      <div className="text-xs text-purple-600">Workouts</div>
                     </div>
-                    <div className="text-xs text-purple-600">Level</div>
+                    <div className="bg-purple-50 p-3 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-700">
+                        {Math.floor(Math.random() * 20) + 1}
+                      </div>
+                      <div className="text-xs text-purple-600">Day Streak</div>
+                    </div>
+                    <div className="bg-purple-50 p-3 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-700">
+                        {user.level}
+                      </div>
+                      <div className="text-xs text-purple-600">Level</div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+      <Navigation />
+    </>
   );
 }
