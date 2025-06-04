@@ -1,4 +1,4 @@
-import { FrontendUserData } from "@/types";
+import { FrontendUserData, HealthInsightResponse } from "@/types";
 import axios from "axios";
 
 export const userService = {
@@ -21,4 +21,8 @@ export const userService = {
   ): Promise<FrontendUserData> => {
     return (await axios.patch(`/user-settings/user/${userId}`, settings)).data;
   },
+
+  getUserInsights: async (userId: number): Promise<HealthInsightResponse> => {
+    return (await axios.get(`/user-goals/user/${userId}/insights`)).data;
+  }
 };
