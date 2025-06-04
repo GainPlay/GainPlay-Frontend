@@ -92,8 +92,15 @@ export default function FriendsPage() {
               Discover
             </TabsTrigger>
             <TabsTrigger value="my-friends" className="data-[state=active]:bg-white rounded-md">
-              <UserCheck className="w-4 h-4 mr-2" />
-              My Friends
+              <span className="flex items-center">
+                <UserCheck className="w-4 h-4 mr-2" />
+                My Friends
+                {myFriends.length > 0 && (
+                  <span className="ml-1.5 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {myFriends.length}
+                  </span>
+                )}
+              </span>
             </TabsTrigger>
             <TabsTrigger value="requests" className="data-[state=active]:bg-white rounded-md relative">
               <span className="flex items-center">

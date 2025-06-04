@@ -20,11 +20,9 @@ export const mapFriendshipsToFrontend = (
       name: otherUser.name,
       avatar: otherUser.avatar_url,
       email: otherUser.email,
-      goals:
-        otherUser.user_goals.map((userGoal: UserGoal) => userGoal.goals.name) ||
-        [],
+      goals: otherUser.user_goals.map((userGoal: UserGoal) => userGoal.goals.name) || [],
       level: otherUser.level,
-      status: friendship.status as FriendshipStatus
+      status: friendship.status as FriendshipStatus,
     };
 
     if (friendship.status === "accepted") {
