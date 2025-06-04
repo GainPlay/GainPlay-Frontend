@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, ArrowRight, ArrowLeft, Dumbbell } from "lucide-react";
+import { CheckCircle2, ArrowRight, ArrowLeft, Dumbbell, Star, Clock, Target, Activity, User, LucideIcon } from "lucide-react";
 import { mapSurveyValuesToApi } from "@/utils/surveyMap";
 import { onboardingService } from "@/services/onboardingService";
 import { toast } from "@/hooks/use-toast";
@@ -30,6 +30,8 @@ type Option = {
   label: string;
   description: string;
   image?: string;
+  icon?: string;
+  color?: string;
 };
 
 type Field = {
@@ -42,13 +44,16 @@ type Field = {
 type GoalOption = {
   id: string;
   label: string;
+  icon?: string;
+  color?: string;
 };
 
 interface BaseQuestion {
   id: keyof Answers;
   question: string;
   description: string;
-  icon: string;
+  icon: LucideIcon;
+  gradient?: string;
 }
 
 interface RadioQuestion extends BaseQuestion {
@@ -65,7 +70,7 @@ interface BodyTypeQuestion extends BaseQuestion {
   question: string;
   description: string;
   type: "bodyType";
-  icon: string;
+  icon: LucideIcon;
 }
 
 interface TechnicalDataQuestion extends BaseQuestion {
@@ -79,7 +84,7 @@ type Question =
   | BodyTypeQuestion
   | TechnicalDataQuestion;
   
-  type TechnicalData = {
+type TechnicalData = {
   age: string;
   weight: string;
   height: string;
@@ -174,36 +179,46 @@ const questions: Question[] = [
         placeholder: "Enter your height in cm"
       }
     ],
-    icon: "📋"
+    icon: User,
+    gradient: "from-rose-500 to-pink-600"
   },
   {
     id: "fitnessLevel",
     question: "What's your current fitness level?",
-    description: "Be honest about where you are today",
+    description: "Be honest about where you are today - this helps us create the perfect starting point",
     type: "radio",
     options: [
       {
         value: "beginner",
         label: "Beginner",
-        description: "New to fitness or returning after a long break"
+        description: "New to fitness or returning after a long break",
+        icon: "🌱",
+        color: "from-green-500 to-emerald-600",
       },
       {
         value: "intermediate",
         label: "Intermediate",
-        description: "Exercise regularly with some experience"
+        description: "Exercise regularly with some experience",
+        icon: "💪",
+        color: "from-blue-500 to-cyan-600",
       },
       {
         value: "advanced",
         label: "Advanced",
-        description: "Consistent training with good knowledge"
+        description: "Consistent training with good knowledge",
+        icon: "🏋️",
+        color: "from-purple-500 to-indigo-600",
       },
       {
         value: "expert",
         label: "Expert",
-        description: "Highly trained with extensive experience"
-      }
+        description: "Highly trained with extensive experience",
+        icon: "🏆",
+        color: "from-amber-500 to-orange-600",
+      },
     ],
-    icon: "📊"
+    icon: Activity,
+    gradient: "from-blue-500 to-purple-600",
   },
   {
     id: "fitnessGoals",
@@ -211,64 +226,105 @@ const questions: Question[] = [
     description: "Select all that apply and rate their importance to you",
     type: "multiGoal",
     options: [
-      { id: "loseWeight", label: "Lose Weight" },
-      { id: "gainMuscle", label: "Gain Muscle" },
-      { id: "improveEndurance", label: "Improve Endurance" },
-      { id: "increaseStrength", label: "Increase Strength" },
-      { id: "improveFlexibility", label: "Improve Flexibility" },
-      { id: "maintainHealth", label: "Maintain Health" }
+      { id: "loseWeight", label: "Lose Weight", icon: "⚖️", color: "from-red-400 to-pink-500" },
+      { id: "gainMuscle", label: "Gain Muscle", icon: "💪", color: "from-blue-500 to-indigo-600" },
+      { id: "improveEndurance", label: "Improve Endurance", icon: "🏃", color: "from-green-500 to-emerald-600" },
+      { id: "increaseStrength", label: "Increase Strength", icon: "🏋️", color: "from-purple-500 to-violet-600" },
+      { id: "improveFlexibility", label: "Improve Flexibility", icon: "🧘", color: "from-teal-500 to-cyan-600" },
+      { id: "maintainHealth", label: "Maintain Health", icon: "❤️", color: "from-rose-500 to-pink-600" },
     ],
-    icon: "🎯"
+    icon: Target,
+    gradient: "from-purple-500 to-pink-600",
   },
   {
     id: "workoutFrequency",
     question: "How often can you commit to working out?",
-    description: "Select your realistic weekly workout frequency",
+    description: "Select your realistic weekly workout frequency - consistency beats intensity",
     type: "radio",
     options: [
       {
         value: "1-2",
         label: "1-2 times per week",
-        description: "Getting started"
+        description: "Perfect for getting started and building habits",
+        icon: "🌟",
+        color: "from-green-400 to-emerald-500",
       },
       {
         value: "3-4",
         label: "3-4 times per week",
-        description: "Consistent routine"
+        description: "Great balance for consistent progress",
+        icon: "⚡",
+        color: "from-blue-500 to-cyan-600",
       },
       {
         value: "5-6",
         label: "5-6 times per week",
-        description: "Dedicated schedule"
+        description: "Dedicated schedule for serious results",
+        icon: "🔥",
+        color: "from-purple-500 to-indigo-600",
       },
-      { value: "daily", label: "Daily", description: "Full commitment" }
+      {
+        value: "daily",
+        label: "Daily",
+        description: "Full commitment to your fitness journey",
+        icon: "💎",
+        color: "from-amber-500 to-orange-600",
+      },
     ],
-    icon: "📅"
+    icon: Clock,
+    gradient: "from-emerald-500 to-teal-600",
   },
   {
     id: "workoutDuration",
     question: "How long can you workout each session?",
-    description: "Be realistic about your available time",
+    description: "Be realistic about your available time - we'll make every minute count",
     type: "radio",
     options: [
-      { value: "15min", label: "15 minutes", description: "Quick sessions" },
-      { value: "30min", label: "30 minutes", description: "Standard sessions" },
-      { value: "45min", label: "45 minutes", description: "Extended sessions" },
-      { value: "60min", label: "60 minutes", description: "Full sessions" },
+      {
+        value: "15min",
+        label: "15 minutes",
+        description: "Quick, efficient sessions that fit any schedule",
+        icon: "⚡",
+        color: "from-yellow-400 to-amber-500",
+      },
+      {
+        value: "30min",
+        label: "30 minutes",
+        description: "Perfect balance of time and effectiveness",
+        icon: "⏰",
+        color: "from-green-500 to-emerald-600",
+      },
+      {
+        value: "45min",
+        label: "45 minutes",
+        description: "Extended sessions for comprehensive training",
+        icon: "🎯",
+        color: "from-blue-500 to-cyan-600",
+      },
+      {
+        value: "60min",
+        label: "60 minutes",
+        description: "Full sessions for maximum results",
+        icon: "💪",
+        color: "from-purple-500 to-indigo-600",
+      },
       {
         value: "90min",
         label: "90+ minutes",
-        description: "Extended training"
-      }
+        description: "Extended training for serious athletes",
+        icon: "🏆",
+        color: "from-orange-500 to-red-600",
+      },
     ],
-    icon: "⏱️"
+    icon: Clock,
+    gradient: "from-cyan-500 to-blue-600",
   },
   {
     id: "bodyStructure",
     question: "Which body type best represents you?",
     description: "Select the body structure that most closely matches yours",
     type: "bodyType",
-    icon: "👤"
+    icon: User
   },
 ];
 
@@ -356,15 +412,16 @@ export default function OnboardingPage() {
         ...answers,
         fitnessGoals: updatedGoals
       });
+    } else {
+      setAnswers({
+        ...answers,
+        fitnessGoals: {
+          ...answers.fitnessGoals,
+          [goalId]: 5
+        }
+      });
+      console.log("new answers", answers.fitnessGoals)
     }
-
-    setAnswers({
-      ...answers,
-      fitnessGoals: {
-        ...answers.fitnessGoals,
-        [goalId]: 5
-      }
-    });
   };
 
   const handleGoalImportanceChange = (goalId: string, importance: number) => {
@@ -394,7 +451,7 @@ export default function OnboardingPage() {
     enter: (direction: number) => ({
       x: direction > 0 ? 300 : -300,
       opacity: 0,
-      scale: 0.9
+      scale: 0.95
     }),
     center: {
       x: 0,
@@ -404,7 +461,7 @@ export default function OnboardingPage() {
     exit: (direction: number) => ({
       x: direction < 0 ? 300 : -300,
       opacity: 0,
-      scale: 0.9
+      scale: 0.95
     })
   };
 
@@ -415,36 +472,66 @@ export default function OnboardingPage() {
       case "radio": {
         const radioQuestion = question as RadioQuestion;
         return (
-          <RadioGroup
-            value={answers[radioQuestion.id] as string}
-            onValueChange={handleAnswerChange}
-            className="space-y-3 mt-4"
-          >
-            {radioQuestion.options.map((option) => (
-              <Label
+          <div className="space-y-4 mt-6">
+            {radioQuestion.options.map((option, index) => (
+              <motion.div
                 key={option.value}
-                htmlFor={option.value}
-                className="flex items-center border border-purple-100 p-3 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer"
-                onClick={() => handleAnswerChange(option.value)}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.3 }}
               >
-                <div className="flex items-center">
-                  <RadioGroupItem
-                    value={option.value}
-                    id={option.value}
-                    className="mr-3"
+                <Label
+                  htmlFor={option.value}
+                  className={`group relative flex items-center border-2 rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-purple-100 ${
+                    answers[radioQuestion.id] === option.value
+                      ? "border-purple-400 bg-gradient-to-r from-purple-50 to-indigo-50 shadow-md"
+                      : "border-gray-200 bg-white hover:border-purple-200"
+                  }`}
+                  onClick={() => handleAnswerChange(option.value)}
+                >
+                  <div
+                    className="absolute inset-0 rounded-2xl bg-gradient-to-r opacity-0 group-hover:opacity-5 transition-opacity duration-300"
+                    style={{
+                      backgroundImage: option.color ? `linear-gradient(135deg, ${option.color.split(" ")[1]}, ${option.color.split(" ")[3]})` : '',
+                    }}
                   />
-                </div>
-                <div className="grid gap-1 flex-1">
-                  <div className="font-medium text-purple-900">
-                    {option.label}
+
+                  <div className="flex items-center w-full relative z-10">
+                    <div className="flex items-center mr-4">
+                      <RadioGroup value={answers[radioQuestion.id] as string} className="flex">
+                        <RadioGroupItem
+                          value={option.value}
+                          id={option.value}
+                          className={`w-5 h-5 ${answers[radioQuestion.id] === option.value ? "border-purple-500 text-purple-600" : ""}`}
+                        />
+                      </RadioGroup>
+                    </div>
+
+                    {option.color && (
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 bg-gradient-to-br ${option.color} shadow-sm`}
+                      >
+                        <span className="text-2xl">{option.icon}</span>
+                      </div>
+                    )}
+
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-900 mb-1">{option.label}</div>
+                      <p className="text-sm text-gray-600 leading-relaxed">{option.description}</p>
+                    </div>
+
+                    {answers[radioQuestion.id] === option.value && (
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="ml-4">
+                        <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                          <CheckCircle2 className="w-5 h-5 text-white" />
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
-                  <p className="text-sm text-purple-600">
-                    {option.description}
-                  </p>
-                </div>
-              </Label>
+                </Label>
+              </motion.div>
             ))}
-          </RadioGroup>
+          </div>
         );
       }
 
@@ -502,7 +589,6 @@ export default function OnboardingPage() {
           </div>
         );
       }
-
       case "bodyType": {
         return (
           <div className="space-y-4 mt-6">
@@ -627,7 +713,7 @@ export default function OnboardingPage() {
         );
       }
 
-case "technicalData": {
+      case "technicalData": {
         return (
           <div className="space-y-8 mt-6">
             {/* Age Input */}
@@ -936,142 +1022,185 @@ case "technicalData": {
     return false;
   };
 
+  const currentQuestionData = questions[currentQuestion];
+  const IconComponent = currentQuestionData.icon;
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[100dvh] px-4 py-6 bg-gradient-to-b from-purple-50 to-purple-200">
-      <div className="w-full max-w-md mb-8">
+    <div className="flex flex-col items-center justify-center min-h-[100dvh] px-4 py-6 bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md mb-8">
         <img
           src="/GainPlay.png"
           alt="GainPlay Logo"
-          width={120}
-          height={120}
-          className="mx-auto mb-4"
+          width={100}
+          height={100}
+          className="mx-auto mb-6"
         />
-        <h1 className="text-3xl font-bold text-center text-purple-800">
-          Let's Personalize Your Experience
-        </h1>
-        <p className="text-center text-purple-600 mt-2">
-          Help us understand your fitness goals
-        </p>
-      </div>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Let's Personalize Your Experience</h1>
+          <p className="text-gray-600">Help us understand your fitness goals and create the perfect plan for you</p>
+        </div>
+      </motion.div>
 
-      {/* Stepper */}
-      <div className="w-full max-w-md mb-8">
-        <div className="flex items-center justify-between relative">
-          {questions.map((_, index) => (
-            <div key={index} className="flex flex-col items-center z-10">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  index < currentQuestion
-                    ? "bg-purple-600 text-white"
-                    : index === currentQuestion
-                    ? "bg-purple-600 text-white ring-4 ring-purple-200"
-                    : "bg-purple-200 text-purple-400"
-                }`}
+      {/* Enhanced Progress Stepper */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md mb-8"
+      >
+        <div className="relative">
+          <div className="flex items-center justify-between relative z-10">
+            {questions.map((_, index) => (
+              <motion.div
+                key={index}
+                className="flex flex-col items-center"
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: index * 0.1 }}
               >
-                {index < currentQuestion ? (
-                  <CheckCircle2 className="w-5 h-5" />
-                ) : (
-                  <span>{index + 1}</span>
-                )}
-              </div>
-            </div>
-          ))}
-          {/* Connecting lines */}
-          <div className="absolute top-4 left-0 right-0 h-0.5 bg-purple-200">
-            <div
-              className="h-full bg-purple-600 transition-all duration-300"
-              style={{
-                width: `${(currentQuestion / (questions.length - 1)) * 100}%`
-              }}
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    index < currentQuestion
+                      ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg"
+                      : index === currentQuestion
+                        ? `bg-gradient-to-r ${currentQuestionData.gradient} text-white ring-4 ring-purple-200 shadow-lg`
+                        : "bg-gray-200 text-gray-400"
+                  }`}
+                >
+                  {index < currentQuestion ? (
+                    <CheckCircle2 className="w-5 h-5" />
+                  ) : index === currentQuestion ? (
+                    <IconComponent className="w-5 h-5" />
+                  ) : (
+                    <span className="text-sm font-medium">{index + 1}</span>
+                  )}
+                </div>
+                <div className="mt-2 text-xs text-center">
+                  <div className={`font-medium ${index <= currentQuestion ? "text-gray-700" : "text-gray-400"}`}>
+                    Step {index + 1}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Progress Line */}
+          <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 -z-10">
+            <motion.div
+              className={`h-full bg-gradient-to-r ${currentQuestionData.gradient} rounded-full`}
+              initial={{ width: "0%" }}
+              animate={{ width: `${(currentQuestion / (questions.length - 1)) * 100}%` }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
             />
           </div>
         </div>
-      </div>
 
-      <Card className="w-full max-w-md shadow-lg border-purple-200">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-center text-4xl mb-2">
-            {questions[currentQuestion].icon}
+        {/* Progress Percentage */}
+        <div className="mt-4 text-center">
+          <div className="text-sm text-gray-600">
+            Progress:{" "}
+            <span className="font-semibold text-purple-600">
+              {Math.round(((currentQuestion + 1) / questions.length) * 100)}%
+            </span>
           </div>
-          <CardTitle className="text-2xl font-bold text-center text-purple-800">
-            {questions[currentQuestion].question}
-          </CardTitle>
-          <CardDescription className="text-center text-purple-600">
-            {questions[currentQuestion].description}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <AnimatePresence custom={direction} mode="wait">
+        </div>
+      </motion.div>
+
+      {/* Question Card */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
+        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="pb-4 text-center">
             <motion.div
-              key={currentQuestion}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{
-                type: "spring",
-                stiffness: 400,
-                damping: 35,
-                mass: 1.5
-              }}
-              className="w-full"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r ${currentQuestionData.gradient} flex items-center justify-center shadow-lg`}
             >
-              {renderQuestionInput()}
-
-              <div className="flex justify-between gap-4 mt-8">
-                <Button
-                  onClick={handlePrevious}
-                  variant="outline"
-                  disabled={currentQuestion === 0}
-                  className="flex-1"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
-                </Button>
-                <Button
-                  onClick={handleNext}
-                  className="bg-purple-600 hover:bg-purple-700 flex-1"
-                  disabled={isNextDisabled()}
-                >
-                  {currentQuestion < questions.length - 1 ? (
-                    <>
-                      Next
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </>
-                  ) : (
-                    "Finish"
-                  )}
-                </Button>
-              </div>
+              <IconComponent className="w-8 h-8 text-white" />
             </motion.div>
-          </AnimatePresence>
-        </CardContent>
-      </Card>
 
+            <CardTitle className="text-2xl font-bold text-gray-900 leading-tight">
+              {currentQuestionData.question}
+            </CardTitle>
+            <CardDescription className="text-gray-600 leading-relaxed mt-2">
+              {currentQuestionData.description}
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="pt-2">
+            <AnimatePresence custom={direction} mode="wait">
+              <motion.div
+                key={currentQuestion}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="w-full"
+              >
+                {renderQuestionInput()}
+
+                {/* Navigation Buttons */}
+                <div className="flex justify-between gap-4 mt-8">
+                  <Button
+                    onClick={handlePrevious}
+                    variant="outline"
+                    disabled={currentQuestion === 0}
+                    className="flex-1 h-12 border-2 border-gray-200 hover:border-gray-300 disabled:opacity-50"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                  </Button>
+                  <Button
+                    onClick={handleNext}
+                    disabled={isNextDisabled()}
+                    className={`flex-1 h-12 bg-gradient-to-r ${currentQuestionData.gradient} hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:transform-none`}
+                  >
+                    {currentQuestion < questions.length - 1 ? (
+                      <>
+                        Next
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </>
+                    ) : (
+                      <>
+                        Create My Plan
+                        <Star className="w-4 h-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Loading Animation */}
       {isGeneratingWorkout && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="bg-white p-8 rounded-2xl shadow-lg max-w-sm w-[90%] mx-auto"
+            className="bg-white p-8 rounded-3xl shadow-2xl max-w-sm w-[90%] mx-auto"
           >
             <div className="flex flex-col items-center">
+              {/* Animated Loading Icon */}
               <div className="relative mb-6">
                 <motion.div
                   className="w-20 h-20 rounded-full border-4 border-purple-100"
                   animate={{
                     boxShadow: [
-                      "0 0 0 0 rgba(147, 51, 234, 0.2)",
-                      "0 0 0 10px rgba(147, 51, 234, 0)",
-                      "0 0 0 0 rgba(147, 51, 234, 0)"
-                    ]
+                      "0 0 0 0 rgba(147, 51, 234, 0.3)",
+                      "0 0 0 20px rgba(147, 51, 234, 0)",
+                      "0 0 0 0 rgba(147, 51, 234, 0)",
+                    ],
                   }}
                   transition={{
                     duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                 />
                 <motion.div
@@ -1080,56 +1209,66 @@ case "technicalData": {
                   transition={{
                     duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "linear"
+                    ease: "linear",
                   }}
                 >
-                  <div className="w-20 h-20 rounded-full border-4 border-transparent border-t-purple-600" />
+                  <div className="w-20 h-20 rounded-full border-4 border-transparent border-t-purple-600 border-r-purple-400" />
                 </motion.div>
                 <motion.div
                   className="absolute inset-0 flex items-center justify-center"
                   animate={{
-                    scale: [1, 1.1, 1]
+                    scale: [1, 1.1, 1],
                   }}
                   transition={{
                     duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                 >
                   <Dumbbell className="h-8 w-8 text-purple-600" />
                 </motion.div>
               </div>
-              <h3 className="text-xl font-bold text-purple-800 mb-2">
-                Creating your workout plan
-              </h3>
-              <p className="text-purple-600 text-sm text-center">
-                Personalizing exercises based on your goals
+
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Creating Your Perfect Plan</h3>
+              <p className="text-gray-600 text-center mb-6 leading-relaxed">
+                Analyzing your goals and personalizing exercises just for you...
               </p>
 
-              <motion.div
-                className="w-full mt-4 h-1.5 bg-purple-100 rounded-full overflow-hidden"
-                initial={{ width: "100%" }}
-              >
+              {/* Enhanced Progress Bar */}
+              <div className="w-full">
                 <motion.div
-                  className="h-full bg-purple-600 rounded-full"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{
-                    duration: 4.5,
-                    ease: "easeInOut"
-                  }}
-                />
-              </motion.div>
+                  className="w-full h-2 bg-gray-100 rounded-full overflow-hidden"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 rounded-full"
+                    initial={{ width: "0%", x: "-100%" }}
+                    animate={{
+                      width: "100%",
+                      x: "0%",
+                      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                    }}
+                    transition={{
+                      width: { duration: 4.5, ease: "easeInOut" },
+                      backgroundPosition: { duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" },
+                    }}
+                    style={{
+                      backgroundSize: "200% 200%",
+                    }}
+                  />
+                </motion.div>
+
+                <div className="flex justify-between text-xs text-gray-500 mt-2">
+                  <span>Analyzing preferences...</span>
+                  <span>Almost ready!</span>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
       )}
-
-      <div className="mt-8 text-center text-purple-600">
-        <p>
-          Question {currentQuestion + 1} of {questions.length}
-        </p>
-      </div>
     </div>
   );
 }

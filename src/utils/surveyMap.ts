@@ -8,7 +8,7 @@ export const mapSurveyValuesToApi = (
     beginner: 1,
     intermediate: 2,
     advanced: 3,
-    expert: 4
+    expert: 4,
   };
 
   // Map fitness goals to goal IDs
@@ -18,7 +18,7 @@ export const mapSurveyValuesToApi = (
     improveEndurance: 3,
     increaseStrength: 4,
     improveFlexibility: 5,
-    maintainHealth: 6
+    maintainHealth: 6,
   };
 
   // Map workout frequency to number
@@ -26,7 +26,7 @@ export const mapSurveyValuesToApi = (
     "1-2": 2,
     "3-4": 4,
     "5-6": 6,
-    daily: 7
+    daily: 7,
   };
 
   // Map workout duration to minutes
@@ -35,28 +35,28 @@ export const mapSurveyValuesToApi = (
     "30min": 30,
     "45min": 45,
     "60min": 60,
-    "90min": 90
+    "90min": 90,
   };
 
-  // Transform fitness goals from keys to IDs
-  const mappedGoals: Record<string, number> = {};
+  // Transform fitness goals from keys to IDs - FIXED VERSION
+  const mappedGoals: Record<number, number> = {}; // Changed from Record<string, number> to Record<number, number>
   Object.entries(values.fitnessGoals).forEach(([key, value]) => {
     const goalId = fitnessGoalsMap[key];
-    if (goalId) {
-      mappedGoals[goalId] = value;
+    if (goalId && value !== undefined) {
+      mappedGoals[goalId] = value; // Now using goalId (number) as key instead of string
     }
   });
 
   return {
     fitnessLevel: fitnessLevelMap[values.fitnessLevel] || 1,
-    fitnessGoals: mappedGoals,
+    fitnessGoals: mappedGoals, // This will now have numeric keys like { 1: 5, 2: 8 }
     workoutFrequency: workoutFrequencyMap[values.workoutFrequency] || 3,
     workoutDuration: workoutDurationMap[values.workoutDuration] || 30,
     bodyStructure: values.bodyStructure,
     technicalData: {
       age: parseInt(values.technicalData.age) || 0,
       weight: parseInt(values.technicalData.weight) || 0,
-      height: parseInt(values.technicalData.height) || 0
-    }
+      height: parseInt(values.technicalData.height) || 0,
+    },
   };
 };
