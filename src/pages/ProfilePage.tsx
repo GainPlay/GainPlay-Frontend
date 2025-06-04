@@ -543,9 +543,6 @@ export default function ProfilePage() {
                     <div className="text-sm font-medium text-center text-amber-800 mt-2 w-full truncate">
                       {badge.name}
                     </div>
-                    <div className="text-xs text-amber-600 mt-0.5">
-                      Click to view
-                    </div>
                   </motion.div>
                 ))}
               </div>
