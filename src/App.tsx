@@ -12,10 +12,7 @@ import OnboardingPage from "./pages/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import WorkoutHistoryPage from "./pages/WorkoutHistoryPage";
-import {
-  getValidAccessToken,
-  setDefaultAxiosConfig,
-} from "./services/authService";
+import { getValidAccessToken, setDefaultAxiosConfig } from "./services/authService";
 import { userService } from "./services/userService";
 import { useUserStore } from "./stores/useUserStore";
 import { ACCESS_TOKEN_KEY } from "./utils/constants";
@@ -40,19 +37,13 @@ function App() {
 
       if (token) {
         const decodedToken = token ? jwtDecode<{ email: string }>(token) : null;
-        const fetchedUser = await userService.getUserDataByMail(
-          decodedToken?.email || ""
-        );
+        const fetchedUser = await userService.getUserDataByMail(decodedToken?.email || "");
         user.setUser({
           ...fetchedUser,
           ...fetchedUser.user_settings,
           ...fetchedUser.user_badges,
           ...fetchedUser.user_goals,
         });
-
-        console.log("User data fetched and stored in Zustand:");
-        console.log(user);
-        console.log("User data fetched and stored in Zustand:");
 
         if (!fetchedUser.finished_onboarding) {
           navigate("/onboarding");

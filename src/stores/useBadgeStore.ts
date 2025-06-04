@@ -24,7 +24,6 @@ export const useBadgeStore = create<BadgeStore>()(
       set({ loading: true, error: null });
       try {
         const response = await fetch("/api/badges");
-        console.log({ response });
         if (!response.ok) {
           throw new Error("Failed to fetch badges");
         }
