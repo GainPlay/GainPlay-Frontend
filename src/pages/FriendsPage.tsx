@@ -6,17 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Search,
-  Filter,
-  Users,
-  ArrowLeft,
-  X,
-  UserCheck,
-  ChevronDown,
-  ChevronUp,
-  ChevronRight,
-} from "lucide-react";
+import { Search, Filter, Users, ArrowLeft, X, UserCheck, ChevronDown, ChevronUp, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { FrontendUserData } from "@/types";
@@ -24,6 +14,7 @@ import { friendsService } from "@/services/friendsService";
 import { mapFriendshipsToFrontend } from "@/utils/friendshipsUtils";
 import { allGoals } from "@/utils/constants/friendships.consts";
 import Navigation from "@/components/Navigation";
+import { useUserStore } from "@/stores/useUserStore";
 
 export default function FriendsPage() {
   const navigate = useNavigate();
@@ -36,21 +27,14 @@ export default function FriendsPage() {
 
   const [myFriends, setMyFriends] = useState<FrontendUserData[]>([]);
   const [pendingRequest, setPendingRequest] = useState<FrontendUserData[]>([]);
-  const [allDiscoverableUsers, setAllDiscoverableUsers] = useState<
-    FrontendUserData[]
-  >([]);
-  const [filteredDiscoverableUsers, setFilteredDiscoverableUsers] = useState<
-    FrontendUserData[]
-  >([]);
+  const [allDiscoverableUsers, setAllDiscoverableUsers] = useState<FrontendUserData[]>([]);
+  const [filteredDiscoverableUsers, setFilteredDiscoverableUsers] = useState<FrontendUserData[]>([]);
+  const user = useUserStore();
 
   useEffect(() => {
     const getFriendsData = async (): Promise<void> => {
-      const currentUserId = 1; // Replace with actual user ID from context or state
       const fetchedFriendships = await friendsService.getFriends();
-      const { friends, pendingReceived } = mapFriendshipsToFrontend(
-        fetchedFriendships,
-        currentUserId
-      );
+      const { friends, pendingReceived } = mapFriendshipsToFrontend(fetchedFriendships, user.id);
       setMyFriends(friends);
       setPendingRequest(pendingReceived);
       const fetchedDiscoverFriends = await friendsService.getDiscover();
@@ -65,17 +49,11 @@ export default function FriendsPage() {
 
   const handleSearch = (): void => {
     const filtered = allDiscoverableUsers.filter((friend) => {
-      const nameMatch = friend.name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const emailMatch = friend.email
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase());
+      const nameMatch = friend.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      const emailMatch = friend.email?.toLowerCase().includes(searchTerm.toLowerCase());
       const goalsMatch =
         selectedGoals.length === 0 ||
-        selectedGoals.some((goal) =>
-          friend.user_goals?.some((userGoal) => userGoal.goals.name === goal)
-        );
+        selectedGoals.some((goal) => friend.user_goals?.some((userGoal) => userGoal.goals.name === goal));
       return (nameMatch || emailMatch) && goalsMatch;
     });
 
@@ -84,9 +62,7 @@ export default function FriendsPage() {
   };
 
   const handleGoalToggle = (goal: string): void => {
-    setSelectedGoals((prev) =>
-      prev.includes(goal) ? prev.filter((g) => g !== goal) : [...prev, goal]
-    );
+    setSelectedGoals((prev) => (prev.includes(goal) ? prev.filter((g) => g !== goal) : [...prev, goal]));
   };
 
   const clearFilters = (): void => {
@@ -102,11 +78,7 @@ export default function FriendsPage() {
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
         <header className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/home")}
-              className="mr-2 p-2"
-            >
+            <Button variant="ghost" onClick={() => navigate("/home")} className="mr-2 p-2">
               <ArrowLeft className="w-6 h-6 text-purple-600" />
             </Button>
             <h1 className="text-2xl font-bold text-purple-800">Friends</h1>
@@ -115,24 +87,15 @@ export default function FriendsPage() {
 
         <Tabs defaultValue="discover" className="mb-6">
           <TabsList className="grid grid-cols-3 w-full bg-purple-50 p-1">
-            <TabsTrigger
-              value="discover"
-              className="data-[state=active]:bg-white rounded-md"
-            >
+            <TabsTrigger value="discover" className="data-[state=active]:bg-white rounded-md">
               <Users className="w-4 h-4 mr-2" />
               Discover
             </TabsTrigger>
-            <TabsTrigger
-              value="my-friends"
-              className="data-[state=active]:bg-white rounded-md"
-            >
+            <TabsTrigger value="my-friends" className="data-[state=active]:bg-white rounded-md">
               <UserCheck className="w-4 h-4 mr-2" />
               My Friends
             </TabsTrigger>
-            <TabsTrigger
-              value="requests"
-              className="data-[state=active]:bg-white rounded-md relative"
-            >
+            <TabsTrigger value="requests" className="data-[state=active]:bg-white rounded-md relative">
               <span className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -205,20 +168,11 @@ export default function FriendsPage() {
                 >
                   <Filter className="w-4 h-4 mr-2" />
                   Filter by Goals
-                  {showFilters ? (
-                    <ChevronUp className="ml-2 w-4 h-4" />
-                  ) : (
-                    <ChevronDown className="ml-2 w-4 h-4" />
-                  )}
+                  {showFilters ? <ChevronUp className="ml-2 w-4 h-4" /> : <ChevronDown className="ml-2 w-4 h-4" />}
                 </Button>
 
                 {selectedGoals.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFilters}
-                    className="text-purple-600"
-                  >
+                  <Button variant="ghost" size="sm" onClick={clearFilters} className="text-purple-600">
                     Clear filters
                   </Button>
                 )}
@@ -247,9 +201,7 @@ export default function FriendsPage() {
                             )}
                             onClick={() => handleGoalToggle(goal)}
                           >
-                            {selectedGoals.includes(goal) && (
-                              <X className="w-3.5 h-3.5 mr-1.5" />
-                            )}
+                            {selectedGoals.includes(goal) && <X className="w-3.5 h-3.5 mr-1.5" />}
                             {goal}
                           </motion.div>
                         ))}
@@ -284,16 +236,11 @@ export default function FriendsPage() {
                   className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-sm"
                 >
                   <Users className="w-16 h-16 text-purple-200 mb-4" />
-                  <h3 className="text-lg font-semibold text-purple-800 mb-2">
-                    No Users Found
-                  </h3>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-2">No Users Found</h3>
                   <p className="text-purple-600 text-center mb-4">
                     We couldn't find anyone matching your search criteria.
                   </p>
-                  <Button
-                    onClick={clearFilters}
-                    className="bg-purple-600 hover:bg-purple-700"
-                  >
+                  <Button onClick={clearFilters} className="bg-purple-600 hover:bg-purple-700">
                     Clear Filters
                   </Button>
                 </motion.div>
@@ -315,10 +262,7 @@ export default function FriendsPage() {
                           <div className="flex items-center">
                             <div className="relative">
                               <Avatar className="h-14 w-14 border-2 border-purple-100">
-                                <AvatarImage
-                                  src={friend.avatar || "/placeholder.svg"}
-                                  alt={friend.name}
-                                />
+                                <AvatarImage src={friend.avatar_url || "/placeholder.svg"} alt={friend.name} />
                                 <AvatarFallback className="bg-purple-200 text-purple-700">
                                   {(friend?.name ?? "?").charAt(0)}
                                 </AvatarFallback>
@@ -329,23 +273,19 @@ export default function FriendsPage() {
                             </div>
                             <div className="ml-4 flex-grow">
                               <div className="flex items-center justify-between">
-                                <h2 className="font-semibold text-purple-900">
-                                  {friend.name}
-                                </h2>
+                                <h2 className="font-semibold text-purple-900">{friend.name}</h2>
                                 <ChevronRight className="h-5 w-5 text-purple-400" />
                               </div>
                               <div className="flex flex-wrap gap-1 mt-1">
-                                {friend.user_goals
-                                  ?.slice(0, 1)
-                                  .map((goal, index) => (
-                                    <Badge
-                                      key={index}
-                                      variant="outline"
-                                      className="bg-purple-50 text-purple-700 border-purple-200 text-xs"
-                                    >
-                                      {goal.goals.name}
-                                    </Badge>
-                                  ))}
+                                {friend.user_goals?.slice(0, 1).map((goal, index) => (
+                                  <Badge
+                                    key={index}
+                                    variant="outline"
+                                    className="bg-purple-50 text-purple-700 border-purple-200 text-xs"
+                                  >
+                                    {goal.goals.name}
+                                  </Badge>
+                                ))}
                                 {(friend.user_goals?.length ?? 0) > 1 && (
                                   <Badge
                                     variant="outline"
@@ -385,10 +325,7 @@ export default function FriendsPage() {
                           <div className="flex items-center">
                             <div className="relative">
                               <Avatar className="h-14 w-14 border-2 border-green-100">
-                                <AvatarImage
-                                  src={friend.avatar || "/placeholder.svg"}
-                                  alt={friend.name}
-                                />
+                                <AvatarImage src={friend.avatar_url || "/placeholder.svg"} alt={friend.name} />
                                 <AvatarFallback className="bg-green-200 text-green-700">
                                   {(friend?.name ?? "?").charAt(0)}
                                 </AvatarFallback>
@@ -399,23 +336,19 @@ export default function FriendsPage() {
                             </div>
                             <div className="ml-4 flex-grow">
                               <div className="flex items-center justify-between">
-                                <h2 className="font-semibold text-purple-900">
-                                  {friend.name}
-                                </h2>
+                                <h2 className="font-semibold text-purple-900">{friend.name}</h2>
                                 <ChevronRight className="h-5 w-5 text-purple-400" />
                               </div>
                               <div className="flex flex-wrap gap-1 mt-1">
-                                {friend.user_goals
-                                  ?.slice(0, 1)
-                                  .map((goal, index) => (
-                                    <Badge
-                                      key={index}
-                                      variant="outline"
-                                      className="bg-green-50 text-green-700 border-green-200 text-xs"
-                                    >
-                                      {goal.goals.name}
-                                    </Badge>
-                                  ))}
+                                {friend.user_goals?.slice(0, 1).map((goal, index) => (
+                                  <Badge
+                                    key={index}
+                                    variant="outline"
+                                    className="bg-green-50 text-green-700 border-green-200 text-xs"
+                                  >
+                                    {goal.goals.name}
+                                  </Badge>
+                                ))}
                                 {(friend.user_goals?.length ?? 0) > 1 && (
                                   <Badge
                                     variant="outline"
@@ -435,16 +368,11 @@ export default function FriendsPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-sm">
                   <Users className="w-16 h-16 text-purple-200 mb-4" />
-                  <h3 className="text-lg font-semibold text-purple-800 mb-2">
-                    No Friends Yet
-                  </h3>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-2">No Friends Yet</h3>
                   <p className="text-purple-600 text-center mb-4">
-                    You haven't added any friends yet. Discover and connect with
-                    other users!
+                    You haven't added any friends yet. Discover and connect with other users!
                   </p>
-                  <Button className="bg-purple-600 hover:bg-purple-700">
-                    Find Friends
-                  </Button>
+                  <Button className="bg-purple-600 hover:bg-purple-700">Find Friends</Button>
                 </div>
               )}
             </div>
@@ -470,10 +398,7 @@ export default function FriendsPage() {
                           <div className="flex items-center">
                             <div className="relative">
                               <Avatar className="h-14 w-14 border-2 border-amber-100">
-                                <AvatarImage
-                                  src={friend.avatar || "/placeholder.svg"}
-                                  alt={friend.name}
-                                />
+                                <AvatarImage src={friend.avatar_url || "/placeholder.svg"} alt={friend.name} />
                                 <AvatarFallback className="bg-amber-200 text-amber-700">
                                   {(friend?.name ?? "?").charAt(0)}
                                 </AvatarFallback>
@@ -484,14 +409,10 @@ export default function FriendsPage() {
                             </div>
                             <div className="ml-4 flex-grow">
                               <div className="flex items-center justify-between">
-                                <h2 className="font-semibold text-purple-900">
-                                  {friend.name}
-                                </h2>
+                                <h2 className="font-semibold text-purple-900">{friend.name}</h2>
                                 <ChevronRight className="h-5 w-5 text-purple-400" />
                               </div>
-                              <p className="text-xs text-amber-600 mt-1">
-                                Wants to connect with you
-                              </p>
+                              <p className="text-xs text-amber-600 mt-1">Wants to connect with you</p>
                             </div>
                           </div>
                         </div>
@@ -516,9 +437,7 @@ export default function FriendsPage() {
                     <path d="M15 8h6" />
                     <path d="M18 5v6" />
                   </svg>
-                  <h3 className="text-lg font-semibold text-purple-800 mb-2">
-                    No Friend Requests
-                  </h3>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-2">No Friend Requests</h3>
                   <p className="text-purple-600 text-center mb-4">
                     You don't have any pending friend requests at the moment.
                   </p>

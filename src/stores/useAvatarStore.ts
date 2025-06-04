@@ -26,9 +26,7 @@ export const useAvatarStore = create<AvatarStore>()(
         const response = await fetch("/api/avatars");
 
         if (!response.ok) {
-          throw new Error(
-            `Failed to fetch avatars: ${response.status} ${response.statusText}`
-          );
+          throw new Error(`Failed to fetch avatars: ${response.status} ${response.statusText}`);
         }
 
         const contentType = response.headers.get("content-type") || "";
@@ -41,8 +39,6 @@ export const useAvatarStore = create<AvatarStore>()(
         }
 
         const data: Avatar[] = await response.json();
-        console.log("Fetched avatars:", data);
-
         set({ allAvatars: data, loading: false });
       } catch (err: any) {
         console.error("Error fetching avatars:", err);
