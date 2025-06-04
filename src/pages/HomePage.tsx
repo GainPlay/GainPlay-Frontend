@@ -20,6 +20,8 @@ import {
   Loader2,
   X,
   AlertTriangle,
+  Play,
+  Pause,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion, AnimatePresence } from "framer-motion";
@@ -120,6 +122,7 @@ export default function HomePage() {
   >([]);
   const [restMode, setRestMode] = useState(false);
   const [restTimeRemaining, setRestTimeRemaining] = useState(0);
+  const [isRestPaused, setIsRestPaused] = useState(false)
   const [level, setLevel] = useState(1);
   const [streak, setStreak] = useState(0);
   const [showExerciseComplete, setShowExerciseComplete] = useState(false);
@@ -198,7 +201,7 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    if (restMode && restTimeRemaining > 0) {
+    if (restMode && restTimeRemaining > 0 && !isRestPaused) {
       timerRef.current = setTimeout(() => {
         setRestTimeRemaining((prev) => prev - 1);
       }, 1000);
@@ -211,7 +214,7 @@ export default function HomePage() {
         clearTimeout(timerRef.current);
       }
     };
-  }, [restMode, restTimeRemaining]);
+  }, [restMode, restTimeRemaining, isRestPaused]);
 
   const handleRepsChange = (increment: boolean) => {
     if (currentExerciseIndex >= exercises.length) return;
@@ -325,12 +328,14 @@ export default function HomePage() {
           if (currentExerciseIndex < exercises.length - 1) {
             setRestMode(true);
             setRestTimeRemaining(exercise.restTime);
+            setIsRestPaused(false)
           }
         }, 500);
       } else {
         // Start rest timer between sets
         setRestMode(true);
         setRestTimeRemaining(exercise.restTime);
+        setIsRestPaused(false)
       }
     } catch (err) {
       console.error("Error submitting set:", err);
@@ -356,6 +361,7 @@ export default function HomePage() {
 
   const skipRest = () => {
     setRestMode(false);
+    setIsRestPaused(false)
     if (
       exercises[currentExerciseIndex].currentSet >=
       exercises[currentExerciseIndex].targetSets
@@ -364,6 +370,10 @@ export default function HomePage() {
     }
   };
 
+  const toggleRestPause = () => {
+    setIsRestPaused(!isRestPaused)
+  }
+
   const quitWorkout = () => {
     // Clear workout data and return to home
     localStorage.removeItem("currentWorkout");
@@ -371,6 +381,7 @@ export default function HomePage() {
     setWorkoutStarted(false);
     setCurrentExerciseIndex(0);
     setRestMode(false);
+    setIsRestPaused(false)
     setShowQuitDialog(false);
   };
 
@@ -966,53 +977,164 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </>
-        ) : restMode ? (
-          <Card className="mb-6">
-            <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", duration: 0.5 }}
-                className="w-full"
-              >
-                <Clock className="w-16 h-16 text-purple-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-purple-800 mb-2">
-                  Rest Time
-                </h2>
-                <p className="text-purple-600 mb-2">
-                  Take a breather before the next{" "}
-                  {currentExercise.currentSet >= currentExercise.targetSets
-                    ? "exercise"
-                    : "set"}
-                </p>
+) : restMode ? (
+  <div className="flex items-center justify-center min-h-[60vh] px-4">
+    <motion.div
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: "spring", duration: 0.5 }}
+      className="w-full max-w-sm"
+    >
+      <Card className="overflow-hidden border-none shadow-xl bg-gradient-to-br from-white via-blue-50 to-purple-50">
+        <CardContent className="p-8 text-center">
+          {/* Animated Clock Icon */}
+          <motion.div
+            className="relative mb-6 mx-auto w-24 h-24"
+            animate={{
+              scale: [1, 1.05, 1],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "easeInOut",
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+              <Clock className="w-12 h-12 text-white" />
+            </div>
+            <motion.div
+              className="absolute inset-0 border-4 border-blue-300 rounded-full"
+              animate={{
+                rotate: 360,
+              }}
+              transition={{
+                duration: 8,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "linear",
+              }}
+              style={{
+                borderTopColor: "transparent",
+                borderRightColor: "transparent",
+              }}
+            />
+            <motion.div
+              className="absolute inset-0 border-4 border-purple-300 rounded-full"
+              animate={{
+                rotate: -360,
+              }}
+              transition={{
+                duration: 6,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "linear",
+              }}
+              style={{
+                borderBottomColor: "transparent",
+                borderLeftColor: "transparent",
+              }}
+            />
+          </motion.div>
 
-                <div className="w-full bg-purple-200 h-4 rounded-full mb-4 overflow-hidden">
-                  <div
-                    className="h-full bg-purple-600"
-                    style={{
-                      width: `${
-                        (restTimeRemaining /
-                          exercises[currentExerciseIndex].restTime) *
-                        100
-                      }%`,
-                    }}
-                  />
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            Rest Time
+          </h2>
+          <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+            {currentExercise.currentSet >= currentExercise.targetSets
+              ? "Great job! Take a breather before the next exercise"
+              : "Recover and prepare for your next set"}
+          </p>
+
+          {/* Circular Progress */}
+          <div className="relative mb-6">
+            <div className="w-32 h-32 mx-auto">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  fill="transparent"
+                  className="text-blue-100"
+                />
+                <motion.circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  stroke="url(#gradient)"
+                  strokeWidth="8"
+                  fill="transparent"
+                  strokeLinecap="round"
+                  style={{
+                    strokeDasharray: `${2 * Math.PI * 45}`,
+                    strokeDashoffset: `${
+                      2 * Math.PI * 45 * (1 - restTimeRemaining / exercises[currentExerciseIndex].restTime)
+                    }`,
+                  }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
+                <defs>
+                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#3B82F6" />
+                    <stop offset="50%" stopColor="#8B5CF6" />
+                    <stop offset="100%" stopColor="#EC4899" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    {formatTime(restTimeRemaining)}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {isRestPaused ? "Paused" : "Remaining"}
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <p className="text-4xl font-bold text-purple-800 mb-6">
-                  {formatTime(restTimeRemaining)}
-                </p>
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <Button
+                onClick={toggleRestPause}
+                variant="outline"
+                className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 transition-all duration-200"
+              >
+                {isRestPaused ? (
+                  <>
+                    <Play className="w-4 h-4 mr-2" />
+                    Resume
+                  </>
+                ) : (
+                  <>
+                    <Pause className="w-4 h-4 mr-2" />
+                    Pause
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={skipRest}
+                className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                Skip Rest
+              </Button>
+            </div>
 
-                <Button
-                  onClick={skipRest}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full"
-                >
-                  Skip Rest
-                </Button>
-              </motion.div>
-            </CardContent>
-          </Card>
-        ) : (
+            {/* Next Exercise Preview */}
+            {currentExercise.currentSet >= currentExercise.targetSets &&
+              currentExerciseIndex < exercises.length - 1 && (
+                <div className="mt-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                  <p className="text-xs text-green-600 mb-1">Next Exercise:</p>
+                  <p className="font-medium text-green-800 text-sm">{exercises[currentExerciseIndex + 1].name}</p>
+                </div>
+              )}
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  </div>
+) : (
           <>
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
