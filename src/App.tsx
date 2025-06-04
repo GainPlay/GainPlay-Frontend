@@ -19,6 +19,7 @@ import {
 import { userService } from "./services/userService";
 import { useUserStore } from "./stores/useUserStore";
 import { ACCESS_TOKEN_KEY } from "./utils/constants";
+import ProgressPage from "@/pages/ProgressPage";
 
 function App() {
   const navigate = useNavigate();
@@ -75,6 +76,7 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/friends" element={<FriendsPage />} />
+          <Route path="/progress" element={<ProgressPage />} />
           <Route path="/workout-history" element={<WorkoutHistoryPage />} />
           <Route path="/user-profile/:id" element={<UserProfilePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
