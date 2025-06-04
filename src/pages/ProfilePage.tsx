@@ -12,7 +12,8 @@ import {
   History,
   Dumbbell,
   TrendingUp,
-  Lightbulb
+  Lightbulb,
+  Loader2 // Import Loader2 icon for loading state
 } from "lucide-react";
 import {
   Dialog,
@@ -29,117 +30,32 @@ import { useAvatarStore } from "@/stores/useAvatarStore";
 import { avatarService } from "@/services/avatarService";
 import Navigation from "@/components/Navigation";
 
-const getHealthInsights = (bmi: number, fitnessLevel: number, age: number) => {
-  const insights = [];
+// Component for the Skeleton Loader
+const HealthInsightSkeleton = () => (
+  <div className="space-y-3">
+    {[...Array(3)].map((_, i) => (
+      <div
+        key={i}
+        className="p-3 rounded-xl shadow-md bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse"
+      >
+        <div className="flex items-start space-x-3">
+          <div className="bg-gray-400 rounded-full p-2 flex-shrink-0 w-8 h-8"></div>
+          <div className="flex-1 min-w-0">
+            <div className="h-10 bg-gray-400 rounded w-full"></div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
-  // BMI-based insights
-  if (bmi < 18.5) {
-    insights.push({
-      type: "nutrition",
-      icon: "🥗",
-      title: "Focus on Healthy Weight Gain",
-      description:
-        "Consider adding protein-rich foods and strength training to build healthy muscle mass.",
-      color: "from-blue-500 to-blue-600"
-    });
-  } else if (bmi >= 18.5 && bmi < 25) {
-    insights.push({
-      type: "maintenance",
-      icon: "✅",
-      title: "Maintain Your Healthy Weight",
-      description:
-        "Great job! Focus on maintaining your current weight with balanced nutrition and regular exercise.",
-      color: "from-green-500 to-green-600"
-    });
-  } else if (bmi >= 25 && bmi < 30) {
-    insights.push({
-      type: "weight-loss",
-      icon: "🎯",
-      title: "Gradual Weight Loss Recommended",
-      description:
-        "Combine cardio exercises with strength training and focus on a balanced, calorie-controlled diet.",
-      color: "from-orange-500 to-orange-600"
-    });
-  } else {
-    insights.push({
-      type: "health-focus",
-      icon: "❤️",
-      title: "Prioritize Health & Wellness",
-      description:
-        "Start with low-impact exercises and consult a healthcare provider for personalized guidance.",
-      color: "from-red-500 to-red-600"
-    });
-  }
-
-  // Fitness level based insights
-  if (fitnessLevel <= 2) {
-    insights.push({
-      type: "beginner",
-      icon: "🌱",
-      title: "Build Your Foundation",
-      description:
-        "Start with 2-3 workouts per week, focusing on basic movements and building consistency.",
-      color: "from-emerald-500 to-emerald-600"
-    });
-  } else if (fitnessLevel <= 5) {
-    insights.push({
-      type: "intermediate",
-      icon: "💪",
-      title: "Level Up Your Training",
-      description:
-        "Add variety to your workouts and consider increasing intensity or duration gradually.",
-      color: "from-purple-500 to-purple-600"
-    });
-  } else {
-    insights.push({
-      type: "advanced",
-      icon: "🏆",
-      title: "Optimize Performance",
-      description:
-        "Focus on specific goals like strength, endurance, or skill development. Consider periodization.",
-      color: "from-yellow-500 to-yellow-600"
-    });
-  }
-
-  // Age-based insights
-  if (age >= 50) {
-    insights.push({
-      type: "age-specific",
-      icon: "🧘",
-      title: "Focus on Mobility & Balance",
-      description:
-        "Include flexibility work, balance exercises, and adequate recovery time in your routine.",
-      color: "from-indigo-500 to-indigo-600"
-    });
-  } else if (age >= 30) {
-    insights.push({
-      type: "age-specific",
-      icon: "⚡",
-      title: "Maintain Metabolic Health",
-      description:
-        "Combine strength training with cardio to maintain muscle mass and metabolic rate.",
-      color: "from-cyan-500 to-cyan-600"
-    });
-  } else {
-    insights.push({
-      type: "age-specific",
-      icon: "🚀",
-      title: "Build Healthy Habits",
-      description:
-        "This is the perfect time to establish lifelong fitness habits and explore different activities.",
-      color: "from-pink-500 to-pink-600"
-    });
-  }
-
-  return insights.slice(0, 3); // Return top 3 most relevant insights
+const getHealthInsights = async (userId: number) => {
+  const insights = await userService.getUserInsights(userId);
+  return insights;
 };
 
-const generateHealthInsights = (
-  bmi: number,
-  fitnessLevel: number,
-  age: number
-) => {
-  return getHealthInsights(bmi, fitnessLevel, age);
+const generateHealthInsights = (userId: number) => {
+  return getHealthInsights(userId);
 };
 
 export default function ProfilePage() {
@@ -158,6 +74,8 @@ export default function ProfilePage() {
   const [userBadges, setUserBadges] = useState<FrontendBadge[]>([]);
   const [ownedAvatars] = useState<string[]>([]);
   const [healthInsights, setHealthInsights] = useState<HealthInsight[]>([]);
+  const [loadingInsights, setLoadingInsights] = useState(true); // New state for loading insights
+  const [regeneratingInsights, setRegeneratingInsights] = useState(false); // New state for regenerate button loading
 
   const user = useUserStore();
   const { initializeAvatars } = useAvatarStore();
@@ -180,15 +98,6 @@ export default function ProfilePage() {
       }
     };
 
-    // const loadUserAvatars = async () => {
-    //   try {
-    //     const userAvatarsData = await avatarService.getUserAvatars();
-    //     setOwnedAvatars(userAvatarsData);
-    //   } catch (err) {
-    //     console.error("Failed to load user avatars:", err);
-    //   }
-    // };
-
     if (user) {
       setEditedName(user.name!);
       setEditedEmail(user.email);
@@ -196,37 +105,30 @@ export default function ProfilePage() {
       setEditedWeight(user.weight);
       setEditedAge(user.age);
       loadBadges();
-      // loadUserAvatars();
 
-      // Generate health insights
-      const bmi =
-        user.height && user.weight && user.height > 0 && user.weight > 0
-          ? user.weight / Math.pow(user.height / 100, 2)
-          : 0;
-
-      const fitnessLevel = user.level || 1;
-      const age = user.age || 25;
-
-      if (bmi > 0) {
-        const initialInsights = generateHealthInsights(bmi, fitnessLevel, age);
-        setHealthInsights(initialInsights);
-      }
+      // Initial load of health insights
+      setLoadingInsights(true); // Start loading
+      generateHealthInsights(user.id)
+        .then((insights) => {
+          setHealthInsights(insights.insights);
+        })
+        .finally(() => {
+          setLoadingInsights(false); // End loading
+        });
     }
   }, [user]);
 
-  const handleRegenerateInsights = () => {
+  const handleRegenerateInsights = async () => {
     if (user) {
-      const bmi =
-        user.height && user.weight && user.height > 0 && user.weight > 0
-          ? user.weight / Math.pow(user.height / 100, 2)
-          : 0;
-
-      const fitnessLevel = user.level || 1;
-      const age = user.age || 25;
-
-      if (bmi > 0) {
-        const newInsights = generateHealthInsights(bmi, fitnessLevel, age);
-        setHealthInsights(newInsights);
+      setRegeneratingInsights(true); // Start regenerating state
+      setHealthInsights([]); // Clear current insights to show skeleton
+      try {
+        const insights = await generateHealthInsights(user.id);
+        setHealthInsights(insights.insights);
+      } catch (error) {
+        console.error("Failed to regenerate insights:", error);
+      } finally {
+        setRegeneratingInsights(false); // End regenerating state
       }
     }
   };
@@ -728,21 +630,24 @@ export default function ProfilePage() {
           </Button>
         </Card>
 
-        {healthInsights.length > 0 && (
-          <Card className="mb-6 overflow-hidden border-none shadow-lg">
-            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-4">
-              <CardTitle className="flex items-center justify-between text-white">
-                <div className="flex items-center">
-                  <div className="bg-white/20 rounded-full p-2 mr-3">
-                    <Lightbulb className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-lg font-bold">Health Insights</span>
+        <Card className="mb-6 overflow-hidden border-none shadow-lg">
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-4">
+            <CardTitle className="flex items-center justify-between text-white">
+              <div className="flex items-center">
+                <div className="bg-white/20 rounded-full p-2 mr-3">
+                  <Lightbulb className="w-5 h-5 text-white" />
                 </div>
-                <Button
-                  size="sm"
-                  onClick={handleRegenerateInsights}
-                  className="bg-white/20 hover:bg-white/30 text-white border-white/30 p-2"
-                >
+                <span className="text-lg font-bold">Health Insights</span>
+              </div>
+              <Button
+                size="sm"
+                onClick={handleRegenerateInsights}
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30 p-2"
+                disabled={regeneratingInsights} // Disable button during regeneration
+              >
+                {regeneratingInsights ? (
+                  <Loader2 className="w-4 h-4 animate-spin" /> // Show spinner
+                ) : (
                   <svg
                     className="w-4 h-4"
                     viewBox="0 0 24 24"
@@ -754,14 +659,18 @@ export default function ProfilePage() {
                       fill="currentColor"
                     />
                   </svg>
-                </Button>
-              </CardTitle>
-              <p className="text-emerald-100 text-sm mt-1">
-                Personalized recommendations for you
-              </p>
-            </div>
+                )}
+              </Button>
+            </CardTitle>
+            <p className="text-emerald-100 text-sm mt-1">
+              Personalized recommendations for you
+            </p>
+          </div>
 
-            <CardContent className="p-4 bg-gradient-to-b from-white to-emerald-50">
+          <CardContent className="p-4 bg-gradient-to-b from-white to-emerald-50">
+            {loadingInsights || regeneratingInsights ? (
+              <HealthInsightSkeleton /> // Show skeleton when loading or regenerating
+            ) : healthInsights.length > 0 ? (
               <div className="space-y-3">
                 {healthInsights.map((insight, index) => (
                   <motion.div
@@ -769,7 +678,7 @@ export default function ProfilePage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`p-3 rounded-xl text-white shadow-md bg-gradient-to-r ${insight.color}`}
+                    className={`p-3 rounded-xl text-white shadow-md bg-gradient-to-r from-${insight.color}-500 to-${insight.color}-600`}
                   >
                     <div className="flex items-start space-x-3">
                       <div className="bg-white/20 rounded-full p-2 flex-shrink-0">
@@ -787,9 +696,13 @@ export default function ProfilePage() {
                   </motion.div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            ) : (
+              <p className="text-center text-gray-500">
+                No health insights available.
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
         <Dialog open={badgeDialogOpen} onOpenChange={setBadgeDialogOpen}>
           <DialogContent className="sm:max-w-md max-w-[85%] mx-auto">
