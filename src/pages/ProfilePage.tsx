@@ -12,7 +12,8 @@ import {
   History,
   Dumbbell,
   TrendingUp,
-  Lightbulb
+  Lightbulb,
+  Loader2 // Import Loader2 icon for loading state
 } from "lucide-react";
 import {
   Dialog,
@@ -29,9 +30,27 @@ import { useAvatarStore } from "@/stores/useAvatarStore";
 import { avatarService } from "@/services/avatarService";
 import Navigation from "@/components/Navigation";
 
+// Component for the Skeleton Loader
+const HealthInsightSkeleton = () => (
+  <div className="space-y-3">
+    {[...Array(3)].map((_, i) => (
+      <div
+        key={i}
+        className="p-3 rounded-xl shadow-md bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse"
+      >
+        <div className="flex items-start space-x-3">
+          <div className="bg-gray-400 rounded-full p-2 flex-shrink-0 w-8 h-8"></div>
+          <div className="flex-1 min-w-0">
+            <div className="h-10 bg-gray-400 rounded w-full"></div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 const getHealthInsights = async (userId: number) => {
   const insights = await userService.getUserInsights(userId);
-
   return insights;
 };
 
@@ -55,6 +74,8 @@ export default function ProfilePage() {
   const [userBadges, setUserBadges] = useState<FrontendBadge[]>([]);
   const [ownedAvatars] = useState<string[]>([]);
   const [healthInsights, setHealthInsights] = useState<HealthInsight[]>([]);
+  const [loadingInsights, setLoadingInsights] = useState(true); // New state for loading insights
+  const [regeneratingInsights, setRegeneratingInsights] = useState(false); // New state for regenerate button loading
 
   const user = useUserStore();
   const { initializeAvatars } = useAvatarStore();
@@ -77,15 +98,6 @@ export default function ProfilePage() {
       }
     };
 
-    // const loadUserAvatars = async () => {
-    //   try {
-    //     const userAvatarsData = await avatarService.getUserAvatars();
-    //     setOwnedAvatars(userAvatarsData);
-    //   } catch (err) {
-    //     console.error("Failed to load user avatars:", err);
-    //   }
-    // };
-
     if (user) {
       setEditedName(user.name!);
       setEditedEmail(user.email);
@@ -93,19 +105,31 @@ export default function ProfilePage() {
       setEditedWeight(user.weight);
       setEditedAge(user.age);
       loadBadges();
-      // loadUserAvatars();
 
-      generateHealthInsights(user.id).then((insights) => {
-        setHealthInsights(insights.insights);
-      });
+      // Initial load of health insights
+      setLoadingInsights(true); // Start loading
+      generateHealthInsights(user.id)
+        .then((insights) => {
+          setHealthInsights(insights.insights);
+        })
+        .finally(() => {
+          setLoadingInsights(false); // End loading
+        });
     }
   }, [user]);
 
-  const handleRegenerateInsights = () => {
+  const handleRegenerateInsights = async () => {
     if (user) {
-      generateHealthInsights(user.id).then((insights) => {
+      setRegeneratingInsights(true); // Start regenerating state
+      setHealthInsights([]); // Clear current insights to show skeleton
+      try {
+        const insights = await generateHealthInsights(user.id);
         setHealthInsights(insights.insights);
-      });
+      } catch (error) {
+        console.error("Failed to regenerate insights:", error);
+      } finally {
+        setRegeneratingInsights(false); // End regenerating state
+      }
     }
   };
 
@@ -606,21 +630,24 @@ export default function ProfilePage() {
           </Button>
         </Card>
 
-        {healthInsights.length > 0 && (
-          <Card className="mb-6 overflow-hidden border-none shadow-lg">
-            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-4">
-              <CardTitle className="flex items-center justify-between text-white">
-                <div className="flex items-center">
-                  <div className="bg-white/20 rounded-full p-2 mr-3">
-                    <Lightbulb className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-lg font-bold">Health Insights</span>
+        <Card className="mb-6 overflow-hidden border-none shadow-lg">
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-4">
+            <CardTitle className="flex items-center justify-between text-white">
+              <div className="flex items-center">
+                <div className="bg-white/20 rounded-full p-2 mr-3">
+                  <Lightbulb className="w-5 h-5 text-white" />
                 </div>
-                <Button
-                  size="sm"
-                  onClick={handleRegenerateInsights}
-                  className="bg-white/20 hover:bg-white/30 text-white border-white/30 p-2"
-                >
+                <span className="text-lg font-bold">Health Insights</span>
+              </div>
+              <Button
+                size="sm"
+                onClick={handleRegenerateInsights}
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30 p-2"
+                disabled={regeneratingInsights} // Disable button during regeneration
+              >
+                {regeneratingInsights ? (
+                  <Loader2 className="w-4 h-4 animate-spin" /> // Show spinner
+                ) : (
                   <svg
                     className="w-4 h-4"
                     viewBox="0 0 24 24"
@@ -632,14 +659,18 @@ export default function ProfilePage() {
                       fill="currentColor"
                     />
                   </svg>
-                </Button>
-              </CardTitle>
-              <p className="text-emerald-100 text-sm mt-1">
-                Personalized recommendations for you
-              </p>
-            </div>
+                )}
+              </Button>
+            </CardTitle>
+            <p className="text-emerald-100 text-sm mt-1">
+              Personalized recommendations for you
+            </p>
+          </div>
 
-            <CardContent className="p-4 bg-gradient-to-b from-white to-emerald-50">
+          <CardContent className="p-4 bg-gradient-to-b from-white to-emerald-50">
+            {loadingInsights || regeneratingInsights ? (
+              <HealthInsightSkeleton /> // Show skeleton when loading or regenerating
+            ) : healthInsights.length > 0 ? (
               <div className="space-y-3">
                 {healthInsights.map((insight, index) => (
                   <motion.div
@@ -665,9 +696,13 @@ export default function ProfilePage() {
                   </motion.div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            ) : (
+              <p className="text-center text-gray-500">
+                No health insights available.
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
         <Dialog open={badgeDialogOpen} onOpenChange={setBadgeDialogOpen}>
           <DialogContent className="sm:max-w-md max-w-[85%] mx-auto">
