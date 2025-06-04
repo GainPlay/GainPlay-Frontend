@@ -78,8 +78,8 @@ type Question =
   | MultiGoalQuestion
   | BodyTypeQuestion
   | TechnicalDataQuestion;
-
-type TechnicalData = {
+  
+  type TechnicalData = {
   age: string;
   weight: string;
   height: string;
@@ -100,7 +100,7 @@ const bodyTypeOptions = [
     title: "Ectomorph",
     subtitle: "Naturally Lean Build",
     description:
-      "You tend to be naturally thin with a fast metabolism. You may find it challenging to gain weight or build muscle mass, even when eating more.",
+    "You tend to be naturally thin with a fast metabolism. You may find it challenging to gain weight or build muscle mass, even when eating more.",
     characteristics: [
       "Fast metabolism",
       "Hard to gain weight",
@@ -117,7 +117,7 @@ const bodyTypeOptions = [
     title: "Mesomorph",
     subtitle: "Naturally Athletic Build",
     description:
-      "You have a naturally muscular and well-proportioned body. You respond well to exercise and can gain or lose weight relatively easily.",
+    "You have a naturally muscular and well-proportioned body. You respond well to exercise and can gain or lose weight relatively easily.",
     characteristics: [
       "Builds muscle easily",
       "Athletic look",
@@ -149,6 +149,33 @@ const bodyTypeOptions = [
 ];
 
 const questions: Question[] = [
+  {
+    id: "technicalData",
+    question: "Tell us a bit more about yourself",
+    description: "This helps us personalize your experience",
+    type: "technicalData",
+    fields: [
+      {
+        id: "age",
+        label: "Age",
+        type: "number",
+        placeholder: "Enter your age"
+      },
+      {
+        id: "weight",
+        label: "Weight (kg)",
+        type: "number",
+        placeholder: "Enter your weight in kg"
+      },
+      {
+        id: "height",
+        label: "Height (cm)",
+        type: "number",
+        placeholder: "Enter your height in cm"
+      }
+    ],
+    icon: "📋"
+  },
   {
     id: "fitnessLevel",
     question: "What's your current fitness level?",
@@ -243,33 +270,6 @@ const questions: Question[] = [
     type: "bodyType",
     icon: "👤"
   },
-  {
-    id: "technicalData",
-    question: "Tell us a bit more about yourself",
-    description: "This helps us personalize your experience",
-    type: "technicalData",
-    fields: [
-      {
-        id: "age",
-        label: "Age",
-        type: "number",
-        placeholder: "Enter your age"
-      },
-      {
-        id: "weight",
-        label: "Weight (kg)",
-        type: "number",
-        placeholder: "Enter your weight in kg"
-      },
-      {
-        id: "height",
-        label: "Height (cm)",
-        type: "number",
-        placeholder: "Enter your height in cm"
-      }
-    ],
-    icon: "📋"
-  }
 ];
 
 export default function OnboardingPage() {
@@ -627,33 +627,292 @@ export default function OnboardingPage() {
         );
       }
 
-      case "technicalData": {
-        const technicalDataQuestion = question as TechnicalDataQuestion;
+case "technicalData": {
         return (
-          <div className="space-y-4 mt-4">
-            {technicalDataQuestion.fields.map((field) => (
-              <div key={field.id} className="space-y-2">
-                <Label
-                  htmlFor={field.id}
-                  className="font-medium text-purple-900"
-                >
-                  {field.label}
-                </Label>
-                <Input
-                  id={field.id}
-                  type={field.type}
-                  placeholder={field.placeholder}
-                  value={answers.technicalData[field.id as keyof TechnicalData]}
-                  onChange={(e) =>
-                    handleTechnicalDataChange(
-                      field.id as keyof TechnicalData,
-                      e.target.value
-                    )
-                  }
-                  className="w-full"
-                />
+          <div className="space-y-8 mt-6">
+            {/* Age Input */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="relative">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  {answers.technicalData.age && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                      <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="age" className="text-base font-semibold text-gray-800">
+                    Age
+                  </Label>
+                  <p className="text-sm text-gray-500">How old are you?</p>
+                </div>
               </div>
-            ))}
+
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative bg-white border-2 border-gray-200 rounded-2xl p-4 transition-all duration-200 group-hover:border-blue-300 focus-within:border-blue-500 focus-within:shadow-lg focus-within:shadow-blue-500/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <Input
+                        id="age"
+                        type="number"
+                        placeholder="25"
+                        value={answers.technicalData.age}
+                        onChange={(e) => handleTechnicalDataChange("age", e.target.value)}
+                        className="border-0 text-2xl font-bold text-gray-800 placeholder-gray-400 bg-transparent focus:ring-0 p-0 h-auto"
+                        min="13"
+                        max="100"
+                      />
+                      <div className="text-sm text-gray-500 mt-1">years old</div>
+                    </div>
+                    <div className="text-4xl opacity-20">🎂</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-gray-500 ml-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>Helps us create age-appropriate workouts</span>
+              </div>
+            </div>
+
+            {/* Weight Input */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="relative">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
+                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  {answers.technicalData.weight && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                      <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="weight" className="text-base font-semibold text-gray-800">
+                    Weight
+                  </Label>
+                  <p className="text-sm text-gray-500">Current body weight</p>
+                </div>
+              </div>
+
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative bg-white border-2 border-gray-200 rounded-2xl p-4 transition-all duration-200 group-hover:border-emerald-300 focus-within:border-emerald-500 focus-within:shadow-lg focus-within:shadow-emerald-500/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-2">
+                        <Input
+                          id="weight"
+                          type="number"
+                          placeholder="70"
+                          value={answers.technicalData.weight}
+                          onChange={(e) => handleTechnicalDataChange("weight", e.target.value)}
+                          className="border-0 text-2xl font-bold text-gray-800 placeholder-gray-400 bg-transparent focus:ring-0 p-0 h-auto w-20"
+                          min="30"
+                          max="300"
+                          step="0.1"
+                        />
+                        <span className="text-lg font-medium text-gray-600">kg</span>
+                      </div>
+                      <div className="text-sm text-gray-500 mt-1">kilograms</div>
+                    </div>
+                    <div className="text-4xl opacity-20">⚖️</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-gray-500 ml-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>Used for BMI calculation and exercise intensity</span>
+              </div>
+            </div>
+
+            {/* Height Input */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="relative">
+                  <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-sm">
+                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  {answers.technicalData.height && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                      <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="height" className="text-base font-semibold text-gray-800">
+                    Height
+                  </Label>
+                  <p className="text-sm text-gray-500">How tall are you?</p>
+                </div>
+              </div>
+
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative bg-white border-2 border-gray-200 rounded-2xl p-4 transition-all duration-200 group-hover:border-amber-300 focus-within:border-amber-500 focus-within:shadow-lg focus-within:shadow-amber-500/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-2">
+                        <Input
+                          id="height"
+                          type="number"
+                          placeholder="175"
+                          value={answers.technicalData.height}
+                          onChange={(e) => handleTechnicalDataChange("height", e.target.value)}
+                          className="border-0 text-2xl font-bold text-gray-800 placeholder-gray-400 bg-transparent focus:ring-0 p-0 h-auto w-20"
+                          min="120"
+                          max="250"
+                        />
+                        <span className="text-lg font-medium text-gray-600">cm</span>
+                      </div>
+                      <div className="text-sm text-gray-500 mt-1">centimeters</div>
+                    </div>
+                    <div className="text-4xl opacity-20">📏</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-gray-500 ml-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>Helps recommend appropriate exercise modifications</span>
+              </div>
+            </div>
+
+            {/* Enhanced BMI Preview */}
+            {answers.technicalData.weight &&
+              answers.technicalData.height &&
+              parseInt(answers.technicalData.weight) > 0 &&
+              parseInt(answers.technicalData.height) > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className="relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-2xl blur-xl" />
+                  <div className="relative bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
+                          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-800 text-lg">Your BMI</h4>
+                          <p className="text-sm text-gray-500">Body Mass Index calculated</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-gray-800 mb-1">
+                          {(
+                            parseInt(answers.technicalData.weight) /
+                            Math.pow(parseInt(answers.technicalData.height) / 100, 2)
+                          ).toFixed(1)}
+                        </div>
+                        <div
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${(() => {
+                            const bmi =
+                              parseInt(answers.technicalData.weight) /
+                              Math.pow(parseInt(answers.technicalData.height) / 100, 2);
+                            if (bmi < 18.5) return "bg-blue-100 text-blue-800";
+                            if (bmi < 25) return "bg-green-100 text-green-800";
+                            if (bmi < 30) return "bg-yellow-100 text-yellow-800";
+                            return "bg-red-100 text-red-800";
+                          })()}`}
+                        >
+                          {(() => {
+                            const bmi =
+                              parseInt(answers.technicalData.weight) /
+                              Math.pow(parseInt(answers.technicalData.height) / 100, 2);
+                            if (bmi < 18.5) return "Underweight";
+                            if (bmi < 25) return "Normal";
+                            if (bmi < 30) return "Overweight";
+                            return "Obese";
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-100 rounded-xl p-3">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>This helps us personalize your workout intensity and nutrition guidance</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
           </div>
         );
       }
