@@ -314,3 +314,11 @@ export interface Badge {
 // export interface UserBadge extends Badge {
 //   earnedAt: string;
 // }
+
+export type HealthInsight = {
+  type: string;
+  icon: string;
+  title: string;
+  description: string;
+  color: string;
+};
