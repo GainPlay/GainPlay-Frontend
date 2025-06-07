@@ -143,7 +143,6 @@ export default function ProfilePage() {
         age: editedAge
       };
       await userService.updateUser(user.id, updatedUserData);
-      console.log("User data updated:", updatedUserData);
       user.setUser(updatedUserData);
       setEditMode(false);
     }
