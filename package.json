@@ -7,7 +7,7 @@
     "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "serve": "vite preview"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.13.5",
@@ -47,6 +47,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.5.2",
+    "esbuild": "0.25.5",
     "framer-motion": "^12.10.5",
     "input-otp": "^1.4.2",
     "jwt-decode": "^4.0.0",

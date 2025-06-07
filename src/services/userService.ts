@@ -12,7 +12,7 @@ export const userService = {
     userId: number,
     userData: unknown
   ): Promise<FrontendUserData> => {
-    return (await axios.post(`/users/${userId}/updateUser`, { userData })).data;
+    return (await axios.post(`/users/${userId}/updateUser`, userData)).data;
   },
 
   updateUserSettings: async (
@@ -24,5 +24,5 @@ export const userService = {
 
   getUserInsights: async (userId: number): Promise<HealthInsightResponse> => {
     return (await axios.get(`/user-goals/user/${userId}/insights`)).data;
-  }
+  },
 };
