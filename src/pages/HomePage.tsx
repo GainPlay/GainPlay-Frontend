@@ -207,8 +207,6 @@ export default function HomePage() {
   const handleRepsChange = (increment: boolean) => {
     if (currentExerciseIndex >= exercises.length) return;
 
-    console.log("Current Exercise Index:", currentExerciseIndex);
-
     const updatedExercise = exercises[currentExerciseIndex];
     updatedExercise.currentReps = Math.max(
       0,

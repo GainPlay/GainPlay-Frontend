@@ -41,8 +41,6 @@ export default function FallbackExerciseImage({
     );
   }
 
-  console.log(lottiePath);
-
   return (
     <div className={className}>
       {exerciseName ? (
