@@ -22,11 +22,10 @@ export default function FallbackExerciseImage({
     const hue = hash % 360;
     return `hsl(${hue}, 70%, 80%)`;
   };
-
   const bgColor = getColorFromString(exerciseName);
 
   // Lottie animation path based on exercise name
-  const lottiePath = `/src/assets/lottie/${exerciseName}.lottie`;
+  const lottiePath = `/lottie/${exerciseName}.lottie`;
 
   if (lottieError) {
     return (
