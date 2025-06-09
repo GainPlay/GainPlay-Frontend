@@ -43,13 +43,7 @@ import { useWorkoutStore } from "@/stores/useWorkoutStore";
 import { Challenge, challengeService } from "@/services/challegeService";
 import { motivationalQuotes } from "@/utils/constants/motivationalQuotes";
 import { useUserStore } from "@/stores/useUserStore";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Navigation from "@/components/Navigation";
 
 // Convert API workout to UI format
@@ -62,8 +56,7 @@ const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
 
     let difficultyString: ExerciseDifficulty = "beginner";
     if (exercise?.difficulty_level) {
-      difficultyString =
-        difficultyMap[exercise.difficulty_level as DifficultyLevel];
+      difficultyString = difficultyMap[exercise.difficulty_level as DifficultyLevel];
     }
 
     // Convert exercise sets to UI format
@@ -82,8 +75,7 @@ const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
       targetSets: template?.target_sets || 3,
       targetReps: template?.target_reps || 10,
       restTime: template?.rest_time_seconds || 60,
-      instruction:
-        exercise?.description || "Perform the exercise with proper form.",
+      instruction: exercise?.description || "Perform the exercise with proper form.",
       difficulty: difficultyString,
       muscleGroup: exercise?.muscle_group || "Full Body",
       xpReward: XP_CONST * (exercise?.difficulty_level ?? 1),
@@ -117,12 +109,10 @@ export default function HomePage() {
   const [earnedCoins, setEarnedCoins] = useState(0);
   const [earnedXP, setEarnedXP] = useState(0);
   const [earnedScore, setEarnedScore] = useState(0);
-  const [earnedBadges, setEarnedBadges] = useState<
-    Array<{ id: string; name: string; icon: string }>
-  >([]);
+  const [earnedBadges, setEarnedBadges] = useState<Array<{ id: string; name: string; icon: string }>>([]);
   const [restMode, setRestMode] = useState(false);
   const [restTimeRemaining, setRestTimeRemaining] = useState(0);
-  const [isRestPaused, setIsRestPaused] = useState(false)
+  const [isRestPaused, setIsRestPaused] = useState(false);
   const [level, setLevel] = useState(1);
   const [streak, setStreak] = useState(0);
   const [showExerciseComplete, setShowExerciseComplete] = useState(false);
@@ -134,9 +124,7 @@ export default function HomePage() {
   const [isDailyChallengeDone, setIsDailyChallengeDone] = useState(false);
   const [dailyChallengeProgress, setDailyChallengeProgress] = useState(0);
   const [showChallengeComplete, setShowChallengeComplete] = useState(false);
-  const [todaysChallenge, setTodaysChallenge] = useState<Challenge | null>(
-    null
-  );
+  const [todaysChallenge, setTodaysChallenge] = useState<Challenge | null>(null);
 
   // Add loading and error states
   const [isLoading, setIsLoading] = useState(false);
@@ -192,7 +180,7 @@ export default function HomePage() {
     if (userStreak) setStreak(userStreak);
 
     getNewQuote();
-  }, []);
+  }, [user]);
 
   const getNewQuote = () => {
     const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
@@ -224,9 +212,7 @@ export default function HomePage() {
     const updatedExercise = exercises[currentExerciseIndex];
     updatedExercise.currentReps = Math.max(
       0,
-      increment
-        ? updatedExercise.currentReps + 1
-        : updatedExercise.currentReps - 1
+      increment ? updatedExercise.currentReps + 1 : updatedExercise.currentReps - 1
     );
 
     setExercises((prevExercises) => {
@@ -328,14 +314,14 @@ export default function HomePage() {
           if (currentExerciseIndex < exercises.length - 1) {
             setRestMode(true);
             setRestTimeRemaining(exercise.restTime);
-            setIsRestPaused(false)
+            setIsRestPaused(false);
           }
         }, 500);
       } else {
         // Start rest timer between sets
         setRestMode(true);
         setRestTimeRemaining(exercise.restTime);
-        setIsRestPaused(false)
+        setIsRestPaused(false);
       }
     } catch (err) {
       console.error("Error submitting set:", err);
@@ -361,18 +347,15 @@ export default function HomePage() {
 
   const skipRest = () => {
     setRestMode(false);
-    setIsRestPaused(false)
-    if (
-      exercises[currentExerciseIndex].currentSet >=
-      exercises[currentExerciseIndex].targetSets
-    ) {
+    setIsRestPaused(false);
+    if (exercises[currentExerciseIndex].currentSet >= exercises[currentExerciseIndex].targetSets) {
       moveToNextExercise();
     }
   };
 
   const toggleRestPause = () => {
-    setIsRestPaused(!isRestPaused)
-  }
+    setIsRestPaused(!isRestPaused);
+  };
 
   const quitWorkout = () => {
     // Clear workout data and return to home
@@ -381,7 +364,7 @@ export default function HomePage() {
     setWorkoutStarted(false);
     setCurrentExerciseIndex(0);
     setRestMode(false);
-    setIsRestPaused(false)
+    setIsRestPaused(false);
     setShowQuitDialog(false);
   };
 
@@ -393,23 +376,17 @@ export default function HomePage() {
       setIsLoading(true);
 
       // Finish the workout and receive rewards from the backend
-      const { coins, experience_earned, score, newBadges } =
-        await workoutService.finishWorkout(originalWorkout);
+      const { coins, experience_earned, score, newBadges } = await workoutService.finishWorkout(originalWorkout);
 
       // Save the completed workout to local storage
       const completedExercises = exercises.map((exercise) => ({
         name: exercise.name,
         sets: exercise.sets,
-        totalReps: exercise.sets.reduce(
-          (total, set) => total + (set.reps || 0),
-          0
-        ),
+        totalReps: exercise.sets.reduce((total, set) => total + (set.reps || 0), 0),
       }));
 
       //TODO: implement workout history
-      const workoutHistory = JSON.parse(
-        localStorage.getItem("workoutHistory") || "[]"
-      );
+      const workoutHistory = JSON.parse(localStorage.getItem("workoutHistory") || "[]");
       workoutHistory.push({
         date: new Date().toISOString(),
         exercises: completedExercises,
@@ -426,6 +403,7 @@ export default function HomePage() {
       const newCoins = coins + (user.coins ?? 0);
       setCoins(newCoins);
       setEarnedCoins(coins);
+      user.setUser({ coins: newCoins });
 
       // Update experience and level
       const currentXP = user.experience || 0;
@@ -442,26 +420,22 @@ export default function HomePage() {
         const userBadges = user.user_badges || [];
         const newUserBadges = [...userBadges];
 
-        newBadges.forEach(
-          (badge: { id: number; name: string; icon: string }) => {
-            if (!userBadges.some((b: { id: number }) => b.id === badge.id)) {
-              newUserBadges.push({
-                ...badge,
-                description: "Badge earned",
-                earnedOn: new Date().toISOString(),
-              });
-            }
+        newBadges.forEach((badge: { id: number; name: string; icon: string }) => {
+          if (!userBadges.some((b: { id: number }) => b.id === badge.id)) {
+            newUserBadges.push({
+              ...badge,
+              description: "Badge earned",
+              earnedOn: new Date().toISOString(),
+            });
           }
-        );
+        });
 
         user.setUser({ user_badges: newUserBadges });
         setEarnedBadges(
-          newBadges.map(
-            (badge: { id: number; name: string; icon: string }) => ({
-              ...badge,
-              id: badge.id.toString(),
-            })
-          )
+          newBadges.map((badge: { id: number; name: string; icon: string }) => ({
+            ...badge,
+            id: badge.id.toString(),
+          }))
         );
       }
 
@@ -525,9 +499,7 @@ export default function HomePage() {
 
     // Simulate progress update
     if (todaysChallenge?.intervals) {
-      setDailyChallengeProgress((prev) =>
-        Math.min(prev + todaysChallenge.intervals, todaysChallenge.repetitions)
-      );
+      setDailyChallengeProgress((prev) => Math.min(prev + todaysChallenge.intervals, todaysChallenge.repetitions));
     }
 
     // If challenge is completed
@@ -568,9 +540,7 @@ export default function HomePage() {
                 className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full mx-4"
               >
                 <div className="mb-6">
-                  <h2 className="text-3xl font-bold text-purple-800 relative z-10">
-                    Workout Complete!
-                  </h2>
+                  <h2 className="text-3xl font-bold text-purple-800 relative z-10">Workout Complete!</h2>
                 </div>
                 <div className="h-1 w-20 bg-purple-600 mx-auto mb-6"></div>
 
@@ -578,25 +548,19 @@ export default function HomePage() {
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <Zap className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                     <p className="text-sm text-purple-600">XP Earned</p>
-                    <p className="text-2xl font-bold text-purple-800">
-                      {earnedXP}
-                    </p>
+                    <p className="text-2xl font-bold text-purple-800">{earnedXP}</p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <Coins className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
                     <p className="text-sm text-purple-600">Coins Earned</p>
-                    <p className="text-2xl font-bold text-purple-800">
-                      {earnedCoins}
-                    </p>
+                    <p className="text-2xl font-bold text-purple-800">{earnedCoins}</p>
                   </div>
                 </div>
 
                 <div className="bg-purple-50 p-4 rounded-lg mb-6">
                   <BarChart className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                   <p className="text-sm text-purple-600">Workout Score</p>
-                  <p className="text-2xl font-bold text-purple-800">
-                    {earnedScore} / 100
-                  </p>
+                  <p className="text-2xl font-bold text-purple-800">{earnedScore} / 100</p>
                   <div className="w-full bg-purple-200 h-2 rounded-full mt-2">
                     <div
                       className="h-full bg-purple-600 rounded-full transition-all duration-500"
@@ -610,9 +574,7 @@ export default function HomePage() {
                 {earnedBadges.length > 0 && (
                   <div className="bg-purple-50 p-4 rounded-lg mb-6">
                     <Trophy className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-                    <p className="text-sm text-purple-600 mb-3">
-                      Badges Earned
-                    </p>
+                    <p className="text-sm text-purple-600 mb-3">Badges Earned</p>
                     <div
                       className="grid grid-cols-4 gap-4 justify-center max-h-40 overflow-y-auto"
                       style={{ maxWidth: 450 }}
@@ -641,10 +603,7 @@ export default function HomePage() {
                   </div>
                 )}
 
-                <Button
-                  onClick={closePopup}
-                  className="bg-purple-600 hover:bg-purple-700 w-full"
-                >
+                <Button onClick={closePopup} className="bg-purple-600 hover:bg-purple-700 w-full">
                   Continue
                 </Button>
               </motion.div>
@@ -659,10 +618,7 @@ export default function HomePage() {
             className="p-0 h-10 w-10 rounded-full overflow-hidden"
           >
             <img
-              src={
-                userAvatar ||
-                "https://api.dicebear.com/6.x/avataaars/svg?seed=default"
-              }
+              src={userAvatar || "https://api.dicebear.com/6.x/avataaars/svg?seed=default"}
               alt="User Avatar"
               className="h-full w-full object-cover"
             />
@@ -675,10 +631,7 @@ export default function HomePage() {
         </header>
 
         {error && (
-          <Alert
-            variant="destructive"
-            className="mb-4 animate-in slide-in-from-top"
-          >
+          <Alert variant="destructive" className="mb-4 animate-in slide-in-from-top">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
@@ -686,27 +639,19 @@ export default function HomePage() {
         )}
 
         {showMaxSetsAlert && (
-          <Alert
-            variant="destructive"
-            className="mb-4 animate-in slide-in-from-top"
-          >
+          <Alert variant="destructive" className="mb-4 animate-in slide-in-from-top">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Maximum Sets Reached</AlertTitle>
-            <AlertDescription>
-              You've reached the maximum sets for this exercise. Great work! 💪
-            </AlertDescription>
+            <AlertDescription>You've reached the maximum sets for this exercise. Great work! 💪</AlertDescription>
           </Alert>
         )}
 
         {showExerciseComplete && (
           <Alert className="mb-4 animate-in slide-in-from-top bg-green-100 border-green-200">
             <Check className="h-4 w-4 text-green-600" />
-            <AlertTitle className="text-green-800">
-              Exercise Complete!
-            </AlertTitle>
+            <AlertTitle className="text-green-800">Exercise Complete!</AlertTitle>
             <AlertDescription className="text-green-700">
-              You've completed all sets for this exercise. Keep up the good
-              work!
+              You've completed all sets for this exercise. Keep up the good work!
             </AlertDescription>
           </Alert>
         )}
@@ -715,34 +660,22 @@ export default function HomePage() {
           <>
             <Card className="mb-6 overflow-hidden border-none shadow-md">
               <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6">
-                <h3 className="text-xl font-bold text-white mb-2">
-                  Today's Focus
-                </h3>
-                <p className="text-purple-100 text-sm">
-                  Stay consistent and track your progress
-                </p>
+                <h3 className="text-xl font-bold text-white mb-2">Today's Focus</h3>
+                <p className="text-purple-100 text-sm">Stay consistent and track your progress</p>
               </div>
               <CardContent className="p-0">
                 <div className="grid grid-cols-3 divide-x divide-y">
                   <div className="p-4 text-center hover:bg-purple-50 transition-colors">
-                    <div className="font-bold text-2xl text-purple-700 mb-1">
-                      {streak}
-                    </div>
+                    <div className="font-bold text-2xl text-purple-700 mb-1">{streak}</div>
                     <div className="text-xs text-purple-600">Day Streak</div>
                   </div>
                   <div className="p-4 text-center hover:bg-purple-50 transition-colors">
-                    <div className="font-bold text-2xl text-purple-700 mb-1">
-                      {level}
-                    </div>
+                    <div className="font-bold text-2xl text-purple-700 mb-1">{level}</div>
                     <div className="text-xs text-purple-600">Current Level</div>
                   </div>
                   <div className="p-4 text-center hover:bg-purple-50 transition-colors">
                     <div className="font-bold text-2xl text-purple-700 mb-1">
-                      {
-                        JSON.parse(
-                          localStorage.getItem("workoutHistory") || "[]"
-                        ).length
-                      }
+                      {JSON.parse(localStorage.getItem("workoutHistory") || "[]").length}
                     </div>
                     <div className="text-xs text-purple-600">Workouts Done</div>
                   </div>
@@ -751,16 +684,8 @@ export default function HomePage() {
                     onClick={startWorkout}
                   >
                     <div className="flex items-center justify-center gap-2 text-purple-700 font-medium">
-                      {isLoading ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <PlayCircle className="w-5 h-5" />
-                      )}
-                      <span>
-                        {isLoading
-                          ? "Loading Workout..."
-                          : "Start Today's Workout"}
-                      </span>
+                      {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <PlayCircle className="w-5 h-5" />}
+                      <span>{isLoading ? "Loading Workout..." : "Start Today's Workout"}</span>
                     </div>
                   </div>
                 </div>
@@ -776,12 +701,8 @@ export default function HomePage() {
               </CardHeader>
               <CardContent className="p-4">
                 <div className="mb-4">
-                  <h3 className="font-medium text-gray-800 mb-1">
-                    {todaysChallenge?.description}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Earn bonus XP and coins by completing this challenge
-                  </p>
+                  <h3 className="font-medium text-gray-800 mb-1">{todaysChallenge?.description}</h3>
+                  <p className="text-sm text-gray-600">Earn bonus XP and coins by completing this challenge</p>
                 </div>
                 <div className="w-full bg-gray-200 h-2 rounded-full mb-2">
                   <div
@@ -791,8 +712,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>
-                    {dailyChallengeProgress}/{todaysChallenge?.repetitions}{" "}
-                    completed
+                    {dailyChallengeProgress}/{todaysChallenge?.repetitions} completed
                   </span>
                   <span>+100 XP</span>
                 </div>
@@ -820,12 +740,8 @@ export default function HomePage() {
                       <BarChart className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-green-800">
-                        Workout History
-                      </h3>
-                      <p className="text-xs text-green-600">
-                        Track your progress over time
-                      </p>
+                      <h3 className="font-semibold text-green-800">Workout History</h3>
+                      <p className="text-xs text-green-600">Track your progress over time</p>
                     </div>
                   </div>
                   <Button
@@ -857,10 +773,7 @@ export default function HomePage() {
                           {upcomingWorkout.workout_exercises.length > 0
                             ? upcomingWorkout.workout_exercises
                                 .map((we) => we.exercises?.muscle_group)
-                                .filter(
-                                  (group, index, arr) =>
-                                    arr.indexOf(group) === index
-                                )
+                                .filter((group, index, arr) => arr.indexOf(group) === index)
                                 .join(", ") || "Full Body"
                             : "Full Body"}
                         </p>
@@ -870,27 +783,16 @@ export default function HomePage() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      {upcomingWorkout.workout_exercises.map(
-                        (workoutExercise) => (
-                          <div
-                            key={workoutExercise.id}
-                            className="flex items-center gap-2 text-sm"
-                          >
-                            <Dumbbell className="h-4 w-4 text-purple-500" />
-                            <span className="flex-1">
-                              {workoutExercise.exercises?.name ||
-                                "Unknown Exercise"}
-                            </span>
-                            <span className="text-xs text-purple-600">
-                              {workoutExercise.exercise_templates
-                                ?.target_sets || 3}{" "}
-                              ×{" "}
-                              {workoutExercise.exercise_templates
-                                ?.target_reps || 10}
-                            </span>
-                          </div>
-                        )
-                      )}
+                      {upcomingWorkout.workout_exercises.map((workoutExercise) => (
+                        <div key={workoutExercise.id} className="flex items-center gap-2 text-sm">
+                          <Dumbbell className="h-4 w-4 text-purple-500" />
+                          <span className="flex-1">{workoutExercise.exercises?.name || "Unknown Exercise"}</span>
+                          <span className="text-xs text-purple-600">
+                            {workoutExercise.exercise_templates?.target_sets || 3} ×{" "}
+                            {workoutExercise.exercise_templates?.target_reps || 10}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                     <div className="mt-3 pt-3 border-t border-purple-100">
                       <div className="text-xs text-purple-600 space-y-1">
@@ -898,9 +800,7 @@ export default function HomePage() {
                           <span>Total Sets:</span>
                           <span className="font-medium">
                             {upcomingWorkout.workout_exercises.reduce(
-                              (total, we) =>
-                                total +
-                                (we.exercise_templates?.target_sets || 0),
+                              (total, we) => total + (we.exercise_templates?.target_sets || 0),
                               0
                             )}
                           </span>
@@ -913,8 +813,7 @@ export default function HomePage() {
                                 (total, we) =>
                                   total +
                                   (we.exercise_templates?.target_sets || 0) *
-                                    (we.exercise_templates?.rest_time_seconds ||
-                                      60),
+                                    (we.exercise_templates?.rest_time_seconds || 60),
                                 0
                               ) / 60
                             )}{" "}
@@ -937,9 +836,7 @@ export default function HomePage() {
               <CardContent className="p-4">
                 <div className="flex flex-col items-center text-center">
                   <div className="flex items-center justify-between w-full mb-2">
-                    <div className="text-purple-800 font-medium">
-                      Daily Quote
-                    </div>
+                    <div className="text-purple-800 font-medium">Daily Quote</div>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -977,170 +874,168 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </>
-) : restMode ? (
-  <div className="flex items-center justify-center min-h-[60vh] px-4">
-    <motion.div
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: "spring", duration: 0.5 }}
-      className="w-full max-w-sm"
-    >
-      <Card className="overflow-hidden border-none shadow-xl bg-gradient-to-br from-white via-blue-50 to-purple-50">
-        <CardContent className="p-8 text-center">
-          {/* Animated Clock Icon */}
-          <motion.div
-            className="relative mb-6 mx-auto w-24 h-24"
-            animate={{
-              scale: [1, 1.05, 1],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "easeInOut",
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-              <Clock className="w-12 h-12 text-white" />
-            </div>
+        ) : restMode ? (
+          <div className="flex items-center justify-center min-h-[60vh] px-4">
             <motion.div
-              className="absolute inset-0 border-4 border-blue-300 rounded-full"
-              animate={{
-                rotate: 360,
-              }}
-              transition={{
-                duration: 8,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "linear",
-              }}
-              style={{
-                borderTopColor: "transparent",
-                borderRightColor: "transparent",
-              }}
-            />
-            <motion.div
-              className="absolute inset-0 border-4 border-purple-300 rounded-full"
-              animate={{
-                rotate: -360,
-              }}
-              transition={{
-                duration: 6,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "linear",
-              }}
-              style={{
-                borderBottomColor: "transparent",
-                borderLeftColor: "transparent",
-              }}
-            />
-          </motion.div>
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="w-full max-w-sm"
+            >
+              <Card className="overflow-hidden border-none shadow-xl bg-gradient-to-br from-white via-blue-50 to-purple-50">
+                <CardContent className="p-8 text-center">
+                  {/* Animated Clock Icon */}
+                  <motion.div
+                    className="relative mb-6 mx-auto w-24 h-24"
+                    animate={{
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+                      <Clock className="w-12 h-12 text-white" />
+                    </div>
+                    <motion.div
+                      className="absolute inset-0 border-4 border-blue-300 rounded-full"
+                      animate={{
+                        rotate: 360,
+                      }}
+                      transition={{
+                        duration: 8,
+                        repeat: Number.POSITIVE_INFINITY,
+                        ease: "linear",
+                      }}
+                      style={{
+                        borderTopColor: "transparent",
+                        borderRightColor: "transparent",
+                      }}
+                    />
+                    <motion.div
+                      className="absolute inset-0 border-4 border-purple-300 rounded-full"
+                      animate={{
+                        rotate: -360,
+                      }}
+                      transition={{
+                        duration: 6,
+                        repeat: Number.POSITIVE_INFINITY,
+                        ease: "linear",
+                      }}
+                      style={{
+                        borderBottomColor: "transparent",
+                        borderLeftColor: "transparent",
+                      }}
+                    />
+                  </motion.div>
 
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Rest Time
-          </h2>
-          <p className="text-gray-600 mb-6 text-sm leading-relaxed">
-            {currentExercise.currentSet >= currentExercise.targetSets
-              ? "Great job! Take a breather before the next exercise"
-              : "Recover and prepare for your next set"}
-          </p>
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                    Rest Time
+                  </h2>
+                  <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+                    {currentExercise.currentSet >= currentExercise.targetSets
+                      ? "Great job! Take a breather before the next exercise"
+                      : "Recover and prepare for your next set"}
+                  </p>
 
-          {/* Circular Progress */}
-          <div className="relative mb-6">
-            <div className="w-32 h-32 mx-auto">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="45"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  fill="transparent"
-                  className="text-blue-100"
-                />
-                <motion.circle
-                  cx="50"
-                  cy="50"
-                  r="45"
-                  stroke="url(#gradient)"
-                  strokeWidth="8"
-                  fill="transparent"
-                  strokeLinecap="round"
-                  style={{
-                    strokeDasharray: `${2 * Math.PI * 45}`,
-                    strokeDashoffset: `${
-                      2 * Math.PI * 45 * (1 - restTimeRemaining / exercises[currentExerciseIndex].restTime)
-                    }`,
-                  }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                />
-                <defs>
-                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#3B82F6" />
-                    <stop offset="50%" stopColor="#8B5CF6" />
-                    <stop offset="100%" stopColor="#EC4899" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    {formatTime(restTimeRemaining)}
+                  {/* Circular Progress */}
+                  <div className="relative mb-6">
+                    <div className="w-32 h-32 mx-auto">
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          stroke="currentColor"
+                          strokeWidth="8"
+                          fill="transparent"
+                          className="text-blue-100"
+                        />
+                        <motion.circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          stroke="url(#gradient)"
+                          strokeWidth="8"
+                          fill="transparent"
+                          strokeLinecap="round"
+                          style={{
+                            strokeDasharray: `${2 * Math.PI * 45}`,
+                            strokeDashoffset: `${
+                              2 * Math.PI * 45 * (1 - restTimeRemaining / exercises[currentExerciseIndex].restTime)
+                            }`,
+                          }}
+                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                        />
+                        <defs>
+                          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#3B82F6" />
+                            <stop offset="50%" stopColor="#8B5CF6" />
+                            <stop offset="100%" stopColor="#EC4899" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            {formatTime(restTimeRemaining)}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">{isRestPaused ? "Paused" : "Remaining"}</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {isRestPaused ? "Paused" : "Remaining"}
+
+                  {/* Action Buttons */}
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={toggleRestPause}
+                        variant="outline"
+                        className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 transition-all duration-200"
+                      >
+                        {isRestPaused ? (
+                          <>
+                            <Play className="w-4 h-4 mr-2" />
+                            Resume
+                          </>
+                        ) : (
+                          <>
+                            <Pause className="w-4 h-4 mr-2" />
+                            Pause
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        onClick={skipRest}
+                        className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-lg transform hover:scale-105 transition-all duration-200"
+                      >
+                        Skip Rest
+                      </Button>
+                    </div>
+
+                    {/* Next Exercise Preview */}
+                    {currentExercise.currentSet >= currentExercise.targetSets &&
+                      currentExerciseIndex < exercises.length - 1 && (
+                        <div className="mt-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                          <p className="text-xs text-green-600 mb-1">Next Exercise:</p>
+                          <p className="font-medium text-green-800 text-sm">
+                            {exercises[currentExerciseIndex + 1].name}
+                          </p>
+                        </div>
+                      )}
                   </div>
-                </div>
-              </div>
-            </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
-
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <div className="flex gap-3">
-              <Button
-                onClick={toggleRestPause}
-                variant="outline"
-                className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 transition-all duration-200"
-              >
-                {isRestPaused ? (
-                  <>
-                    <Play className="w-4 h-4 mr-2" />
-                    Resume
-                  </>
-                ) : (
-                  <>
-                    <Pause className="w-4 h-4 mr-2" />
-                    Pause
-                  </>
-                )}
-              </Button>
-              <Button
-                onClick={skipRest}
-                className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-lg transform hover:scale-105 transition-all duration-200"
-              >
-                Skip Rest
-              </Button>
-            </div>
-
-            {/* Next Exercise Preview */}
-            {currentExercise.currentSet >= currentExercise.targetSets &&
-              currentExerciseIndex < exercises.length - 1 && (
-                <div className="mt-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                  <p className="text-xs text-green-600 mb-1">Next Exercise:</p>
-                  <p className="font-medium text-green-800 text-sm">{exercises[currentExerciseIndex + 1].name}</p>
-                </div>
-              )}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  </div>
-) : (
+        ) : (
           <>
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-purple-600">
-                  Workout Progress
-                </span>
+                <span className="text-sm font-medium text-purple-600">Workout Progress</span>
                 <span className="text-sm font-medium text-purple-600">
                   {currentExerciseIndex + 1} of {exercises.length} exercises
                 </span>
@@ -1158,9 +1053,7 @@ export default function HomePage() {
                 <div
                   className="bg-purple-600 h-full rounded-full"
                   style={{
-                    width: `${
-                      ((currentExerciseIndex + 1) / exercises.length) * 100
-                    }%`,
+                    width: `${((currentExerciseIndex + 1) / exercises.length) * 100}%`,
                   }}
                 />
               </div>
@@ -1181,9 +1074,7 @@ export default function HomePage() {
                 variant="outline"
                 size="sm"
                 onClick={moveToNextExercise}
-                disabled={
-                  currentExerciseIndex === exercises.length - 1 || isLoading
-                }
+                disabled={currentExerciseIndex === exercises.length - 1 || isLoading}
                 className="text-purple-600 border-purple-300"
               >
                 Next
@@ -1202,10 +1093,7 @@ export default function HomePage() {
               >
                 <Card className="mb-6 overflow-hidden">
                   <div className="relative h-64 bg-purple-50">
-                    <FallbackExerciseImage
-                      exerciseName={currentExercise.name}
-                      className="h-64"
-                    />
+                    <FallbackExerciseImage exerciseName={currentExercise.name} className="h-64" />
                     <div className="absolute top-2 right-2">
                       <span
                         className={cn(
@@ -1220,13 +1108,9 @@ export default function HomePage() {
 
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-center">
-                      <CardTitle className="text-xl font-bold text-purple-800">
-                        {currentExercise.name}
-                      </CardTitle>
+                      <CardTitle className="text-xl font-bold text-purple-800">{currentExercise.name}</CardTitle>
                     </div>
-                    <p className="text-sm text-purple-600">
-                      {currentExercise.muscleGroup}
-                    </p>
+                    <p className="text-sm text-purple-600">{currentExercise.muscleGroup}</p>
                   </CardHeader>
 
                   <CardContent>
@@ -1241,9 +1125,7 @@ export default function HomePage() {
                         exit={{ opacity: 0, height: 0 }}
                         className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg mb-4"
                       >
-                        <h4 className="font-medium text-yellow-800 mb-2">
-                          Pro Tips:
-                        </h4>
+                        <h4 className="font-medium text-yellow-800 mb-2">Pro Tips:</h4>
                         <ul className="list-disc pl-5 text-sm text-yellow-700 space-y-1">
                           {currentExercise.tips.map((tip, index) => (
                             <li key={index}>{tip}</li>
@@ -1255,23 +1137,14 @@ export default function HomePage() {
                     <div className="mb-4">
                       <div className="flex justify-between mb-1">
                         <span className="text-sm font-medium">
-                          Set {currentExercise.currentSet + 1} of{" "}
-                          {currentExercise.targetSets}
+                          Set {currentExercise.currentSet + 1} of {currentExercise.targetSets}
                         </span>
                         <span className="text-sm text-purple-600">
-                          {
-                            currentExercise.sets.filter((set) => set.completed)
-                              .length
-                          }{" "}
-                          sets completed
+                          {currentExercise.sets.filter((set) => set.completed).length} sets completed
                         </span>
                       </div>
                       <Progress
-                        value={
-                          (currentExercise.currentSet /
-                            currentExercise.targetSets) *
-                          100
-                        }
+                        value={(currentExercise.currentSet / currentExercise.targetSets) * 100}
                         className="h-2"
                       />
                     </div>
@@ -1279,9 +1152,7 @@ export default function HomePage() {
                     {currentExercise.currentSet < currentExercise.targetSets ? (
                       <div className="space-y-4">
                         <div className="flex flex-col items-center">
-                          <p className="text-sm text-purple-600 mb-2">
-                            Target: {currentExercise.targetReps} reps
-                          </p>
+                          <p className="text-sm text-purple-600 mb-2">Target: {currentExercise.targetReps} reps</p>
                           <div className="flex items-center gap-4">
                             <Button
                               variant="outline"
@@ -1290,14 +1161,10 @@ export default function HomePage() {
                               className="h-12 w-12 rounded-full border-2 border-purple-300"
                               disabled={isLoading}
                             >
-                              <span className="text-2xl font-bold text-purple-600">
-                                -
-                              </span>
+                              <span className="text-2xl font-bold text-purple-600">-</span>
                             </Button>
                             <div className="bg-purple-100 h-20 w-20 rounded-full flex items-center justify-center">
-                              <span className="text-3xl font-bold text-purple-800">
-                                {currentExercise.currentReps}
-                              </span>
+                              <span className="text-3xl font-bold text-purple-800">{currentExercise.currentReps}</span>
                             </div>
                             <Button
                               variant="outline"
@@ -1306,9 +1173,7 @@ export default function HomePage() {
                               className="h-12 w-12 rounded-full border-2 border-purple-300"
                               disabled={isLoading}
                             >
-                              <span className="text-2xl font-bold text-purple-600">
-                                +
-                              </span>
+                              <span className="text-2xl font-bold text-purple-600">+</span>
                             </Button>
                           </div>
                         </div>
@@ -1331,12 +1196,8 @@ export default function HomePage() {
                     ) : (
                       <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
                         <Check className="w-6 h-6 text-green-500 mx-auto mb-2" />
-                        <p className="text-sm font-medium text-green-700">
-                          All sets completed! 🎉
-                        </p>
-                        <p className="text-xs text-green-600 mt-1">
-                          Move to the next exercise
-                        </p>
+                        <p className="text-sm font-medium text-green-700">All sets completed! 🎉</p>
+                        <p className="text-xs text-green-600 mt-1">Move to the next exercise</p>
                       </div>
                     )}
 
@@ -1345,17 +1206,11 @@ export default function HomePage() {
                         <div
                           key={setIndex}
                           className={`text-center p-2 rounded ${
-                            set.completed
-                              ? "bg-purple-100 text-purple-700"
-                              : "bg-gray-100 text-gray-400"
+                            set.completed ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-400"
                           }`}
                         >
-                          <div className="text-xs font-medium">
-                            Set {setIndex + 1}
-                          </div>
-                          <div className="text-sm">
-                            {set.completed ? set.reps : "-"}
-                          </div>
+                          <div className="text-xs font-medium">Set {setIndex + 1}</div>
+                          <div className="text-sm">{set.completed ? set.reps : "-"}</div>
                         </div>
                       ))}
                     </div>
@@ -1388,12 +1243,8 @@ export default function HomePage() {
               <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="h-8 w-8 text-red-500" />
               </div>
-              <DialogTitle className="text-xl font-bold text-gray-800 mb-2">
-                Exit Workout?
-              </DialogTitle>
-              <DialogDescription className="text-gray-600 text-sm">
-                Progress won't be saved
-              </DialogDescription>
+              <DialogTitle className="text-xl font-bold text-gray-800 mb-2">Exit Workout?</DialogTitle>
+              <DialogDescription className="text-gray-600 text-sm">Progress won't be saved</DialogDescription>
             </DialogHeader>
             <div className="flex flex-row gap-3 pt-4 justify-center">
               <Button
@@ -1403,18 +1254,13 @@ export default function HomePage() {
               >
                 Resume
               </Button>
-              <Button
-                onClick={quitWorkout}
-                className="bg-red-500 hover:bg-red-600 text-white px-6"
-              >
+              <Button onClick={quitWorkout} className="bg-red-500 hover:bg-red-600 text-white px-6">
                 Exit
               </Button>
             </div>
           </DialogContent>
         </Dialog>
-        {workoutStarted && !restMode && currentExercise && (
-          <ExerciseAssistant exerciseName={currentExercise.name} />
-        )}
+        {workoutStarted && !restMode && currentExercise && <ExerciseAssistant exerciseName={currentExercise.name} />}
         {showChallengeComplete && (
           <>
             <Confetti
@@ -1437,9 +1283,7 @@ export default function HomePage() {
                     <Fire className="w-20 h-20 text-orange-300 opacity-20" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <h2 className="text-2xl font-bold text-purple-800 relative z-10">
-                      Challenge Complete!
-                    </h2>
+                    <h2 className="text-2xl font-bold text-purple-800 relative z-10">Challenge Complete!</h2>
                   </div>
                 </div>
                 <div className="h-1 w-20 bg-orange-500 mx-auto mb-4"></div>
