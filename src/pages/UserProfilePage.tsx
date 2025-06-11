@@ -8,7 +8,12 @@ import { friendsService } from "@/services/friendsService";
 import { userService } from "@/services/userService";
 import { useBadgeStore } from "@/stores/useBadgeStore";
 import { useUserStore } from "@/stores/useUserStore";
-import { Friendship, FriendshipStatus, FrontendUserData, UserGoal } from "@/types";
+import {
+  Friendship,
+  FriendshipStatus,
+  FrontendUserData,
+  UserGoal,
+} from "@/types";
 import { motion } from "framer-motion";
 import { ArrowLeft, Check, Trophy, UserPlus, UserX, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -51,7 +56,9 @@ export default function UserProfilePage() {
     initializeBadges();
   }, []);
 
-  const handleFriendAction = async (action: "add" | "accept" | "reject" | "remove"): Promise<void> => {
+  const handleFriendAction = async (
+    action: "add" | "accept" | "reject" | "remove"
+  ): Promise<void> => {
     try {
       let updated: Friendship | null = null;
 
@@ -103,7 +110,11 @@ export default function UserProfilePage() {
     return (
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
         <header className="flex items-center mb-6">
-          <Button variant="ghost" onClick={() => navigate("/friends")} className="mr-2 p-2">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/friends")}
+            className="mr-2 p-2"
+          >
             <ArrowLeft className="w-6 h-6 text-purple-600" />
           </Button>
           <h1 className="text-2xl font-bold text-purple-800">User Profile</h1>
@@ -116,24 +127,33 @@ export default function UserProfilePage() {
     );
   }
 
-  console.log(friendship);
-
   return (
     <>
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 p-4 pb-20">
         <header className="flex items-center mb-6">
-          <Button variant="ghost" onClick={() => navigate("/friends")} className="mr-2 p-2">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/friends")}
+            className="mr-2 p-2"
+          >
             <ArrowLeft className="w-6 h-6 text-purple-600" />
           </Button>
           <h1 className="text-2xl font-bold text-purple-800">User Profile</h1>
         </header>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
           <Card className="mb-6 overflow-hidden">
             <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 flex flex-col items-center">
               <div className="relative mb-4">
                 <Avatar className="h-24 w-24 border-4 border-white">
-                  <AvatarImage src={userProfile.avatar_url || "/placeholder.svg"} alt={userProfile.name} />
+                  <AvatarImage
+                    src={userProfile.avatar_url || "/placeholder.svg"}
+                    alt={userProfile.name}
+                  />
                   <AvatarFallback className="bg-purple-200 text-purple-700 text-2xl">
                     {userProfile.name?.charAt(0)}
                   </AvatarFallback>
@@ -142,14 +162,19 @@ export default function UserProfilePage() {
                   {userProfile.level}
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-1">{userProfile.name}</h2>
+              <h2 className="text-2xl font-bold text-white mb-1">
+                {userProfile.name}
+              </h2>
               <p className="text-purple-200">{userProfile.email}</p>
             </div>
 
             <CardContent className="p-6">
               <div className="flex justify-center space-x-2 mb-6">
                 {!friendship && (
-                  <Button onClick={() => handleFriendAction("add")} className="bg-purple-600 hover:bg-purple-700">
+                  <Button
+                    onClick={() => handleFriendAction("add")}
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
                     <UserPlus className="w-4 h-4 mr-2" />
                     Add Friend
                   </Button>
@@ -157,7 +182,11 @@ export default function UserProfilePage() {
 
                 {friendship?.status === FriendshipStatus.PENDING &&
                   (friendship.user_id === user.id ? (
-                    <Button variant="outline" className="border-purple-200 text-purple-700" disabled>
+                    <Button
+                      variant="outline"
+                      className="border-purple-200 text-purple-700"
+                      disabled
+                    >
                       <Check className="w-4 h-4 mr-2" />
                       Request Sent
                     </Button>
@@ -171,7 +200,10 @@ export default function UserProfilePage() {
                         <X className="w-4 h-4 mr-2" />
                         Reject
                       </Button>
-                      <Button onClick={() => handleFriendAction("accept")} className="bg-green-600 hover:bg-green-700">
+                      <Button
+                        onClick={() => handleFriendAction("accept")}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
                         <Check className="w-4 h-4 mr-2" />
                         Accept
                       </Button>
@@ -197,19 +229,29 @@ export default function UserProfilePage() {
                     Fitness Goals
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {userProfile.user_goals?.map((goal: UserGoal, index: number) => (
-                      <Badge key={index} className="bg-purple-100 text-purple-700 px-3 py-1.5">
-                        {goal.goals.name}
-                      </Badge>
-                    ))}
+                    {userProfile.user_goals?.map(
+                      (goal: UserGoal, index: number) => (
+                        <Badge
+                          key={index}
+                          className="bg-purple-100 text-purple-700 px-3 py-1.5"
+                        >
+                          {goal.goals.name}
+                        </Badge>
+                      )
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-purple-800 mb-3">Achievements</h3>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                    Achievements
+                  </h3>
                   <div className="grid grid-cols-3 gap-4">
                     {allBadges?.slice(0, 3).map((badge) => (
-                      <div key={badge.id} className="flex flex-col items-center text-center">
+                      <div
+                        key={badge.id}
+                        className="flex flex-col items-center text-center"
+                      >
                         <div className="text-4xl mb-1">{badge.icon}</div>
                         <div className="text-sm">{badge.name}</div>
                       </div>
@@ -218,18 +260,26 @@ export default function UserProfilePage() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-purple-800 mb-3">Stats</h3>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                    Stats
+                  </h3>
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div className="bg-purple-50 p-3 rounded-lg">
-                      <div className="text-2xl font-bold text-purple-700">{Math.floor(Math.random() * 30) + 1}</div>
+                      <div className="text-2xl font-bold text-purple-700">
+                        {Math.floor(Math.random() * 30) + 1}
+                      </div>
                       <div className="text-xs text-purple-600">Workouts</div>
                     </div>
                     <div className="bg-purple-50 p-3 rounded-lg">
-                      <div className="text-2xl font-bold text-purple-700">{Math.floor(Math.random() * 20) + 1}</div>
+                      <div className="text-2xl font-bold text-purple-700">
+                        {Math.floor(Math.random() * 20) + 1}
+                      </div>
                       <div className="text-xs text-purple-600">Day Streak</div>
                     </div>
                     <div className="bg-purple-50 p-3 rounded-lg">
-                      <div className="text-2xl font-bold text-purple-700">{userProfile.level}</div>
+                      <div className="text-2xl font-bold text-purple-700">
+                        {userProfile.level}
+                      </div>
                       <div className="text-xs text-purple-600">Level</div>
                     </div>
                   </div>
