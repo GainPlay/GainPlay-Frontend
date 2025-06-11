@@ -13,13 +13,14 @@ import {
   Dumbbell,
   TrendingUp,
   Lightbulb,
-  Loader2 // Import Loader2 icon for loading state
+  Loader2, // Import Loader2 icon for loading state
+  Calendar,
 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import type { FrontendBadge, HealthInsight } from "../types";
@@ -29,8 +30,35 @@ import { badgeService } from "@/services/badgeService";
 import { useAvatarStore } from "@/stores/useAvatarStore";
 import { avatarService } from "@/services/avatarService";
 import Navigation from "@/components/Navigation";
-
+// import { formatEarnedDate } from "@/utils/badgesUtils";
+import {getBadgeRarity} from "@/utils/badgesUtils";
 // Component for the Skeleton Loader
+
+const formatEarnedDate = (dateString: string | undefined) => {
+  if (!dateString) return "Recently";
+
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - date.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 1) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+
+  const weeks = Math.floor(diffDays / 7);
+  if (weeks === 1) return "1 week ago";
+  if (weeks < 4) return `${weeks} weeks ago`;
+
+  const months = Math.floor(diffDays / 30);
+  if (months === 1) return "1 month ago";
+  if (months < 12) return `${months} months ago`;
+
+  const years = Math.floor(diffDays / 365);
+  if (years === 1) return "1 year ago";
+  return `${years} years ago`;
+};
+
 const HealthInsightSkeleton = () => (
   <div className="space-y-3">
     {[...Array(3)].map((_, i) => (
@@ -89,7 +117,7 @@ export default function ProfilePage() {
       try {
         const [all, userOwned] = await Promise.all([
           badgeService.getAllBadges(),
-          badgeService.getUserBadges()
+          badgeService.getUserBadges(),
         ]);
         setAllBadges(all);
         setUserBadges(userOwned);
@@ -140,7 +168,7 @@ export default function ProfilePage() {
         email: editedEmail,
         height: editedHeight,
         weight: editedWeight,
-        age: editedAge
+        age: editedAge,
       };
       await userService.updateUser(user.id, updatedUserData);
       user.setUser(updatedUserData);
@@ -161,10 +189,12 @@ export default function ProfilePage() {
   };
 
   const handleBadgeClick = (badge: FrontendBadge) => {
-    const badgeWithDesc = allBadges.find((b) => b.id === badge.id) || {
+    const badgeWithDesc = {
+      ...(allBadges.find((b) => b.id === badge.id) || {
       ...badge,
       description: "Achievement unlocked for your fitness journey!",
-      earnedOn: "Recently"
+      }),
+      earnedAt: (userBadges.find((b) => b.id === badge.id) as FrontendBadge)?.earnedAt,
     };
 
     setSelectedBadge(badgeWithDesc);
@@ -705,28 +735,121 @@ export default function ProfilePage() {
         </Card>
 
         <Dialog open={badgeDialogOpen} onOpenChange={setBadgeDialogOpen}>
-          <DialogContent className="sm:max-w-md max-w-[85%] mx-auto">
-            <DialogHeader>
-              <DialogTitle className="text-center">
-                {selectedBadge?.name}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col items-center p-4">
-              <div className="text-6xl mb-6 bg-purple-50 w-24 h-24 rounded-full flex items-center justify-center shadow-md">
-                {selectedBadge?.icon}
+          <DialogContent className="sm:max-w-md max-w-[90%] mx-auto border-0 p-0 overflow-hidden bg-transparent">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.3 }}
+              className="relative bg-white rounded-2xl shadow-2xl overflow-hidden"
+            >
+              {/* Header with gradient background */}
+              <div className="bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 p-6 text-center relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-orange-600/20" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setBadgeDialogOpen(false)}
+                  className="absolute top-3 right-3 text-white/80 hover:text-white hover:bg-white/20 rounded-full h-8 w-8 p-0"
+                >
+                  {/* <X className="h-4 w-4" /> */}
+                </Button>
+
+                {/* Badge Icon with animated glow */}
+                <motion.div
+                  initial={{ scale: 0.8, rotate: -10 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", duration: 0.5 }}
+                  className="relative mx-auto mb-4"
+                >
+                  <div className="absolute inset-0 bg-white/30 rounded-full blur-xl scale-110" />
+                  <div className="relative w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-white/50">
+                    <span className="text-4xl">{selectedBadge?.icon}</span>
+                  </div>
+                  {/* Sparkle effects */}
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                    }}
+                    className="absolute -top-2 -right-2 w-4 h-4 bg-white rounded-full opacity-80"
+                  />
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.3, 1],
+                      opacity: [0.3, 0.8, 0.3],
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                      delay: 0.5,
+                    }}
+                    className="absolute -bottom-1 -left-2 w-3 h-3 bg-white rounded-full opacity-60"
+                  />
+                </motion.div>
+
+                <DialogHeader className="relative z-10">
+                  <DialogTitle className="text-2xl font-bold text-white mb-2">
+                    {selectedBadge?.name}
+                  </DialogTitle>
+                  <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                    <Calendar className="w-3 h-3 mr-1.5 text-white/80" />
+                    <span className="text-sm text-white/90 font-medium">
+                      Earned {formatEarnedDate(selectedBadge?.earnedAt)}
+                    </span>
+                  </div>
+                </DialogHeader>
               </div>
-              <p className="text-center text-gray-700 mb-4">
-                {selectedBadge?.description}
-              </p>
-            </div>
-            <div className="flex justify-center mt-2">
-              <Button
-                onClick={() => setBadgeDialogOpen(false)}
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                Close
-              </Button>
-            </div>
+
+              {/* Content */}
+              <div className="p-6 bg-gradient-to-b from-white to-amber-50">
+                <div className="text-center mb-6">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                    Achievement Details
+                  </h4>
+                  <div className="bg-gradient-to-r from-amber-100 to-yellow-100 rounded-xl p-4 border border-amber-200">
+                    <p className="text-gray-700 leading-relaxed">
+                      {selectedBadge?.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Achievement stats */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="bg-white rounded-lg p-3 text-center border border-gray-100 shadow-sm">
+                    <div className="text-2xl font-bold text-amber-600">🎯</div>
+                    <div className="text-xs text-gray-600 mt-1">
+                      Achievement
+                    </div>
+                    <div className="text-sm font-semibold text-gray-800">
+                      Unlocked
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 text-center border border-gray-100 shadow-sm">
+                    <div className="text-2xl font-bold text-purple-600">⭐</div>
+                    <div className="text-xs text-gray-600 mt-1">Rarity</div>
+                    <div className="text-sm font-semibold text-gray-800">
+                      {selectedBadge ? getBadgeRarity(selectedBadge) : "common"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action button */}
+                <Button
+                  onClick={() => setBadgeDialogOpen(false)}
+                  className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-semibold py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
+                >
+                  <Trophy className="w-4 h-4 mr-2" />
+                  Awesome!
+                </Button>
+              </div>
+            </motion.div>
           </DialogContent>
         </Dialog>
       </div>

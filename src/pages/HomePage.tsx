@@ -447,7 +447,7 @@ export default function HomePage() {
               newUserBadges.push({
                 ...badge,
                 description: "Badge earned",
-                earnedOn: new Date().toISOString(),
+                earnedAt: new Date().toISOString(),
               });
             }
           }
@@ -1381,20 +1381,33 @@ export default function HomePage() {
               </motion.div>
             </AnimatePresence>
 
-            <div className="flex gap-4 mb-6">
+            <div className="flex gap-4 mb-8 justify-center">
               <Button
-                onClick={finishWorkout}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-full transition-all duration-200 ease-in-out transform hover:scale-105"
-                disabled={isLoading}
+              onClick={finishWorkout}
+              className={cn(
+                "w-full max-w-xs py-4 px-6 rounded-full font-bold text-lg shadow-lg transition-all duration-200 ease-in-out transform",
+                "bg-gradient-to-r from-purple-600 via-indigo-500 to-pink-500",
+                "hover:from-purple-700 hover:via-indigo-600 hover:to-pink-600",
+                "text-white border-2 border-purple-300 hover:border-purple-400",
+                "hover:scale-105 focus:ring-4 focus:ring-purple-200"
+              )}
+              disabled={isLoading}
+              style={{
+                letterSpacing: "0.03em",
+                boxShadow: "0 4px 24px 0 rgba(139, 92, 246, 0.15)",
+              }}
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving Workout...
-                  </>
-                ) : (
-                  "Finish Workout"
-                )}
+              {isLoading ? (
+                <>
+                <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                Saving Workout...
+                </>
+              ) : (
+                <>
+                <span className="mr-2">🎉</span>
+                Finish Workout
+                </>
+              )}
               </Button>
             </div>
           </>
