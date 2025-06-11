@@ -195,7 +195,7 @@ export interface FrontendBadge {
   name: string;
   icon: string;
   description: string;
-  earnedOn?: string;
+  earnedAt?: string;
 }
 
 export interface FrontendAvatar {
@@ -306,7 +306,7 @@ export interface Badge {
   name: string;
   icon: string;
   description: string;
-  created_at?: string;
+  earnedAt?: string;
 }
 
 // export interface UserBadge extends Badge {
