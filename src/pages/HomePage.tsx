@@ -559,9 +559,22 @@ export default function HomePage() {
       await challengeService.finishChallenge(user.id);
 
       setIsDailyChallengeDone(true);
+
+      // Update coins, experience and level
       const newCoins = coins + 50;
       setCoins(newCoins);
-      user.setUser({ coins: newCoins });
+
+      const currentXP = user.experience || 0;
+      const newTotalXP = currentXP + 100;
+      setEarnedXP(100);
+
+      user.setUser({ coins: newCoins, experience: newTotalXP });
+
+      const newLevel = Math.floor(newTotalXP / 100) + 1;
+      if (newLevel > level) {
+        setLevel(newLevel);
+        user.setUser({ level: newLevel });
+      }
     }
   };
 
