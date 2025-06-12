@@ -150,6 +150,16 @@ export default function HomePage() {
   const [upcomingWorkout, setUpcomingWorkout] = useState<Workout | null>(null);
 
   useEffect(() => {
+    const localStorageDailyChallenge = localStorage.getItem(
+      "dailyChallengeProgress"
+    );
+    if (localStorageDailyChallenge) {
+      const dailyChallengeProgress = JSON.parse(localStorageDailyChallenge);
+      setDailyChallengeProgress(dailyChallengeProgress);
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchUpcomingWorkout = async () => {
       try {
         if (!currentWorkout) {
@@ -524,6 +534,15 @@ export default function HomePage() {
 
     // Simulate progress update
     if (todaysChallenge?.intervals) {
+      localStorage.setItem(
+        "dailyChallengeProgress",
+        JSON.stringify(
+          Math.min(
+            dailyChallengeProgress + todaysChallenge.intervals,
+            todaysChallenge.repetitions
+          )
+        )
+      );
       setDailyChallengeProgress((prev) =>
         Math.min(prev + todaysChallenge.intervals, todaysChallenge.repetitions)
       );
@@ -531,18 +550,18 @@ export default function HomePage() {
 
     // If challenge is completed
     if (dailyChallengeProgress + 5 >= 50) {
+      // Show celebration popup
+      setShowChallengeComplete(true);
+      setTimeout(() => {
+        setShowChallengeComplete(false);
+      }, 3000);
+
       await challengeService.finishChallenge(user.id);
 
       setIsDailyChallengeDone(true);
       const newCoins = coins + 50;
       setCoins(newCoins);
       user.setUser({ coins: newCoins });
-
-      // Show celebration popup
-      setShowChallengeComplete(true);
-      setTimeout(() => {
-        setShowChallengeComplete(false);
-      }, 3000);
     }
   };
 
@@ -785,7 +804,9 @@ export default function HomePage() {
                 <div className="w-full bg-gray-200 h-2 rounded-full mb-2">
                   <div
                     className="bg-orange-500 h-full rounded-full transition-all duration-500"
-                    style={{ width: `${dailyChallengeProgress * 2}%` }}
+                    style={{
+                      width: `${dailyChallengeProgress * 2}%`,
+                    }}
                   />
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
@@ -1383,31 +1404,31 @@ export default function HomePage() {
 
             <div className="flex gap-4 mb-8 justify-center">
               <Button
-              onClick={finishWorkout}
-              className={cn(
-                "w-full max-w-xs py-4 px-6 rounded-full font-bold text-lg shadow-lg transition-all duration-200 ease-in-out transform",
-                "bg-gradient-to-r from-purple-600 via-indigo-500 to-pink-500",
-                "hover:from-purple-700 hover:via-indigo-600 hover:to-pink-600",
-                "text-white border-2 border-purple-300 hover:border-purple-400",
-                "hover:scale-105 focus:ring-4 focus:ring-purple-200"
-              )}
-              disabled={isLoading}
-              style={{
-                letterSpacing: "0.03em",
-                boxShadow: "0 4px 24px 0 rgba(139, 92, 246, 0.15)",
-              }}
+                onClick={finishWorkout}
+                className={cn(
+                  "w-full max-w-xs py-4 px-6 rounded-full font-bold text-lg shadow-lg transition-all duration-200 ease-in-out transform",
+                  "bg-gradient-to-r from-purple-600 via-indigo-500 to-pink-500",
+                  "hover:from-purple-700 hover:via-indigo-600 hover:to-pink-600",
+                  "text-white border-2 border-purple-300 hover:border-purple-400",
+                  "hover:scale-105 focus:ring-4 focus:ring-purple-200"
+                )}
+                disabled={isLoading}
+                style={{
+                  letterSpacing: "0.03em",
+                  boxShadow: "0 4px 24px 0 rgba(139, 92, 246, 0.15)",
+                }}
               >
-              {isLoading ? (
-                <>
-                <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                Saving Workout...
-                </>
-              ) : (
-                <>
-                <span className="mr-2">🎉</span>
-                Finish Workout
-                </>
-              )}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                    Saving Workout...
+                  </>
+                ) : (
+                  <>
+                    <span className="mr-2">🎉</span>
+                    Finish Workout
+                  </>
+                )}
               </Button>
             </div>
           </>
