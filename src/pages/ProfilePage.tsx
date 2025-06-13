@@ -567,7 +567,7 @@ export default function ProfilePage() {
               </div>
             )}
             <div className="mt-4 text-center">
-              {ownedAvatars && ownedAvatars.length > 1 && (
+              {ownedAvatars && ownedAvatars.length === 0 && (
                 <Button
                   variant="outline"
                   onClick={() => navigate("/cart")}
