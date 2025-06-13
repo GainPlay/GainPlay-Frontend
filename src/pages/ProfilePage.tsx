@@ -574,14 +574,16 @@ export default function ProfilePage() {
               </div>
             )}
             <div className="mt-4 text-center">
-              <Button
-                variant="outline"
-                onClick={() => navigate("/cart")}
-                className="border-purple-200 text-purple-700 hover:bg-purple-50"
-              >
-                <Coins className="w-4 h-4 mr-2 text-yellow-500" />
-                Get More Avatars
-              </Button>
+              {ownedAvatars && ownedAvatars.length === 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/cart")}
+                  className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                >
+                  <Coins className="w-4 h-4 mr-2 text-yellow-500" />
+                  Get More Avatars
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
