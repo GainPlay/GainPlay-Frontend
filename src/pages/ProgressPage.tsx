@@ -102,7 +102,13 @@ export default function ProgressPage() {
   const xpProgressInLevel = currentXP - xpForCurrentLevel;
   const xpNeededForNextLevel = Math.max(0, xpForNextLevel - currentXP);
   const progressPercentage = Math.min(100, (xpProgressInLevel / 100) * 100);
-
+  console.log("currentLevel", currentLevel);
+  console.log("currentXP", currentXP);
+  console.log("xpForCurrentLevel", xpForCurrentLevel);
+  console.log("xpForNextLevel", xpForNextLevel);
+console.log("xpProgressInLevel", xpProgressInLevel);
+  console.log("xpNeededForNextLevel", xpNeededForNextLevel);
+  console.log("progressPercentage", progressPercentage);
   const userBadgeIds = userBadges.map(badge => badge.id);
   const earnedBadges = allBadges.filter((badge) => userBadgeIds.includes(badge.id));
 //   const lockedBadges = allBadges.filter((badge) => !userBadgeIds.includes(badge.id));

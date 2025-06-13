@@ -36,13 +36,22 @@ import { getBadgeRarity } from "@/utils/badgesUtils";
 // Component for the Skeleton Loader
 const formatEarnedDate = (dateString: string | undefined) => {
   if (!dateString) return "Recently";
-
+  
+  console.log("Formatting date:", dateString);
+  
+  // Parse the date and ensure we're working with proper Date objects
   const date = new Date(dateString);
   const now = new Date();
-  const diffTime = Math.abs(now.getTime() - date.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 1) return "Today";
+  
+  // Get the start of today and the date in question (local timezone)
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dateToCheck = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  
+  // Calculate difference in days using local date components
+  const diffTime = today.getTime() - dateToCheck.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 0) return "Today";
   if (diffDays === 1) return "Yesterday";
   if (diffDays < 7) return `${diffDays} days ago`;
 
