@@ -353,7 +353,7 @@ export default function OnboardingPage() {
   const { setCurrentWorkout } = useWorkoutStore();
 
   const handleNext = async () => {
-    if (currentQuestion < questions.length - 1) {
+    if (currentQuestion < questions.length - 1 ) {
       setDirection(1);
       setCurrentQuestion(currentQuestion + 1);
     } else {
@@ -803,7 +803,7 @@ export default function OnboardingPage() {
                       <Input
                         id="age"
                         type="number"
-                        placeholder="25"
+                        placeholder="Enter your age"
                         value={answers.technicalData.age}
                         onChange={(e) => handleTechnicalDataChange("age", e.target.value)}
                         className="border-0 text-2xl font-bold text-gray-800 placeholder-gray-400 bg-transparent focus:ring-0 p-0 h-auto"
@@ -871,7 +871,7 @@ export default function OnboardingPage() {
                         <Input
                           id="weight"
                           type="number"
-                          placeholder="70"
+                          placeholder="Weight"
                           value={answers.technicalData.weight}
                           onChange={(e) => handleTechnicalDataChange("weight", e.target.value)}
                           className="border-0 text-2xl font-bold text-gray-800 placeholder-gray-400 bg-transparent focus:ring-0 p-0 h-auto w-20"
@@ -942,7 +942,7 @@ export default function OnboardingPage() {
                         <Input
                           id="height"
                           type="number"
-                          placeholder="175"
+                          placeholder="Height"
                           value={answers.technicalData.height}
                           onChange={(e) => handleTechnicalDataChange("height", e.target.value)}
                           className="border-0 text-2xl font-bold text-gray-800 placeholder-gray-400 bg-transparent focus:ring-0 p-0 h-auto w-20"
@@ -1062,6 +1062,10 @@ export default function OnboardingPage() {
     }
 
     if (question.id === "bodyStructure" && !answers.bodyStructure) {
+      return true;
+    }
+
+    if (question.id === "technicalData" && !answers.technicalData.age || !answers.technicalData.weight || !answers.technicalData.height) {
       return true;
     }
 
