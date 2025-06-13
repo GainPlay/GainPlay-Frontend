@@ -27,7 +27,6 @@ import type { FrontendBadge, HealthInsight, UserAvatar } from "../types";
 import { useUserStore } from "@/stores/useUserStore";
 import { userService } from "@/services/userService";
 import { badgeService } from "@/services/badgeService";
-import { useAvatarStore } from "@/stores/useAvatarStore";
 import { avatarService } from "@/services/avatarService";
 import Navigation from "@/components/Navigation";
 // import { formatEarnedDate } from "@/utils/badgesUtils";
@@ -77,13 +76,13 @@ const HealthInsightSkeleton = () => (
   </div>
 );
 
-const getHealthInsights = async (userId: number) => {
-  const insights = await userService.getUserInsights(userId);
+const getHealthInsights = async () => {
+  const insights = await userService.getUserInsights();
   return insights;
 };
 
-const generateHealthInsights = (userId: number) => {
-  return getHealthInsights(userId);
+const generateHealthInsights = () => {
+  return getHealthInsights();
 };
 
 export default function ProfilePage() {
@@ -107,11 +106,6 @@ export default function ProfilePage() {
   const [regeneratingInsights, setRegeneratingInsights] = useState(false); // New state for regenerate button loading
 
   const user = useUserStore();
-  const { initializeAvatars } = useAvatarStore();
-
-  useEffect(() => {
-    initializeAvatars();
-  }, []);
 
   useEffect(() => {
     const loadBadges = async () => {
@@ -150,7 +144,7 @@ export default function ProfilePage() {
 
       // Initial load of health insights
       setLoadingInsights(true); // Start loading
-      generateHealthInsights(user.id)
+      generateHealthInsights()
         .then((insights) => {
           setHealthInsights(insights.insights);
         })
@@ -165,7 +159,7 @@ export default function ProfilePage() {
       setRegeneratingInsights(true); // Start regenerating state
       setHealthInsights([]); // Clear current insights to show skeleton
       try {
-        const insights = await generateHealthInsights(user.id);
+        const insights = await generateHealthInsights();
         setHealthInsights(insights.insights);
       } catch (error) {
         console.error("Failed to regenerate insights:", error);
