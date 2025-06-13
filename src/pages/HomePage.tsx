@@ -455,7 +455,6 @@ export default function HomePage() {
       setWorkoutsDone((prev) => prev + 1);
 
       // Update streak
-      const newStreak = streak + 1;
       setStreak(newStreak);
       user.setUser({ streak: newStreak });
 
