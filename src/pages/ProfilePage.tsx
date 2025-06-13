@@ -37,8 +37,6 @@ import { getBadgeRarity } from "@/utils/badgesUtils";
 const formatEarnedDate = (dateString: string | undefined) => {
   if (!dateString) return "Recently";
   
-  console.log("Formatting date:", dateString);
-  
   // Parse the date and ensure we're working with proper Date objects
   const date = new Date(dateString);
   const now = new Date();
