@@ -14,16 +14,16 @@ import {
   TrendingUp,
   Lightbulb,
   Loader2, // Import Loader2 icon for loading state
-  Calendar,
+  Calendar
 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import type { FrontendBadge, HealthInsight } from "../types";
+import type { FrontendBadge, HealthInsight, UserAvatar } from "../types";
 import { useUserStore } from "@/stores/useUserStore";
 import { userService } from "@/services/userService";
 import { badgeService } from "@/services/badgeService";
@@ -31,9 +31,9 @@ import { useAvatarStore } from "@/stores/useAvatarStore";
 import { avatarService } from "@/services/avatarService";
 import Navigation from "@/components/Navigation";
 // import { formatEarnedDate } from "@/utils/badgesUtils";
-import {getBadgeRarity} from "@/utils/badgesUtils";
-// Component for the Skeleton Loader
+import { getBadgeRarity } from "@/utils/badgesUtils";
 
+// Component for the Skeleton Loader
 const formatEarnedDate = (dateString: string | undefined) => {
   if (!dateString) return "Recently";
 
@@ -100,7 +100,8 @@ export default function ProfilePage() {
   const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
   const [allBadges, setAllBadges] = useState<FrontendBadge[]>([]);
   const [userBadges, setUserBadges] = useState<FrontendBadge[]>([]);
-  const [ownedAvatars] = useState<string[]>([]);
+  const [ownedAvatars, setOwnedAvatars] = useState<UserAvatar[]>([]);
+  const [loadingAvatars, setLoadingAvatars] = useState(true);
   const [healthInsights, setHealthInsights] = useState<HealthInsight[]>([]);
   const [loadingInsights, setLoadingInsights] = useState(true); // New state for loading insights
   const [regeneratingInsights, setRegeneratingInsights] = useState(false); // New state for regenerate button loading
@@ -117,12 +118,24 @@ export default function ProfilePage() {
       try {
         const [all, userOwned] = await Promise.all([
           badgeService.getAllBadges(),
-          badgeService.getUserBadges(),
+          badgeService.getUserBadges()
         ]);
         setAllBadges(all);
         setUserBadges(userOwned);
       } catch (err) {
         console.error("Failed to load badges:", err);
+      }
+    };
+
+    const loadOwnedAvatars = async () => {
+      try {
+        setLoadingAvatars(true);
+        const avatars = await avatarService.getOwnedAvatars();
+        setOwnedAvatars(avatars);
+      } catch (err) {
+        console.error("Failed to load owned avatars:", err);
+      } finally {
+        setLoadingAvatars(false);
       }
     };
 
@@ -133,6 +146,7 @@ export default function ProfilePage() {
       setEditedWeight(user.weight);
       setEditedAge(user.age);
       loadBadges();
+      loadOwnedAvatars();
 
       // Initial load of health insights
       setLoadingInsights(true); // Start loading
@@ -168,7 +182,7 @@ export default function ProfilePage() {
         email: editedEmail,
         height: editedHeight,
         weight: editedWeight,
-        age: editedAge,
+        age: editedAge
       };
       await userService.updateUser(user.id, updatedUserData);
       user.setUser(updatedUserData);
@@ -178,9 +192,14 @@ export default function ProfilePage() {
 
   const changeAvatar = async (newAvatar: number) => {
     if (user) {
-      const newAvatarData = await avatarService.setCurrentAvatar(newAvatar);
-      if (newAvatarData.success)
-        user.setUser({ avatar_url: newAvatarData.avatarUrl });
+      try {
+        const newAvatarData = await avatarService.setCurrentAvatar(newAvatar);
+        if (newAvatarData.success) {
+          user.setUser({ avatar_url: newAvatarData.avatarUrl });
+        }
+      } catch (error) {
+        console.error("Failed to change avatar:", error);
+      }
     }
   };
 
@@ -191,10 +210,11 @@ export default function ProfilePage() {
   const handleBadgeClick = (badge: FrontendBadge) => {
     const badgeWithDesc = {
       ...(allBadges.find((b) => b.id === badge.id) || {
-      ...badge,
-      description: "Achievement unlocked for your fitness journey!",
+        ...badge,
+        description: "Achievement unlocked for your fitness journey!"
       }),
-      earnedAt: (userBadges.find((b) => b.id === badge.id) as FrontendBadge)?.earnedAt,
+      earnedAt: (userBadges.find((b) => b.id === badge.id) as FrontendBadge)
+        ?.earnedAt
     };
 
     setSelectedBadge(badgeWithDesc);
@@ -495,50 +515,57 @@ export default function ProfilePage() {
             </p>
           </div>
           <CardContent className="p-4 bg-gradient-to-b from-white to-purple-50">
-            <div className="flex flex-wrap justify-center gap-4">
-              {ownedAvatars.map((avatarId) => {
-                // TODO: Replace with actual avatar fetching logic
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const avatars: any[] = [];
-
-                const avatar = avatars.find(
-                  (a: { id: number }) => String(a.id) === avatarId
-                );
-                if (!avatar) return null;
-                const isSelected = user?.avatar_url === avatar.image_url;
-                return (
-                  <motion.div
-                    key={avatarId}
-                    whileHover={{ scale: 1.05, y: -3 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="relative"
-                  >
-                    <Button
-                      variant="outline"
-                      className={`p-0 h-16 w-16 rounded-full overflow-hidden transition-all duration-200 ${
-                        isSelected
-                          ? "ring-4 ring-purple-500 border-white shadow-lg"
-                          : "border-purple-100 hover:border-purple-300 shadow-sm hover:shadow-md"
-                      }`}
-                      onClick={() => changeAvatar(avatar.id)}
+            {loadingAvatars ? (
+              <div className="flex justify-center items-center py-8">
+                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+              </div>
+            ) : ownedAvatars.length > 0 ? (
+              <div className="flex flex-wrap justify-center gap-4">
+                {ownedAvatars.map((userAvatar) => {
+                  const isSelected =
+                    user?.avatar_url === userAvatar?.avatars.image_url;
+                  return (
+                    <motion.div
+                      key={userAvatar.id}
+                      whileHover={{ scale: 1.05, y: -3 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="relative"
                     >
-                      <img
-                        src={avatar.image_url || "/placeholder.svg"}
-                        alt={avatar.name}
-                        width={64}
-                        height={64}
-                        className="h-full w-full object-cover"
-                      />
-                    </Button>
-                    {isSelected && (
-                      <div className="absolute -bottom-1 -right-1 bg-green-500 text-white rounded-full p-1 shadow-sm border border-white">
-                        <Check className="w-3 h-3" />
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
+                      <Button
+                        variant="outline"
+                        className={`p-0 h-16 w-16 rounded-full overflow-hidden transition-all duration-200 ${
+                          isSelected
+                            ? "ring-4 ring-purple-500 border-white shadow-lg"
+                            : "border-purple-100 hover:border-purple-300 shadow-sm hover:shadow-md"
+                        }`}
+                        onClick={() => changeAvatar(userAvatar.avatar_id)}
+                      >
+                        <img
+                          src={
+                            userAvatar?.avatars.image_url || "/placeholder.svg"
+                          }
+                          alt={userAvatar?.avatars.name}
+                          width={64}
+                          height={64}
+                          className="h-full w-full object-cover"
+                        />
+                      </Button>
+                      {isSelected && (
+                        <div className="absolute -bottom-1 -right-1 bg-green-500 text-white rounded-full p-1 shadow-sm border border-white">
+                          <Check className="w-3 h-3" />
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500 mb-4">
+                  You don't have any avatars yet
+                </p>
+              </div>
+            )}
             <div className="mt-4 text-center">
               <Button
                 variant="outline"
@@ -770,25 +797,25 @@ export default function ProfilePage() {
                   <motion.div
                     animate={{
                       scale: [1, 1.2, 1],
-                      opacity: [0.5, 1, 0.5],
+                      opacity: [0.5, 1, 0.5]
                     }}
                     transition={{
                       duration: 2,
                       repeat: Number.POSITIVE_INFINITY,
-                      ease: "easeInOut",
+                      ease: "easeInOut"
                     }}
                     className="absolute -top-2 -right-2 w-4 h-4 bg-white rounded-full opacity-80"
                   />
                   <motion.div
                     animate={{
                       scale: [1, 1.3, 1],
-                      opacity: [0.3, 0.8, 0.3],
+                      opacity: [0.3, 0.8, 0.3]
                     }}
                     transition={{
                       duration: 2.5,
                       repeat: Number.POSITIVE_INFINITY,
                       ease: "easeInOut",
-                      delay: 0.5,
+                      delay: 0.5
                     }}
                     className="absolute -bottom-1 -left-2 w-3 h-3 bg-white rounded-full opacity-60"
                   />
