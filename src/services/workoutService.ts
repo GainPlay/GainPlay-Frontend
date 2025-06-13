@@ -31,6 +31,7 @@ export const workoutService = {
     experience_earned: number;
     score: number;
     newBadges: FrontendBadge[];
+    newStreak: number;
   }> => {
     try {
       return (await axios.put(`/workout/finishWorkout`, finishedWorkout)).data;
