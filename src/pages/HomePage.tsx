@@ -52,6 +52,9 @@ import {
 } from "@/components/ui/dialog";
 import Navigation from "@/components/Navigation";
 
+const DAILY_CHALLENGE_KEY = "dailyChallenge";
+const DAILY_CHALLENGE_DATE_KEY = "dailyChallengeDate";
+
 // Convert API workout to UI format
 const convertApiWorkoutToUIFormat = (workout: Workout): WorkoutUIExercise[] => {
   if (!workout || !workout.workout_exercises) return [];
@@ -151,16 +154,34 @@ export default function HomePage() {
   const [upcomingWorkout, setUpcomingWorkout] = useState<Workout | null>(null);
 
   useEffect(() => {
-    const localStorageDailyChallenge = localStorage.getItem(
-      "dailyChallengeProgress"
-    );
+    const today = new Date().toDateString(); // Normalize date to day
+    const savedDate = localStorage.getItem(DAILY_CHALLENGE_DATE_KEY);
+    const localStorageDailyChallenge =
+      localStorage.getItem(DAILY_CHALLENGE_KEY);
+
+    if (savedDate !== today) {
+      // New day — reset the challenge
+      const initialProgress = 0;
+      localStorage.setItem(
+        DAILY_CHALLENGE_KEY,
+        JSON.stringify(initialProgress)
+      );
+      localStorage.setItem(DAILY_CHALLENGE_DATE_KEY, today);
+      setDailyChallengeProgress(initialProgress);
+      setIsDailyChallengeDone(false);
+      return;
+    }
+
+    // Same day — load existing progress
     if (localStorageDailyChallenge) {
       const dailyChallengeProgress = JSON.parse(localStorageDailyChallenge);
       setDailyChallengeProgress(dailyChallengeProgress);
-      if (dailyChallengeProgress == todaysChallenge?.repetitions)
+
+      if (dailyChallengeProgress === todaysChallenge?.repetitions) {
         setIsDailyChallengeDone(true);
+      }
     }
-  }, []);
+  }, [todaysChallenge]);
 
   useEffect(() => {
     const fetchUpcomingWorkout = async () => {
@@ -543,7 +564,7 @@ export default function HomePage() {
     // Simulate progress update
     if (todaysChallenge?.intervals) {
       localStorage.setItem(
-        "dailyChallengeProgress",
+        DAILY_CHALLENGE_KEY,
         JSON.stringify(
           Math.min(
             dailyChallengeProgress + todaysChallenge.intervals,
