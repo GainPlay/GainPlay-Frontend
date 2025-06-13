@@ -22,7 +22,7 @@ export const userService = {
     return (await axios.patch(`/user-settings/user/${userId}`, settings)).data;
   },
 
-  getUserInsights: async (userId: number): Promise<HealthInsightResponse> => {
-    return (await axios.get(`/user-goals/user/${userId}/insights`)).data;
-  },
+  getUserInsights: async (): Promise<HealthInsightResponse> => {
+    return (await axios.get(`/user-goals/user/insights`)).data;
+  }
 };
