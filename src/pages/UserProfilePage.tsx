@@ -270,7 +270,8 @@ export default function UserProfilePage() {
                       <div className="text-2xl font-bold text-purple-700">
                         {userProfile.streak}
                       </div>
-                      <div className="text-xs text-purple-600">Day Streak</div>
+                      <div className="text-xs text-purple-600">High-Score Streak</div>
+                      <div className="text-xxs text-purple-600">workouts above 80 score</div>
                     </div>
                     <div className="bg-purple-50 p-3 rounded-lg">
                       <div className="text-2xl font-bold text-purple-700">
