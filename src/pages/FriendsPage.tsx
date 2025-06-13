@@ -33,15 +33,17 @@ export default function FriendsPage() {
 
   useEffect(() => {
     const getFriendsData = async (): Promise<void> => {
-      const fetchedFriendships = await friendsService.getFriends();
-      const { friends, pendingReceived } = mapFriendshipsToFrontend(fetchedFriendships, user.id);
-      setMyFriends(friends);
-      setPendingRequest(pendingReceived);
-      const fetchedDiscoverFriends = await friendsService.getDiscover();
-      setAllDiscoverableUsers(fetchedDiscoverFriends);
+      if (user.id) {
+        const fetchedFriendships = await friendsService.getFriends();
+        const { friends, pendingReceived } = mapFriendshipsToFrontend(fetchedFriendships, user.id);
+        setMyFriends(friends);
+        setPendingRequest(pendingReceived);
+        const fetchedDiscoverFriends = await friendsService.getDiscover();
+        setAllDiscoverableUsers(fetchedDiscoverFriends);
+      }
     };
     getFriendsData();
-  }, []);
+  }, [user.id]);
 
   useEffect(() => {
     handleSearch();

@@ -439,23 +439,12 @@ export default function HomePage() {
       setIsLoading(true);
 
       // Finish the workout and receive rewards from the backend
-      const { coins, experience_earned, score, newBadges } =
+      const { coins, experience_earned, score, newBadges, newStreak } =
         await workoutService.finishWorkout(originalWorkout);
-
-      // Save the completed workout to local storage
-      const completedExercises = exercises.map((exercise) => ({
-        name: exercise.name,
-        sets: exercise.sets,
-        totalReps: exercise.sets.reduce(
-          (total, set) => total + (set.reps || 0),
-          0
-        ),
-      }));
 
       setWorkoutsDone((prev) => prev + 1);
 
       // Update streak
-      const newStreak = streak + 1;
       setStreak(newStreak);
       user.setUser({ streak: newStreak });
 
@@ -571,6 +560,9 @@ export default function HomePage() {
             todaysChallenge.repetitions
           )
         )
+      );
+      setDailyChallengeProgress((prev) =>
+        Math.min(prev + todaysChallenge.intervals, todaysChallenge.repetitions)
       );
       setDailyChallengeProgress((prev) =>
         Math.min(prev + todaysChallenge.intervals, todaysChallenge.repetitions)
@@ -791,7 +783,9 @@ export default function HomePage() {
                     <div className="font-bold text-2xl text-purple-700 mb-1">
                       {streak}
                     </div>
-                    <div className="text-xs text-purple-600">Day Streak</div>
+                    <div className="text-xs text-purple-600">
+                      High-Score Streak
+                    </div>
                   </div>
                   <div className="p-4 text-center hover:bg-purple-50 transition-colors">
                     <div className="font-bold text-2xl text-purple-700 mb-1">
