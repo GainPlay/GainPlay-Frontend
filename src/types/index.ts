@@ -230,6 +230,7 @@ export interface FrontendUserData {
   user_settings?: UserSettings;
   user_badges?: FrontendBadge[];
   user_goals?: UserGoal[];
+  workouts_length?: number;
 }
 
 type GeneralResponse = {

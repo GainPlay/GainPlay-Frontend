@@ -6,11 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { friendsService } from "@/services/friendsService";
 import { userService } from "@/services/userService";
-import { useBadgeStore } from "@/stores/useBadgeStore";
 import { useUserStore } from "@/stores/useUserStore";
 import {
   Friendship,
   FriendshipStatus,
+  FrontendBadge,
   FrontendUserData,
   UserGoal,
 } from "@/types";
@@ -27,6 +27,7 @@ export default function UserProfilePage() {
   const [userProfile, setUserProfile] = useState<FrontendUserData | null>(null);
   const [friendship, setFriendship] = useState<Friendship | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [profileBadges, setProfileBadges] = useState<FrontendBadge[]>([]);
   const user = useUserStore();
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export default function UserProfilePage() {
         return;
       }
       setUserProfile(fetchedUser);
+      setProfileBadges(fetchedUser.user_badges?.map((badge: any) => ({ ...badge.badges }) as FrontendBadge) || []);
 
       const fetchedFriendship = await friendsService.getFriendship(userId);
       setFriendship(fetchedFriendship);
@@ -49,12 +51,6 @@ export default function UserProfilePage() {
     };
     getUserData();
   }, [userId, navigate]);
-
-  const { allBadges, initializeBadges } = useBadgeStore();
-
-  useEffect(() => {
-    initializeBadges();
-  }, []);
 
   const handleFriendAction = async (
     action: "add" | "accept" | "reject" | "remove"
@@ -247,7 +243,7 @@ export default function UserProfilePage() {
                     Achievements
                   </h3>
                   <div className="grid grid-cols-3 gap-4">
-                    {allBadges?.slice(0, 3).map((badge) => (
+                    {profileBadges.map((badge) => (
                       <div
                         key={badge.id}
                         className="flex flex-col items-center text-center"
@@ -266,13 +262,13 @@ export default function UserProfilePage() {
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div className="bg-purple-50 p-3 rounded-lg">
                       <div className="text-2xl font-bold text-purple-700">
-                        {Math.floor(Math.random() * 30) + 1}
+                        {userProfile.workouts_length}
                       </div>
                       <div className="text-xs text-purple-600">Workouts</div>
                     </div>
                     <div className="bg-purple-50 p-3 rounded-lg">
                       <div className="text-2xl font-bold text-purple-700">
-                        {Math.floor(Math.random() * 20) + 1}
+                        {userProfile.streak}
                       </div>
                       <div className="text-xs text-purple-600">Day Streak</div>
                     </div>

@@ -18,9 +18,9 @@ export const mapFriendshipsToFrontend = (
     const frontendFriend = {
       id: otherUser.id,
       name: otherUser.name,
-      avatar: otherUser.avatar_url,
+      avatar_url: otherUser.avatar_url,
       email: otherUser.email,
-      goals: otherUser.user_goals.map((userGoal: UserGoal) => userGoal.goals.name) || [],
+      user_goals: otherUser.user_goals,
       level: otherUser.level,
       status: friendship.status as FriendshipStatus,
     };
