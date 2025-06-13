@@ -587,8 +587,6 @@ export default function HomePage() {
           setShowChallengeComplete(false);
         }, 3000);
 
-        await challengeService.finishChallenge(user.id);
-
         // Update coins, experience and level
         const newCoins = coins + 50;
         setCoins(newCoins);
@@ -604,6 +602,7 @@ export default function HomePage() {
           setLevel(newLevel);
           user.setUser({ level: newLevel });
         }
+        await challengeService.finishChallenge(user.id);
       }
     }
   };
