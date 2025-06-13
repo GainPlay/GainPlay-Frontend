@@ -113,6 +113,7 @@ export default function HomePage() {
   const [workoutStarted, setWorkoutStarted] = useState(false);
   const [userAvatar, setUserAvatar] = useState("");
   const [coins, setCoins] = useState(0);
+  const [workoutsDone, setWorkoutsDone] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [earnedCoins, setEarnedCoins] = useState(0);
   const [earnedXP, setEarnedXP] = useState(0);
@@ -188,6 +189,20 @@ export default function HomePage() {
     };
 
     fetchTodaysChallenge();
+  }, []);
+
+  useEffect(() => {
+    const fetchWorkoutsDone = async () => {
+      try {
+        const workoutsDone = (await workoutService.getWorkoutHistory()).length;
+
+        setWorkoutsDone(workoutsDone);
+      } catch (error) {
+        console.error("Error fetching workout history:", error);
+      }
+    };
+
+    fetchWorkoutsDone();
   }, []);
 
   useEffect(() => {
@@ -414,17 +429,8 @@ export default function HomePage() {
         ),
       }));
 
-      //TODO: implement workout history
-      const workoutHistory = JSON.parse(
-        localStorage.getItem("workoutHistory") || "[]"
-      );
-      workoutHistory.push({
-        date: new Date().toISOString(),
-        exercises: completedExercises,
-        score, // Save score for UI/stats
-      });
-      localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
-
+      setWorkoutsDone((prev) => prev + 1);
+      
       // Update streak
       const newStreak = streak + 1;
       setStreak(newStreak);
@@ -770,9 +776,7 @@ export default function HomePage() {
                   <div className="p-4 text-center hover:bg-purple-50 transition-colors">
                     <div className="font-bold text-2xl text-purple-700 mb-1">
                       {
-                        JSON.parse(
-                          localStorage.getItem("workoutHistory") || "[]"
-                        ).length
+                       workoutsDone
                       }
                     </div>
                     <div className="text-xs text-purple-600">Workouts Done</div>
