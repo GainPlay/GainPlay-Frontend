@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FriendshipStatus, UserGoal } from "@/types";
+import { FriendshipStatus } from "@/types";
 
 export const mapFriendshipsToFrontend = (
   friendships: any[],

@@ -443,20 +443,20 @@ export default function HomePage() {
         await workoutService.finishWorkout(originalWorkout);
 
       // Save the completed workout to local storage
-      const completedExercises = exercises.map((exercise) => ({
-        name: exercise.name,
-        sets: exercise.sets,
-        totalReps: exercise.sets.reduce(
-          (total, set) => total + (set.reps || 0),
-          0
-        ),
-      }));
+      // const completedExercises = exercises.map((exercise) => ({
+      //   name: exercise.name,
+      //   sets: exercise.sets,
+      //   totalReps: exercise.sets.reduce(
+      //     (total, set) => total + (set.reps || 0),
+      //     0
+      //   ),
+      // }));
 
       setWorkoutsDone((prev) => prev + 1);
 
       // Update streak
-      setStreak(newStreak);
-      user.setUser({ streak: newStreak });
+      // setStreak(newStreak);
+      // user.setUser({ streak: newStreak });
 
       // Update coins
       const newCoins = coins + (user.coins ?? 0);
@@ -580,6 +580,7 @@ export default function HomePage() {
         dailyChallengeProgress + todaysChallenge.intervals >=
         todaysChallenge.repetitions
       ) {
+        setIsDailyChallengeDone(true);
         // Show celebration popup
         setShowChallengeComplete(true);
         setTimeout(() => {
@@ -587,8 +588,6 @@ export default function HomePage() {
         }, 3000);
 
         await challengeService.finishChallenge(user.id);
-
-        setIsDailyChallengeDone(true);
 
         // Update coins, experience and level
         const newCoins = coins + 50;
@@ -866,7 +865,7 @@ export default function HomePage() {
                   disabled={isDailyChallengeDone}
                 >
                   {isDailyChallengeDone
-                    ? "Challenge Completed! ✓"
+                    ? `Challenge Completed! ✓`
                     : `Do ${todaysChallenge?.intervals} ${todaysChallenge?.exercise}`}
                 </Button>
               </CardContent>
