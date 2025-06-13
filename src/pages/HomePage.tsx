@@ -157,6 +157,8 @@ export default function HomePage() {
     if (localStorageDailyChallenge) {
       const dailyChallengeProgress = JSON.parse(localStorageDailyChallenge);
       setDailyChallengeProgress(dailyChallengeProgress);
+      if (dailyChallengeProgress == todaysChallenge?.repetitions)
+        setIsDailyChallengeDone(true);
     }
   }, []);
 
@@ -430,7 +432,7 @@ export default function HomePage() {
       }));
 
       setWorkoutsDone((prev) => prev + 1);
-      
+
       // Update streak
       const newStreak = streak + 1;
       setStreak(newStreak);
@@ -552,34 +554,37 @@ export default function HomePage() {
       setDailyChallengeProgress((prev) =>
         Math.min(prev + todaysChallenge.intervals, todaysChallenge.repetitions)
       );
-    }
 
-    // If challenge is completed
-    if (dailyChallengeProgress + 5 >= 50) {
-      // Show celebration popup
-      setShowChallengeComplete(true);
-      setTimeout(() => {
-        setShowChallengeComplete(false);
-      }, 3000);
+      // If challenge is completed
+      if (
+        dailyChallengeProgress + todaysChallenge.intervals >=
+        todaysChallenge.repetitions
+      ) {
+        // Show celebration popup
+        setShowChallengeComplete(true);
+        setTimeout(() => {
+          setShowChallengeComplete(false);
+        }, 3000);
 
-      await challengeService.finishChallenge(user.id);
+        await challengeService.finishChallenge(user.id);
 
-      setIsDailyChallengeDone(true);
+        setIsDailyChallengeDone(true);
 
-      // Update coins, experience and level
-      const newCoins = coins + 50;
-      setCoins(newCoins);
+        // Update coins, experience and level
+        const newCoins = coins + 50;
+        setCoins(newCoins);
 
-      const currentXP = user.experience || 0;
-      const newTotalXP = currentXP + 100;
-      setEarnedXP(100);
+        const currentXP = user.experience || 0;
+        const newTotalXP = currentXP + 100;
+        setEarnedXP(100);
 
-      user.setUser({ coins: newCoins, experience: newTotalXP });
+        user.setUser({ coins: newCoins, experience: newTotalXP });
 
-      const newLevel = Math.floor(newTotalXP / 100) + 1;
-      if (newLevel > level) {
-        setLevel(newLevel);
-        user.setUser({ level: newLevel });
+        const newLevel = Math.floor(newTotalXP / 100) + 1;
+        if (newLevel > level) {
+          setLevel(newLevel);
+          user.setUser({ level: newLevel });
+        }
       }
     }
   };
@@ -775,9 +780,7 @@ export default function HomePage() {
                   </div>
                   <div className="p-4 text-center hover:bg-purple-50 transition-colors">
                     <div className="font-bold text-2xl text-purple-700 mb-1">
-                      {
-                       workoutsDone
-                      }
+                      {workoutsDone}
                     </div>
                     <div className="text-xs text-purple-600">Workouts Done</div>
                   </div>
