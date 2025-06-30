@@ -152,7 +152,6 @@ export default function ProfilePage() {
       setEditedAge(user.age);
       loadBadges();
       loadOwnedAvatars();
-      console.log("User data loaded:", user);
       // Initial load of health insights
       setLoadingInsights(true); // Start loading
       generateHealthInsights()
@@ -189,8 +188,6 @@ export default function ProfilePage() {
         weight: editedWeight,
         age: editedAge,
       };
-      console.log("Updating user data:", updatedUserData);
-      console.log("User ID:", user.id);
       await userService.updateUser(user.id, updatedUserData);
       user.setUser(updatedUserData);
       setEditMode(false);
