@@ -14,13 +14,13 @@ import {
   TrendingUp,
   Lightbulb,
   Loader2, // Import Loader2 icon for loading state
-  Calendar
+  Calendar,
 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import type { FrontendBadge, HealthInsight, UserAvatar } from "../types";
@@ -33,21 +33,25 @@ import Navigation from "@/components/Navigation";
 import { getBadgeRarity } from "@/utils/badgesUtils";
 
 // Component for the Skeleton Loader
-const formatEarnedDate = (dateString: string | undefined) => {
+const formatEarnedDate = (dateString: string   | undefined) => {
   if (!dateString) return "Recently";
-  
+
   // Parse the date and ensure we're working with proper Date objects
   const date = new Date(dateString);
   const now = new Date();
-  
+
   // Get the start of today and the date in question (local timezone)
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const dateToCheck = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  
+  const dateToCheck = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  );
+
   // Calculate difference in days using local date components
   const diffTime = today.getTime() - dateToCheck.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays === 0) return "Today";
   if (diffDays === 1) return "Yesterday";
   if (diffDays < 7) return `${diffDays} days ago`;
@@ -119,7 +123,7 @@ export default function ProfilePage() {
       try {
         const [all, userOwned] = await Promise.all([
           badgeService.getAllBadges(),
-          badgeService.getUserBadges()
+          badgeService.getUserBadges(),
         ]);
         setAllBadges(all);
         setUserBadges(userOwned);
@@ -148,7 +152,7 @@ export default function ProfilePage() {
       setEditedAge(user.age);
       loadBadges();
       loadOwnedAvatars();
-
+      console.log("User data loaded:", user);
       // Initial load of health insights
       setLoadingInsights(true); // Start loading
       generateHealthInsights()
@@ -183,8 +187,10 @@ export default function ProfilePage() {
         email: editedEmail,
         height: editedHeight,
         weight: editedWeight,
-        age: editedAge
+        age: editedAge,
       };
+      console.log("Updating user data:", updatedUserData);
+      console.log("User ID:", user.id);
       await userService.updateUser(user.id, updatedUserData);
       user.setUser(updatedUserData);
       setEditMode(false);
@@ -212,10 +218,10 @@ export default function ProfilePage() {
     const badgeWithDesc = {
       ...(allBadges.find((b) => b.id === badge.id) || {
         ...badge,
-        description: "Achievement unlocked for your fitness journey!"
+        description: "Achievement unlocked for your fitness journey!",
       }),
       earnedAt: (userBadges.find((b) => b.id === badge.id) as FrontendBadge)
-        ?.earnedAt
+        ?.earnedAt,
     };
 
     setSelectedBadge(badgeWithDesc);
@@ -800,25 +806,25 @@ export default function ProfilePage() {
                   <motion.div
                     animate={{
                       scale: [1, 1.2, 1],
-                      opacity: [0.5, 1, 0.5]
+                      opacity: [0.5, 1, 0.5],
                     }}
                     transition={{
                       duration: 2,
                       repeat: Number.POSITIVE_INFINITY,
-                      ease: "easeInOut"
+                      ease: "easeInOut",
                     }}
                     className="absolute -top-2 -right-2 w-4 h-4 bg-white rounded-full opacity-80"
                   />
                   <motion.div
                     animate={{
                       scale: [1, 1.3, 1],
-                      opacity: [0.3, 0.8, 0.3]
+                      opacity: [0.3, 0.8, 0.3],
                     }}
                     transition={{
                       duration: 2.5,
                       repeat: Number.POSITIVE_INFINITY,
                       ease: "easeInOut",
-                      delay: 0.5
+                      delay: 0.5,
                     }}
                     className="absolute -bottom-1 -left-2 w-3 h-3 bg-white rounded-full opacity-60"
                   />

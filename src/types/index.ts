@@ -228,6 +228,10 @@ export interface FrontendUserData {
   level?: number;
   status?: FriendshipStatus;
   user_settings?: UserSettings;
+  workout_duration?: number;
+  body_structure?: string;
+  fitness_level?: number;
+  exercise_frequency?: number;
   user_badges?: FrontendBadge[];
   user_goals?: UserGoal[];
   workouts_length?: number;
