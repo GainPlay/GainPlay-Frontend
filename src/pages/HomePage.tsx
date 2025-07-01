@@ -896,46 +896,40 @@ export default function HomePage() {
                 </div>
               </CardContent>
             </Card>
-
             <Card className="mb-6 overflow-hidden border-none shadow-lg bg-white/40 backdrop-blur-md">
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-                      <Calendar className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-800 to-indigo-600 bg-clip-text text-transparent">
-                        Your Next Workout
-                      </CardTitle>
-                      <p className="text-sm text-purple-600 mt-1">
-                        {upcomingWorkout ? (
-                          <>
-                            {upcomingWorkout.workout_exercises.length > 0
-                              ? (() => {
-                                  const muscleGroups =
-                                    upcomingWorkout.workout_exercises
-                                      .map((we) => we.exercises?.muscle_group)
-                                      .filter(
-                                        (group): group is string => !!group
-                                      )
-                                      .filter(
-                                        (group, index, arr) =>
-                                          arr.indexOf(group) === index
-                                      );
-                                  return muscleGroups.length > 0
-                                    ? muscleGroups.join(" • ")
-                                    : "Full Body";
-                                })()
-                              : "Full Body"}{" "}
-                            • {upcomingWorkout.workout_exercises.length}{" "}
-                            exercises
-                          </>
-                        ) : (
-                          "Loading workout details..."
-                        )}
-                      </p>
-                    </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <Calendar className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-800 to-indigo-600 bg-clip-text text-transparent">
+                      Your Next Workout
+                    </CardTitle>
+                    <p className="text-sm text-purple-600 mt-1">
+                      {upcomingWorkout ? (
+                        <>
+                          {upcomingWorkout.workout_exercises.length > 0
+                            ? (() => {
+                                const muscleGroups =
+                                  upcomingWorkout.workout_exercises
+                                    .map((we) => we.exercises?.muscle_group)
+                                    .filter((group): group is string => !!group)
+                                    .filter(
+                                      (group, index, arr) =>
+                                        arr.indexOf(group) === index
+                                    );
+                                return muscleGroups.length > 0
+                                  ? muscleGroups.join(" • ")
+                                  : "Full Body";
+                              })()
+                            : "Full Body"}{" "}
+                          • {upcomingWorkout.workout_exercises.length} exercises
+                        </>
+                      ) : (
+                        "Loading workout details..."
+                      )}
+                    </p>
                   </div>
                 </div>
               </CardHeader>
@@ -1010,77 +1004,6 @@ export default function HomePage() {
                         }
                       )}
                     </div>
-
-                    {/* Workout Summary Stats */}
-                    <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl border border-purple-200/50">
-                      <div className="grid grid-cols-3 gap-3 text-center">
-                        <div>
-                          <div className="text-lg font-bold text-purple-700">
-                            {upcomingWorkout.workout_exercises.reduce(
-                              (total, we) =>
-                                total +
-                                (we.exercise_templates?.target_sets || 0),
-                              0
-                            )}
-                          </div>
-                          <div className="text-xs text-purple-600">
-                            Total Sets
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-lg font-bold text-purple-700">
-                            ~
-                            {Math.ceil(
-                              upcomingWorkout.workout_exercises.reduce(
-                                (total, we) =>
-                                  total +
-                                  (we.exercise_templates?.target_sets || 0) *
-                                    ((we.exercise_templates
-                                      ?.rest_time_seconds || 60) /
-                                      60),
-                                0
-                              ) + 10
-                            )}
-                          </div>
-                          <div className="text-xs text-purple-600">Minutes</div>
-                        </div>
-                        <div>
-                          <div className="text-lg font-bold text-purple-700">
-                            {upcomingWorkout.workout_exercises.reduce(
-                              (total, we) =>
-                                total +
-                                XP_CONST *
-                                  (we.exercises?.difficulty_level || 1),
-                              0
-                            )}
-                          </div>
-                          <div className="text-xs text-purple-600">Est. XP</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Start Workout Button */}
-                    <Button
-                      onClick={startWorkout}
-                      className="w-full mt-4 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-700 hover:via-purple-800 hover:to-indigo-800 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] relative overflow-hidden group border-none"
-                      disabled={isLoading}
-                    >
-                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <div className="relative flex items-center justify-center gap-2">
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            <span>Loading Workout...</span>
-                          </>
-                        ) : (
-                          <>
-                            <PlayCircle className="w-5 h-5" />
-                            <span>Start This Workout</span>
-                            <ChevronRight className="w-4 h-4" />
-                          </>
-                        )}
-                      </div>
-                    </Button>
                   </>
                 ) : (
                   <div className="flex items-center justify-center py-8">
@@ -1092,7 +1015,6 @@ export default function HomePage() {
                 )}
               </CardContent>
             </Card>
-
             <Card className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-100">
               <CardContent className="p-4">
                 <div className="flex flex-col items-center text-center">
