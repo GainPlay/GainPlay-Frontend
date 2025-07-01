@@ -364,9 +364,16 @@ export default function OnboardingPage() {
         const fetchedUser = await userService.getUserDataByMail(user.email);
         user.setUser({
           ...fetchedUser,
-          ...fetchedUser.user_settings,
-          ...fetchedUser.user_badges,
-          ...fetchedUser.user_goals
+          user_settings: fetchedUser.user_settings,
+          user_badges: fetchedUser.user_badges,
+          user_goals: fetchedUser.user_goals,
+          weight: fetchedUser.user_settings?.weight,
+          height: fetchedUser.user_settings?.height,
+          age: fetchedUser.user_settings?.age,
+          exercise_frequency: fetchedUser.user_settings?.exercise_frequency,
+          fitness_level: fetchedUser.user_settings?.fitness_level,
+          workout_duration: fetchedUser.user_settings?.workout_duration,
+          body_structure: fetchedUser.user_settings?.body_structure,
         });
         const generatedWorkout = await workoutService.generateWorkout();
         setCurrentWorkout(generatedWorkout);
