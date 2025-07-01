@@ -897,95 +897,197 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="mb-6">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-purple-800">
-                  <Calendar className="h-5 w-5 text-purple-600" />
-                  Upcoming Workout
-                </CardTitle>
+            <Card className="mb-6 overflow-hidden border-none shadow-lg bg-white/40 backdrop-blur-md">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Calendar className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-800 to-indigo-600 bg-clip-text text-transparent">
+                        Your Next Workout
+                      </CardTitle>
+                      <p className="text-sm text-purple-600 mt-1">
+                        {upcomingWorkout ? (
+                          <>
+                            {upcomingWorkout.workout_exercises.length > 0
+                              ? (() => {
+                                  const muscleGroups =
+                                    upcomingWorkout.workout_exercises
+                                      .map((we) => we.exercises?.muscle_group)
+                                      .filter(
+                                        (group): group is string => !!group
+                                      )
+                                      .filter(
+                                        (group, index, arr) =>
+                                          arr.indexOf(group) === index
+                                      );
+                                  return muscleGroups.length > 0
+                                    ? muscleGroups.join(" • ")
+                                    : "Full Body";
+                                })()
+                              : "Full Body"}{" "}
+                            • {upcomingWorkout.workout_exercises.length}{" "}
+                            exercises
+                          </>
+                        ) : (
+                          "Loading workout details..."
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </CardHeader>
-              <CardContent>
+
+              <CardContent className="pt-0">
                 {upcomingWorkout ? (
                   <>
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <h3 className="font-medium">Your Next Workout</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Focus:{" "}
-                          {upcomingWorkout.workout_exercises.length > 0
-                            ? upcomingWorkout.workout_exercises
-                                .map((we) => we.exercises?.muscle_group)
-                                .filter(
-                                  (group, index, arr) =>
-                                    arr.indexOf(group) === index
-                                )
-                                .join(", ") || "Full Body"
-                            : "Full Body"}
-                        </p>
-                      </div>
-                      <div className="bg-purple-100 px-2 py-1 rounded text-xs font-medium text-purple-700">
-                        {upcomingWorkout.workout_exercises.length} exercises
-                      </div>
-                    </div>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {upcomingWorkout.workout_exercises.map(
-                        (workoutExercise) => (
-                          <div
-                            key={workoutExercise.id}
-                            className="flex items-center gap-2 text-sm"
-                          >
-                            <Dumbbell className="h-4 w-4 text-purple-500" />
-                            <span className="flex-1">
-                              {workoutExercise.exercises?.name ||
-                                "Unknown Exercise"}
-                            </span>
-                            <span className="text-xs text-purple-600">
-                              {workoutExercise.exercise_templates
-                                ?.target_sets || 3}{" "}
-                              ×{" "}
-                              {workoutExercise.exercise_templates
-                                ?.target_reps || 10}
-                            </span>
-                          </div>
-                        )
+                        (workoutExercise, index) => {
+                          const exercise = workoutExercise.exercises;
+                          const template = workoutExercise.exercise_templates;
+                          const difficultyLevel =
+                            exercise?.difficulty_level || 1;
+                          const difficultyString =
+                            difficultyMap[difficultyLevel as DifficultyLevel] ||
+                            "beginner";
+
+                          return (
+                            <motion.div
+                              key={workoutExercise.id}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="group relative"
+                            >
+                              <div className="flex items-center p-3 rounded-2xl bg-white/30 backdrop-blur-sm hover:bg-white/40 transition-all duration-200 border border-white/30 hover:border-purple-200/50 hover:shadow-md">
+                                {/* Exercise Icon */}
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mr-3 shadow-sm group-hover:shadow-md transition-shadow">
+                                  <Dumbbell className="h-5 w-5 text-white" />
+                                </div>
+
+                                {/* Exercise Details */}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h4 className="font-semibold text-purple-900 truncate">
+                                      {exercise?.name || "Unknown Exercise"}
+                                    </h4>
+                                    <div
+                                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                        difficultyString === "beginner"
+                                          ? "bg-green-100 text-green-700"
+                                          : difficultyString === "intermediate"
+                                          ? "bg-yellow-100 text-yellow-700"
+                                          : "bg-red-100 text-red-700"
+                                      }`}
+                                    >
+                                      {difficultyString}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-4 text-sm text-purple-600">
+                                    <span className="flex items-center gap-1">
+                                      <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                                      {template?.target_sets || 3} sets
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                      <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                                      {template?.target_reps || 10} reps
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Progress Indicator */}
+                                <div className="flex items-center">
+                                  <div className="w-8 h-8 rounded-full border-2 border-purple-300 flex items-center justify-center group-hover:border-purple-400 transition-colors">
+                                    <div className="w-3 h-3 rounded-full bg-purple-300 group-hover:bg-purple-400 transition-colors"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          );
+                        }
                       )}
                     </div>
-                    <div className="mt-3 pt-3 border-t border-purple-100">
-                      <div className="text-xs text-purple-600 space-y-1">
-                        <div className="flex justify-between">
-                          <span>Total Sets:</span>
-                          <span className="font-medium">
+
+                    {/* Workout Summary Stats */}
+                    <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl border border-purple-200/50">
+                      <div className="grid grid-cols-3 gap-3 text-center">
+                        <div>
+                          <div className="text-lg font-bold text-purple-700">
                             {upcomingWorkout.workout_exercises.reduce(
                               (total, we) =>
                                 total +
                                 (we.exercise_templates?.target_sets || 0),
                               0
                             )}
-                          </span>
+                          </div>
+                          <div className="text-xs text-purple-600">
+                            Total Sets
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Est. Duration:</span>
-                          <span className="font-medium">
+                        <div>
+                          <div className="text-lg font-bold text-purple-700">
+                            ~
                             {Math.ceil(
                               upcomingWorkout.workout_exercises.reduce(
                                 (total, we) =>
                                   total +
                                   (we.exercise_templates?.target_sets || 0) *
-                                    (we.exercise_templates?.rest_time_seconds ||
+                                    ((we.exercise_templates
+                                      ?.rest_time_seconds || 60) /
                                       60),
                                 0
-                              ) / 60
-                            )}{" "}
-                            min
-                          </span>
+                              ) + 10
+                            )}
+                          </div>
+                          <div className="text-xs text-purple-600">Minutes</div>
+                        </div>
+                        <div>
+                          <div className="text-lg font-bold text-purple-700">
+                            {upcomingWorkout.workout_exercises.reduce(
+                              (total, we) =>
+                                total +
+                                XP_CONST *
+                                  (we.exercises?.difficulty_level || 1),
+                              0
+                            )}
+                          </div>
+                          <div className="text-xs text-purple-600">Est. XP</div>
                         </div>
                       </div>
                     </div>
+
+                    {/* Start Workout Button */}
+                    <Button
+                      onClick={startWorkout}
+                      className="w-full mt-4 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-700 hover:via-purple-800 hover:to-indigo-800 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] relative overflow-hidden group border-none"
+                      disabled={isLoading}
+                    >
+                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative flex items-center justify-center gap-2">
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <span>Loading Workout...</span>
+                          </>
+                        ) : (
+                          <>
+                            <PlayCircle className="w-5 h-5" />
+                            <span>Start This Workout</span>
+                            <ChevronRight className="w-4 h-4" />
+                          </>
+                        )}
+                      </div>
+                    </Button>
                   </>
                 ) : (
-                  <div className="flex items-center justify-center py-4">
-                    <Loader2 className="w-5 h-5 animate-spin text-purple-600 mr-2" />
-                    <span className="text-purple-600">Loading workout...</span>
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-purple-600 mr-2" />
+                    <span className="text-purple-600">
+                      Loading workout plan...
+                    </span>
                   </div>
                 )}
               </CardContent>
