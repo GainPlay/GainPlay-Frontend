@@ -1581,7 +1581,7 @@ export default function HomePage() {
           </>
         )}
       </div>
-      {!workoutStarted && <Navigation />}
+      {!workoutStarted && !showConfetti && <Navigation />}
     </>
   );
 }

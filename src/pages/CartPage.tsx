@@ -521,6 +521,13 @@ export default function CartPage() {
                     onClick={() => handleAvatarSelect(avatar)}
                   >
                     <div className="relative p-6">
+                      {/* Owned Badge - moved to top-left of the card */}
+                      {ownedAvatars.includes(avatar.id) && (
+                        <div className="absolute top-2 left-2 bg-green-500 text-white rounded-full p-2 shadow-lg border-2 border-white z-10">
+                          <CheckCircle className="w-4 h-4" />
+                        </div>
+                      )}
+
                       {/* Avatar Image */}
                       <div className="flex justify-center mb-4">
                         <div
@@ -539,13 +546,6 @@ export default function CartPage() {
                             height={80}
                             className="rounded-xl border-2 border-white/50 w-full h-full object-cover"
                           />
-
-                          {/* Owned Badge */}
-                          {ownedAvatars.includes(avatar.id) && (
-                            <div className="absolute -bottom-1 -right-1 bg-green-500 text-white rounded-full p-1 shadow-md">
-                              <CheckCircle className="w-3 h-3" />
-                            </div>
-                          )}
                         </div>
                       </div>
 
@@ -567,12 +567,21 @@ export default function CartPage() {
                         <h3 className="font-bold text-purple-800 mb-1 truncate">
                           {avatar.name}
                         </h3>
-                        <div className="flex items-center justify-center bg-yellow-100 rounded-lg px-3 py-1 border border-yellow-200">
-                          <Coins className="w-3 h-3 mr-1 text-yellow-600" />
-                          <span className="text-sm font-semibold text-yellow-800">
-                            {avatar.price.toLocaleString()}
-                          </span>
-                        </div>
+                        {ownedAvatars.includes(avatar.id) ? (
+                          <div className="flex items-center justify-center bg-green-100 rounded-lg px-3 py-1 border border-green-200">
+                            <CheckCircle className="w-3 h-3 mr-1 text-green-600" />
+                            <span className="text-sm font-semibold text-green-700">
+                              Owned
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center bg-yellow-100 rounded-lg px-3 py-1 border border-yellow-200">
+                            <Coins className="w-3 h-3 mr-1 text-yellow-600" />
+                            <span className="text-sm font-semibold text-yellow-800">
+                              {avatar.price.toLocaleString()}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </Card>
